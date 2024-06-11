@@ -1,0 +1,54 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: MS Teams, Thursday, 6th May 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Thursday, 6th May 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. Create GitHub repository and add Yasir (yss1@aber.ac.uk) atleast as a reporter.
+ACTION: mat78
+Status: Done
+
+2. Identify functional requirements and map to MoSCoW requirements model
+ACTION: mat78
+Status: 
+Done: Must have, should have and could have
+Ongoing: Will not have
+
+3. Start developing a UI prototype using Figma (https://www.figma.com). 
+ACTION: mat78
+Status: Ongoing (developed couple of screens)
+
+Other tasks
+===========
+4. Review existing available apps related to your project topic.
+ACTION: mat78
+Status: Reviewd app1, app2 and app3
+
+New business 
+============
+1. Continue developing a UI prototype using Figma (https://www.figma.com). 
+ACTION: mat78
+
+2. Identify "will not have" functional requirements
+ACTION: mat78
+
+3. Explore SplitWise app to get insights whether you want to include similar feature in your app
+ACTION: mat78
+
+4. Research firestore
+ACTION: mat78
+
+
+Future Tasks
+=============
+1. Think about how your app is going to be different and novel from existing apps. 
+ACTION: mat78
+
+AOB 
+=== 
+None
