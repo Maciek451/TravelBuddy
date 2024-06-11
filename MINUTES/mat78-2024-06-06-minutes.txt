@@ -19,7 +19,7 @@ Status:
 Done: Must have, should have and could have
 Ongoing: Will not have
 
-3. Start developing a UI prototype using Figma (https://www.figma.com). 
+3. Start developing a UI prototype using Figma (https://www.figma.com/design/42eGAI5qXsYTGTWKXsZInE/Travel-App-UI-Design?node-id=0-1&t=rC7gdPP9sGMkrScf-0). 
 ACTION: mat78
 Status: Ongoing (developed couple of screens)
 
