@@ -1,0 +1,64 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: LL-E36, Thursday, 13th June 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Thursday, 13th June 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. Continue developing a UI prototype using Figma (https://www.figma.com/design/42eGAI5qXsYTGTWKXsZInE/Travel-App-UI-Design?node-id=0-1&t=rC7gdPP9sGMkrScf-0).
+ACTION: mat78
+Status: Ongoing
+
+2. Identify "will not have" functional requirements
+ACTION: mat78
+Status: Ongoing
+
+3. Explore SplitWise app to get insights whether you want to include similar feature in your app
+a) "Splitwise API (3.0.0)" (https://dev.splitwise.com/#section/Third-Party-SDKs)
+b) Alternative App (better reviews on Play Store)
+"Tricount" (https://play.google.com/store/apps/details?id=com.tribab.tricount.android&hl=en_GB)
+ACTION: mat78
+Status: Done
+
+4. Research firestore
+Useful articles:
+1. "Choose a Database: Cloud Firestore or Realtime Database" (https://firebase.google.com/docs/database/rtdb-vs-firestore)
+2. "Cloud Firestore" (https://firebase.google.com/docs/firestore)
+3. "Cloud Firestore Data model" (https://firebase.google.com/docs/firestore/data-model)
+4. "Get started with Cloud Firestore" (https://firebase.google.com/docs/firestore/quickstart)
+ACTION: mat78
+Status: Done
+
+Other Tasks
+===========
+1. Think about how your app is going to be different and novel from existing apps. 
+a) Include a dedicated section with contact details for emergency personnel, hospital information, and local embassy and travel advisories?
+b) Incorporate a language translation feature for common phrases and an option to learn basic language skills relevant to the destination? (a collaborative feature that allows app users to add commonly used useful phrases for different countries. Plus having a feature to like and comment by other users.)
+ACTION: mat78
+Status: Done
+
+New business 
+============
+1. Finish UI prototype development using Figma (https://www.figma.com/design/42eGAI5qXsYTGTWKXsZInE/Travel-App-UI-Design?node-id=0-1&t=rC7gdPP9sGMkrScf-0).
+
+2. Identify "will not have" functional requirements
+ACTION: mat78
+
+3. Add multi language support in 'could have' MoSCoW requirements
+ACTION: mat78
+
+4. Invite Yasir's personal email (shaikh.yasir.saleem@gmail.com) on GitHub repository.
+ACTION: mat78
+
+Future Tasks
+=============
+1. Set up your project on Android Studio and add into Git repository.
+ACTION: mat78
+
+AOB 
+=== 
+None
