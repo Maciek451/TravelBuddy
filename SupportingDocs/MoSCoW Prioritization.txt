@@ -1,0 +1,29 @@
+1. MUST-HAVE
+
+a) Authentication to allow users to create and manage accounts for a tailored experience.
+b) Cloud database to store user's information and entries.
+c) API integration for displaying maps, weather forecasts, and destination information.
+d) Offline access to previously created itineraries.
+e) Creation and management of personalized travel itineraries (choosing destination, accommodation and transport details, and specifying tasks before the journey).
+
+2. SHOULD-HAVE
+
+a) Planning their trips by searching and adding desired places based on various criteria like budget, weather conditions, or user preferences and interests.
+b) Adding different types of media, reviews, and notes to create trips and visited places.
+c) Proposing recommended destinations, attractions, accommodations, and activities near the user's destination.
+d) Sharing travel journals with friends who can interact with them by leaving reviews and comments.
+
+3. COULD-HAVE
+
+a) Reminding users about previously added checklists/to-do lists a few days before a trip.
+b) Possibility to change a language of the app (English and Polish).
+c) Visualizing trips on an interactive map.
+d) Adding expanses to a trip to split it between previously added friends.
+c) Collaborative feature that allows app users to add commonly used useful phrases for different countries. Plus having a feature to like and comment by other users.
+e) Dedicated section with contact details for emergency personnel, hospital information, and local embassy and travel advisories
+
+4. WON'T-HAVE
+
+a) IOS and web version of the app.
+b) The app will not be deployed to Play Store (due to limitations of free plans).
+c) Multi-language support (just English and Polish).
