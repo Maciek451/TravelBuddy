@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             TravelBuddyTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Maciej",
+                        name = "Android",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
