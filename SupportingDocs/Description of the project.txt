@@ -1,0 +1,33 @@
+Title:
+Android application for travelling
+
+Description:
+The functionality of the app will be focused on guiding the user during every expedition and helping them organise their trips.
+The app will include functionalities like:
+
+1. Authentication to allow users to create and manage accounts for a tailored experience.
+2. Cloud database to store user's information and entries.
+3. API integration for displaying maps, weather forecasts, and destination information.
+4. Planing their trips by searching and adding desired places based on various criteria like budget, weather conditions or user preferences and interests.
+5. Creation and management of personalised travel itineraries (choosing destination, accommodation and transport details, and specifying tasks before the journey).
+6. Reminding users about previously added checklists/ to-do lists a few days before a trip.
+7. Adding different types of media, reviews, and notes to create trips and visited places.
+8. Visualising trips on an interactive map.
+9. Proposing recommended destinations, attractions, accommodations and activities near the user's destination.
+10. Sharing travel journals with friends who can interact with them by leaving reviews and comments.
+11. Offline access to previously created itineraries.
+
+Degree Scheme Information:
+My field of study is Advanced Computer Science. Creating the application described above will require a lot of time and the use of skills learned during the course, such as database design and management, implementation of algorithms and integration of various APIs. The entire process will be carried out using the Agile methodology to actively react to changes and progressively create the project. The whole process will strengthen my development skills before starting my professional career.
+
+Investigation:
+The investigation I conducted was to learn about solutions related to the implementation of the previously described features by researching various websites and tutorials, and refreshing the knowledge acquired during my bachelor's studies. According to my initial assumptions, authentication and database management will be carried out by Firebase services due to their security and reliability. When it comes to creating the application itself, it will be created in Android Studio using the JetPack Compose toolkit. Data that will be used by the application will be retrieved by APIs.
+
+IPR:
+Data about cities, weather forecasts or transport will come from sources that allow their usage for free for non-commercial purposes. For example https://open-meteo.com/ and https://dev.opentripmap.org/product.
+
+Datasets:
+(-)
+
+Hardware or Software:
+The only hardware that will be required to complete the project will be a phone with the Android operating system. I am an owner of an Android phone and the emulator is available in Android Studio IDE. Any additional hardware will not be needed.
