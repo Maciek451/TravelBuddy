@@ -1,0 +1,51 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: MS Teams, Thursday, 20th June 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Thursday, 20th June 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. Finish UI prototype development using Figma (https://www.figma.com/design/42eGAI5qXsYTGTWKXsZInE/Travel-App-UI-Design?node-id=0-1&t=rC7gdPP9sGMkrScf-0).
+Status: Done
+
+2. Identify "will not have" functional requirements
+ACTION: mat78
+Status: Done
+
+3. Add multi language support in 'could have' MoSCoW requirements
+ACTION: mat78
+Status: Done
+
+4. Invite Yasir's personal email (shaikh.yasir.saleem@gmail.com) on GitHub repository.
+ACTION: mat78
+Status: Done
+
+Other Tasks
+===========
+1. Set up your project on Android Studio and add into Git repository.
+ACTION: mat78
+Status: Done
+
+2. Generate a theme for Android Studio that matches with Figma theme. 
+ACTION: mat78
+Status: Done
+
+3. Created an icon for the app
+ACTION: mat78
+Status: Done
+
+New business 
+============
+1. Develop the skeleton of the app (simple components)
+ACTION: mat78
+
+2. Implement and test firebase functionality
+ACTION: mat78
+
+AOB 
+=== 
+None
