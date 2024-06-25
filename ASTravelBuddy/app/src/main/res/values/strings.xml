@@ -16,7 +16,19 @@
     <string name="more_icon">More icon</string>
     <string name="trips">Trips</string>
     <string name="phrases">Phrases</string>
-    <string name="delete_acount">Delete account</string>
+    <string name="delete_account">Delete account</string>
     <string name="remove_all_data">Remove all data</string>
     <string name="log_out">Log out</string>
+    <string name="your_friends">Your friends</string>
+    <string name="preferences">Preferences</string>
+    <string name="about">About</string>
+    <string name="theme">Theme</string>
+    <string name="language">Language</string>
+    <string name="terms_of_service">Terms of service</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="settings">Settings</string>
+    <string name="version">Version</string>
+    <string name="app_icon">App icon</string>
+    <string name="app_description">TravelBuddy simplifies travel planning, allowing you to create and manage personalized itineraries as well as share your travel experiences and explore new destinations effortlessly.</string>
+    <string name="creator">Creator</string>
 </resources>
