@@ -2,23 +2,29 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui.add
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 
@@ -29,24 +35,33 @@ fun AddDialog(
     onDismiss: () -> Unit
 ) {
     if (showDialog) {
-        AlertDialog(
+        Dialog(
             onDismissRequest = onDismiss,
-            text = {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
+            content = {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    AddButton(stringResource(R.string.add_a_trip), Icons.Default.Add, onDismiss)
-                    AddButton(stringResource(R.string.add_a_phrase), Icons.Default.Add, onDismiss)
-                    AddButton(stringResource(R.string.add_a_friend), Icons.Default.Add, onDismiss)
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Icon(Icons.Default.Close, contentDescription = "Close")
+                        }
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(30.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            AddButton(R.string.add_a_trip, Icons.Default.Add, onDismiss)
+                            AddButton(R.string.add_a_phrase, Icons.Default.Add, onDismiss)
+                            AddButton(R.string.add_a_friend, Icons.Default.Add, onDismiss)
+                        }
+                    }
                 }
-            },
-            confirmButton = {
-                // No additional confirm button needed
-            },
-            dismissButton = {
-                // No additional dismiss button needed
             }
         )
     }
@@ -54,7 +69,7 @@ fun AddDialog(
 
 @Composable
 private fun AddButton(
-    text: String,
+    text: Int,
     icon: ImageVector,
     onClick: () -> Unit
 ) {
@@ -63,10 +78,16 @@ private fun AddButton(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp),
-        contentPadding = PaddingValues(16.dp)
     ) {
-        Icon(icon, contentDescription = stringResource(id = R.string.add_icon))
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = text)
+        Icon(icon, contentDescription = null)
+        Spacer(modifier = Modifier.width(30.dp))
+        Text(
+            text = stringResource(text),
+            Modifier
+                .weight(1f)
+                .padding(end = 16.dp), // Adjust padding if necessary
+            fontSize = 18.sp, // Set your desired font size here
+            fontWeight = FontWeight.Normal // Optionally adjust font weight
+        )
     }
 }

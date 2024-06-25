@@ -8,6 +8,7 @@ sealed class Screens(
     object Add : Screens("add")
     object Explore : Screens("explore")
     object Friends : Screens("friends")
+    object Account : Screens("account")
 }
 
 val screens = listOf(

@@ -5,18 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import uk.ac.aber.dcs.chm9360.travelbuddy.ui.add.AddDialog
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.AccountScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.ExploreScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.FriendsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.map.MapScreen
@@ -54,5 +50,6 @@ private fun BuildNavigationGraph() {
         composable(Screens.Map.route) { MapScreen(navController) }
         composable(Screens.Explore.route) { ExploreScreen(navController) }
         composable(Screens.Friends.route) { FriendsScreen(navController) }
+        composable(Screens.Account.route) { AccountScreen(navController) }
     }
 }
