@@ -33,4 +33,24 @@
     <string name="creator">Creator</string>
     <string name="remove_trip">Remove trip</string>
     <string name="edit_trip">Edit trip</string>
+    <string name="notifications">Notification center</string>
+    <string name="delete_sweep_icon">delete_sweep_icon</string>
+    <string name="sign_in_button">Sign in</string>
+    <string name="create_account">Create an account</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="verification_needed_title">Verification needed</string>
+    <string name="verification_needed_content">We\\\'re sorry, but it looks like your account is not yet verified. To access all of our services, you\\\'ll need to verify your account. You can get a verification link sent to your email again.</string>
+    <string name="resend_email">Resend email</string>
+    <string name="try_again">Try again</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="sign_up_button">Sign up</string>
+    <string name="verification_needed_2">To fully activate your account, please verify your email address by following the instructions in the verification email that we sent to your registered email address.</string>
+    <string name="ok">OK</string>
+    <string name="reset_password">Reset password</string>
+    <string name="close_icon">Close icon</string>
+    <string name="save_button">Save button</string>
+    <string name="email_address">Email address</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="signedOut">Signed out</string>
 </resources>

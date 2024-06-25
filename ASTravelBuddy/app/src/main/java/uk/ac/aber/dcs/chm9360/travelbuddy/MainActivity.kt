@@ -14,11 +14,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.about.AboutScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.AccountScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SignInScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SignUpScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.ExploreScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.FriendsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.map.MapScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.MyTripsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.notifications.NotificationScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.theme.TravelBuddyTheme
 
 class MainActivity : ComponentActivity() {
@@ -53,5 +56,8 @@ private fun BuildNavigationGraph() {
         composable(Screens.Friends.route) { FriendsScreen(navController) }
         composable(Screens.Account.route) { AccountScreen(navController) }
         composable(Screens.About.route) { AboutScreen(navController) }
+        composable(Screens.Notification.route) { NotificationScreen(navController) }
+        composable(Screens.SignIn.route) { SignInScreen(navController) }
+        composable(Screens.SignUp.route) { SignUpScreen(navController) }
     }
 }

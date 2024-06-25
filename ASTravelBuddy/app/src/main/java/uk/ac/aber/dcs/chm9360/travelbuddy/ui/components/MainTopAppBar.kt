@@ -26,7 +26,7 @@ fun MainTopAppBar(
             Text(appBarTitle)
         },
         actions = {
-            IconButton(onClick = { onClick }) {
+            IconButton(onClick = { navController.navigate(Screens.Notification.route) }) {
                 Icon(
                     imageVector = Icons.Filled.Notifications,
                     contentDescription = stringResource(R.string.notification_button)

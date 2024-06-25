@@ -1,8 +1,10 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.components
 
+import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -15,9 +17,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,9 +29,12 @@ fun AppBarWithArrowBack(
     navController: NavHostController,
     appBarTitle: Int,
     showMoreIcon: Boolean = true,
+    showRemoveIcon: Boolean = false,
     alternateMenu: Boolean = false
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     CenterAlignedTopAppBar(
         title = { Text(stringResource(id = appBarTitle)) },
@@ -40,6 +47,14 @@ fun AppBarWithArrowBack(
             }
         },
         actions = {
+            if (showRemoveIcon) {
+                IconButton(onClick = {  }) {
+                    Icon(
+                        Icons.Outlined.DeleteSweep,
+                        contentDescription = stringResource(R.string.delete_sweep_icon)
+                    )
+                }
+            }
             if (showMoreIcon) {
                 IconButton(onClick = { isMenuExpanded = !isMenuExpanded }) {
                     Icon(
@@ -54,11 +69,11 @@ fun AppBarWithArrowBack(
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.edit_trip)) },
-                            onClick = { /* Handle click on menu item 1 */ }
+                            onClick = { }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.remove_trip)) },
-                            onClick = { /* Handle click on menu item 1 */ }
+                            onClick = { }
                         )
                     }
                 }
@@ -70,15 +85,17 @@ fun AppBarWithArrowBack(
                         // Define your menu items here
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.delete_account)) },
-                            onClick = { /* Handle click on menu item 1 */ }
+                            onClick = { }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.remove_all_data)) },
-                            onClick = { /* Handle click on menu item 1 */ }
+                            onClick = { }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.log_out)) },
-                            onClick = { /* Handle click on menu item 1 */ }
+                            onClick = { navController.navigate(Screens.SignIn.route) { popUpTo(0)}
+                                Toast.makeText(context, R.string.signedOut, Toast.LENGTH_SHORT).show()
+                            }
                         )
                     }
                 }

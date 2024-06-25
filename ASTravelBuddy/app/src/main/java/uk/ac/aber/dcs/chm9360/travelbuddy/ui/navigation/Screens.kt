@@ -10,6 +10,9 @@ sealed class Screens(
     object Friends : Screens("friends")
     object Account : Screens("account")
     object About : Screens("about")
+    object Notification: Screens("notification")
+    object SignIn: Screens("sign_in")
+    object SignUp: Screens("sign_up")
 }
 
 val screens = listOf(
