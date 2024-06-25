@@ -37,13 +37,21 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.google.firebase.FirebaseError
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 
 @Composable
 fun SignInScreen(
     navController: NavHostController,
+    firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
     var email by remember {
         mutableStateOf("")
@@ -139,6 +147,7 @@ fun SignInScreen(
 
         Button(
             onClick = {
+                Firebase.analytics.logEvent("log_button_click", null)
                 navController.navigate(Screens.MyTrips.route)
             },
             modifier = Modifier

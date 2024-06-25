@@ -93,7 +93,7 @@ fun AccountScreen(
                 textAlign = TextAlign.Center,
             )
             Text(
-                text = "1.0",
+                text = " 1.0",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
             )
