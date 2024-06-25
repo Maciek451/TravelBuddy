@@ -1,5 +1,7 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.components
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Group
@@ -20,7 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -47,7 +52,7 @@ fun MyNavigationBar(
         Screens.Add to IconGroup(
             filledIcon = Icons.Filled.AddCircle,
             outlineIcon = Icons.Outlined.AddCircle,
-            label = stringResource(id = R.string.add)
+            label = ""
         ),
         Screens.Explore to IconGroup(
             filledIcon = Icons.Filled.TravelExplore,
@@ -78,12 +83,22 @@ fun MyNavigationBar(
             val labelText = iconGroup.label
             NavigationBarItem(
                 icon = {
-                    Icon(
-                        imageVector = if (isSelected) iconGroup.filledIcon else iconGroup.outlineIcon,
-                        contentDescription = labelText
-                    )
+                    if (screen == Screens.Add) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = if (isSelected) Icons.Filled.AddCircle else Icons.Outlined.AddCircle,
+                                contentDescription = labelText,
+                                modifier = Modifier.size(36.dp)
+                            )
+                        }
+                    } else {
+                        Icon(
+                            imageVector = if (isSelected) iconGroup.filledIcon else iconGroup.outlineIcon,
+                            contentDescription = labelText
+                        )
+                    }
                 },
-                label = { Text(labelText) },
+                label = { if (screen != Screens.Add) Text(labelText) },
                 selected = isSelected,
                 onClick = {
                     if (screen == Screens.Add) {
