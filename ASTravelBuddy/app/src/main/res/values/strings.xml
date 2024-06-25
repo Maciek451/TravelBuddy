@@ -16,4 +16,7 @@
     <string name="more_icon">More icon</string>
     <string name="trips">Trips</string>
     <string name="phrases">Phrases</string>
+    <string name="delete_acount">Delete account</string>
+    <string name="remove_all_data">Remove all data</string>
+    <string name="log_out">Log out</string>
 </resources>
