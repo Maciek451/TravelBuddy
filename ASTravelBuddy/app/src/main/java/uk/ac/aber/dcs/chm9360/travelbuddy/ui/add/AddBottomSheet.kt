@@ -53,8 +53,8 @@ fun AddBottomSheet(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                 ) {
                     AddButton(R.string.add_a_trip, Icons.Default.Add) { navController.navigate(Screens.AddTrip.route) }
-                    AddButton(R.string.add_a_phrase, Icons.Default.Add, onDismiss)
-                    AddButton(R.string.add_a_friend, Icons.Default.Add, onDismiss)
+                    AddButton(R.string.add_a_phrase, Icons.Default.Add) { navController.navigate(Screens.AddPhrase.route) }
+                    AddButton(R.string.add_a_friend, Icons.Default.Add) { navController.navigate(Screens.AddFriend.route) }
                 }
             }
         }

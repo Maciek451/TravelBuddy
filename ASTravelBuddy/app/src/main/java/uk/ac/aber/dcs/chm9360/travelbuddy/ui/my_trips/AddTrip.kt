@@ -1,4 +1,4 @@
-package uk.ac.aber.dcs.chm9360.travelbuddy.ui.trip
+package uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable

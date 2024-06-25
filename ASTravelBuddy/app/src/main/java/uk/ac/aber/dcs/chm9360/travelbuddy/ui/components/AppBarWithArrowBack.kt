@@ -1,6 +1,5 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.components
 
-import android.widget.Button
 import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
