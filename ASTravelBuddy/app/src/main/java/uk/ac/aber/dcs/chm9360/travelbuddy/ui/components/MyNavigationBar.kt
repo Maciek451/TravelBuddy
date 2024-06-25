@@ -6,13 +6,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CardTravel
 import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Luggage
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.TravelExplore
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.CardTravel
 import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Luggage
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.TravelExplore
 import androidx.compose.material3.Icon
@@ -33,7 +31,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
-import uk.ac.aber.dcs.chm9360.travelbuddy.ui.add.AddDialog
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.add.AddBottomSheet
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 
 @Composable
@@ -51,7 +49,7 @@ fun MyNavigationBar(
             outlineIcon = Icons.Outlined.Map,
             label = stringResource(id = R.string.map)
         ),
-        Screens.Add to IconGroup(
+        Screens.AddSheet to IconGroup(
             filledIcon = Icons.Filled.AddCircle,
             outlineIcon = Icons.Outlined.AddCircle,
             label = ""
@@ -68,12 +66,12 @@ fun MyNavigationBar(
         )
     )
 
-    var showDialog by remember { mutableStateOf(false) }
+    var showBottomSheet by remember { mutableStateOf(false) }
 
-    AddDialog(
+    AddBottomSheet(
         navController = navController,
-        showDialog = showDialog,
-        onDismiss = { showDialog = false }
+        showSheet = showBottomSheet,
+        onDismiss = { showBottomSheet = false }
     )
 
     NavigationBar {
@@ -85,7 +83,7 @@ fun MyNavigationBar(
             val labelText = iconGroup.label
             NavigationBarItem(
                 icon = {
-                    if (screen == Screens.Add) {
+                    if (screen == Screens.AddSheet) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 imageVector = if (isSelected) Icons.Filled.AddCircle else Icons.Outlined.AddCircle,
@@ -100,11 +98,11 @@ fun MyNavigationBar(
                         )
                     }
                 },
-                label = { if (screen != Screens.Add) Text(labelText) },
+                label = { if (screen != Screens.AddSheet) Text(labelText) },
                 selected = isSelected,
                 onClick = {
-                    if (screen == Screens.Add) {
-                        showDialog = true
+                    if (screen == Screens.AddSheet) {
+                        showBottomSheet = true
                     } else {
                         navController.navigate(screen.route) {
                             popUpTo(navController.graph.findStartDestination().id) {

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.trip.AddTripScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.about.AboutScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.AccountScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SignInScreen
@@ -59,5 +60,6 @@ private fun BuildNavigationGraph() {
         composable(Screens.Notification.route) { NotificationScreen(navController) }
         composable(Screens.SignIn.route) { SignInScreen(navController) }
         composable(Screens.SignUp.route) { SignUpScreen(navController) }
+        composable(Screens.AddTrip.route) { AddTripScreen(navController) }
     }
 }

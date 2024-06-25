@@ -5,7 +5,7 @@ sealed class Screens(
 ) {
     object MyTrips : Screens("my_trips")
     object Map : Screens("map")
-    object Add : Screens("add")
+    object AddSheet : Screens("add")
     object Explore : Screens("explore")
     object Friends : Screens("friends")
     object Account : Screens("account")
@@ -13,12 +13,13 @@ sealed class Screens(
     object Notification: Screens("notification")
     object SignIn: Screens("sign_in")
     object SignUp: Screens("sign_up")
+    object AddTrip: Screens("sign_up")
 }
 
 val screens = listOf(
     Screens.MyTrips,
     Screens.Map,
-    Screens.Add,
+    Screens.AddSheet,
     Screens.Explore,
     Screens.Friends
 )

@@ -1,10 +1,12 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.components
 
+import android.widget.Button
 import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.DeleteSweep
+import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -30,7 +32,9 @@ fun AppBarWithArrowBack(
     appBarTitle: Int,
     showMoreIcon: Boolean = true,
     showRemoveIcon: Boolean = false,
-    alternateMenu: Boolean = false
+    alternateMenu: Boolean = false,
+    showSaveButton: Boolean = false,
+    navDestination: String? = null
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -47,6 +51,14 @@ fun AppBarWithArrowBack(
             }
         },
         actions = {
+            if (showSaveButton && navDestination != null) {
+                IconButton(onClick = { navController.navigate(navDestination) }) {
+                    Icon(
+                        Icons.Outlined.Done,
+                        contentDescription = stringResource(R.string.done_icon)
+                    )
+                }
+            }
             if (showRemoveIcon) {
                 IconButton(onClick = {  }) {
                     Icon(
