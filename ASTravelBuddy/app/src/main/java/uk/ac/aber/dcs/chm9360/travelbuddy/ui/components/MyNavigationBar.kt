@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.CardTravel
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Luggage
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.TravelExplore
 import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.CardTravel
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Luggage
 import androidx.compose.material.icons.outlined.Map
@@ -40,8 +42,8 @@ fun MyNavigationBar(
 ) {
     val icons = mapOf(
         Screens.MyTrips to IconGroup(
-            filledIcon = Icons.Filled.Luggage,
-            outlineIcon = Icons.Outlined.Luggage,
+            filledIcon = Icons.Filled.CardTravel,
+            outlineIcon = Icons.Outlined.CardTravel,
             label = stringResource(id = R.string.my_trips)
         ),
         Screens.Map to IconGroup(
