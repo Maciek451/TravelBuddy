@@ -6,11 +6,22 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.add.AddDialog
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.ExploreScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.FriendsScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.map.MapScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.MyTripsScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.theme.TravelBuddyTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,11 +30,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TravelBuddyTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    BuildNavigationGraph()
                 }
             }
         }
@@ -31,17 +42,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+private fun BuildNavigationGraph() {
+    val navController = rememberNavController()
+    val startScreenRoute = Screens.MyTrips.route
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TravelBuddyTheme {
-        Greeting("Android")
+    NavHost(
+        navController = navController,
+        startDestination = startScreenRoute
+    ) {
+        composable(Screens.MyTrips.route) { MyTripsScreen(navController) }
+        composable(Screens.Map.route) { MapScreen(navController) }
+        composable(Screens.Explore.route) { ExploreScreen(navController) }
+        composable(Screens.Friends.route) { FriendsScreen(navController) }
     }
 }
