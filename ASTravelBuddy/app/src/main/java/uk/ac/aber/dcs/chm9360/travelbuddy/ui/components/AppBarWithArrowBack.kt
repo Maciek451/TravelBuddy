@@ -24,7 +24,8 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.R
 fun AppBarWithArrowBack(
     navController: NavHostController,
     appBarTitle: Int,
-    showMoreIcon: Boolean = true
+    showMoreIcon: Boolean = true,
+    alternateMenu: Boolean = false
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -46,23 +47,40 @@ fun AppBarWithArrowBack(
                         contentDescription = stringResource(R.string.more_icon)
                     )
                 }
-                DropdownMenu(
-                    expanded = isMenuExpanded,
-                    onDismissRequest = { isMenuExpanded = false }
-                ) {
-                    // Define your menu items here
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.delete_account)) },
-                        onClick = { /* Handle click on menu item 1 */ }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.remove_all_data)) },
-                        onClick = { /* Handle click on menu item 1 */ }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.log_out)) },
-                        onClick = { /* Handle click on menu item 1 */ }
-                    )
+                if (alternateMenu) {
+                    DropdownMenu(
+                        expanded = isMenuExpanded,
+                        onDismissRequest = { isMenuExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.edit_trip)) },
+                            onClick = { /* Handle click on menu item 1 */ }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.remove_trip)) },
+                            onClick = { /* Handle click on menu item 1 */ }
+                        )
+                    }
+                }
+                else {
+                    DropdownMenu(
+                        expanded = isMenuExpanded,
+                        onDismissRequest = { isMenuExpanded = false }
+                    ) {
+                        // Define your menu items here
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.delete_account)) },
+                            onClick = { /* Handle click on menu item 1 */ }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.remove_all_data)) },
+                            onClick = { /* Handle click on menu item 1 */ }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.log_out)) },
+                            onClick = { /* Handle click on menu item 1 */ }
+                        )
+                    }
                 }
             }
         }

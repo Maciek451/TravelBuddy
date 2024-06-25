@@ -31,4 +31,6 @@
     <string name="app_icon">App icon</string>
     <string name="app_description">TravelBuddy simplifies travel planning, allowing you to create and manage personalized itineraries as well as share your travel experiences and explore new destinations effortlessly.</string>
     <string name="creator">Creator</string>
+    <string name="remove_trip">Remove trip</string>
+    <string name="edit_trip">Edit trip</string>
 </resources>
