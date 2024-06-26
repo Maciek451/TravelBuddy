@@ -2,6 +2,7 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui.components
 
 import android.widget.Toast
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.DeleteSweep
@@ -33,7 +34,8 @@ fun AppBarWithArrowBack(
     showRemoveIcon: Boolean = false,
     alternateMenu: Boolean = false,
     showSaveButton: Boolean = false,
-    navDestination: String? = null
+    navDestination: String? = null,
+    onSave: (() -> Unit)? = null
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -44,14 +46,14 @@ fun AppBarWithArrowBack(
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
-                    Icons.Filled.ArrowBack,
+                    Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.arrow_back)
                 )
             }
         },
         actions = {
-            if (showSaveButton && navDestination != null) {
-                IconButton(onClick = { navController.navigate(navDestination) }) {
+            if (showSaveButton && onSave != null) {
+                IconButton(onClick = { onSave() }) {
                     Icon(
                         Icons.Outlined.Done,
                         contentDescription = stringResource(R.string.done_icon)
@@ -87,8 +89,7 @@ fun AppBarWithArrowBack(
                             onClick = { }
                         )
                     }
-                }
-                else {
+                } else {
                     DropdownMenu(
                         expanded = isMenuExpanded,
                         onDismissRequest = { isMenuExpanded = false }
@@ -104,7 +105,8 @@ fun AppBarWithArrowBack(
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.log_out)) },
-                            onClick = { navController.navigate(Screens.SignIn.route) { popUpTo(0)}
+                            onClick = {
+                                navController.navigate(Screens.SignIn.route) { popUpTo(0) }
                                 Toast.makeText(context, R.string.signedOut, Toast.LENGTH_SHORT).show()
                             }
                         )

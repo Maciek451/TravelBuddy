@@ -42,8 +42,8 @@ fun AccountScreen(
     val username = "Maciej Traczyk"
     val email = "maciektraczyk123@gmail.com"
     val monogram = "M"
-    val navigateToFriends: () -> Unit = { navController.navigate(Screens.Friends.route) }
-    val navigateToPreferences: () -> Unit = { navController.navigate(Screens.MyTrips.route) }
+    val navigateToFriends: () -> Unit = { }
+    val navigateToPreferences: () -> Unit = { }
     val navigateToTermsOfService: () -> Unit = { }
     val navigateToLanguage: () -> Unit = { }
     val navigateToTheme: () -> Unit = { }
@@ -197,6 +197,7 @@ fun UserCard(username: String, email: String, monogram: String) {
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
+                Spacer(modifier = Modifier.padding(3.dp))
                 Text(
                     text = email,
                     style = MaterialTheme.typography.bodyMedium,
