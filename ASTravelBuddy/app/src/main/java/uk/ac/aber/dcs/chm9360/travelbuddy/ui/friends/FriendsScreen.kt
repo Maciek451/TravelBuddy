@@ -145,7 +145,7 @@ fun PhraseCard(phrase: Phrase, username: String) {
             )
             Spacer(modifier = Modifier.height(5.dp))
             Text(
-                text = "\"${phrase.translation}\"",
+                text = "\"${phrase.phrase}\"",
                 fontSize = 20.sp,
             )
             Spacer(modifier = Modifier.height(5.dp))
@@ -158,13 +158,13 @@ fun PhraseCard(phrase: Phrase, username: String) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = { /* Handle like */ }) {
+                IconButton(onClick = { }) {
                     Icon(
                         imageVector = Icons.Default.FavoriteBorder,
                         contentDescription = stringResource(R.string.like)
                     )
                 }
-                IconButton(onClick = { /* Handle comment */ }) {
+                IconButton(onClick = { }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Comment,
                         contentDescription = stringResource(R.string.comment)
