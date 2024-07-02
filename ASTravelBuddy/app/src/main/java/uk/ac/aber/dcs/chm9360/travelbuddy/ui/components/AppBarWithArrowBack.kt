@@ -3,7 +3,6 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui.components
 import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Done
@@ -32,7 +31,7 @@ fun AppBarWithArrowBack(
     appBarTitle: Int,
     showMoreIcon: Boolean = true,
     showRemoveIcon: Boolean = false,
-    alternateMenu: Boolean = false,
+    tripMenu: Boolean = false,
     showSaveButton: Boolean = false,
     navDestination: String? = null,
     onSave: (() -> Unit)? = null
@@ -75,7 +74,7 @@ fun AppBarWithArrowBack(
                         contentDescription = stringResource(R.string.more_icon)
                     )
                 }
-                if (alternateMenu) {
+                if (tripMenu) {
                     DropdownMenu(
                         expanded = isMenuExpanded,
                         onDismissRequest = { isMenuExpanded = false }

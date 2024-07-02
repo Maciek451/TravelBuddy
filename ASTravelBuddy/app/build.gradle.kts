@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "uk.ac.aber.dcs.chm9360.travelbuddy"
-        minSdk = 24
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

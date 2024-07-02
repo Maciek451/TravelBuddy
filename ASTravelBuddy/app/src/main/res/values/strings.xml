@@ -9,7 +9,7 @@
     <string name="account_button">Account icon</string>
     <string name="arrow_back">Arrow back icon</string>
     <string name="add_icon">Add icon</string>
-    <string name="add_a_trip">Add a trip</string>
+    <string name="add_a_trip">Add a\n trip</string>
     <string name="add_a_phrase">Add a phrase</string>
     <string name="add_a_friend">Add a friend</string>
     <string name="account">Account</string>

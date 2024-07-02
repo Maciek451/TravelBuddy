@@ -2,16 +2,27 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui.add
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.FormatQuote
+import androidx.compose.material.icons.filled.Luggage
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -22,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -47,14 +59,16 @@ fun AddBottomSheet(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(30.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 16.dp)
                 ) {
-                    AddButton(R.string.add_a_trip, Icons.Default.Add) { navController.navigate(Screens.AddTrip.route) }
-                    AddButton(R.string.add_a_phrase, Icons.Default.Add) { navController.navigate(Screens.AddPhrase.route) }
-                    AddButton(R.string.add_a_friend, Icons.Default.Add) { navController.navigate(Screens.AddFriend.route) }
+                    AddButton(R.string.add_a_trip, Icons.Default.Luggage) { navController.navigate(Screens.AddTrip.route) }
+                    AddButton(R.string.add_a_phrase, Icons.Default.FormatQuote) { navController.navigate(Screens.AddPhrase.route) }
+                    AddButton(R.string.add_a_friend, Icons.Default.PersonAdd) { navController.navigate(Screens.AddFriend.route) }
                 }
             }
         }
@@ -72,18 +86,25 @@ private fun AddButton(
     icon: ImageVector,
     onClick: () -> Unit
 ) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp),
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(8.dp)
     ) {
-        Icon(icon, contentDescription = stringResource(id = R.string.add_icon))
-        Spacer(modifier = Modifier.width(20.dp))
+        Button(
+            onClick = onClick,
+            shape = CircleShape,
+            modifier = Modifier
+                .size(80.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+        ) {
+            Icon(icon, contentDescription = stringResource(id = R.string.add_icon), modifier = Modifier.size(50.dp))
+        }
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(text),
-            Modifier.weight(1f),
-            fontSize = 20.sp,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(80.dp)
         )
     }
 }
