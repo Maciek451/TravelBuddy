@@ -60,4 +60,5 @@
     <string name="phrase_saved">Phrase added!</string>
     <string name="like">Like icon</string>
     <string name="comment">Comment icon</string>
+    <string name="wrong_password">Wrong password</string>
 </resources>

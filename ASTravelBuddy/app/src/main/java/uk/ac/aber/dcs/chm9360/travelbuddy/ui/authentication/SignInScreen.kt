@@ -19,12 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -39,10 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.firebase.FirebaseError
-import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
@@ -53,15 +46,10 @@ fun SignInScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    var email by remember {
-        mutableStateOf("")
-    }
-    var password by remember {
-        mutableStateOf("")
-    }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var errorMessage by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
-
     var showPasswordDialog by remember { mutableStateOf(false) }
     var showVerificationDialog by remember { mutableStateOf(false) }
 
@@ -132,8 +120,7 @@ fun SignInScreen(
                     Icons.Filled.Visibility
                 else Icons.Filled.VisibilityOff
 
-                val description =
-                    if (passwordVisible) "" else ""
+                val description = if (passwordVisible) "" else ""
 
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(imageVector = image, description)
@@ -141,14 +128,13 @@ fun SignInScreen(
             }
         )
         Text(
-            text = "",
+            text = errorMessage,
             color = MaterialTheme.colorScheme.error
         )
 
         Button(
             onClick = {
-                Firebase.analytics.logEvent("log_button_click", null)
-                navController.navigate(Screens.MyTrips.route)
+                firebaseViewModel.signIn(email, password)
             },
             modifier = Modifier
                 .padding(top = 10.dp),
