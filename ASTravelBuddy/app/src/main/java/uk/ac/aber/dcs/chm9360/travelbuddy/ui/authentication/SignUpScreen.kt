@@ -51,7 +51,7 @@ fun SignUpScreen(
 
     val context = LocalContext.current
 
-    InfoDialog(
+    AfterSignUpDialog(
         navController = navController,
         showDialog = showVerificationDialog,
         onDismiss = { showVerificationDialog = false }

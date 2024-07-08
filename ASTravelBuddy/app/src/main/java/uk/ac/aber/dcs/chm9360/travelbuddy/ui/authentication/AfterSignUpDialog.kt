@@ -11,7 +11,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 
 @Composable
-fun InfoDialog(
+fun AfterSignUpDialog(
     navController: NavController,
     showDialog: Boolean,
     onDismiss: () -> Unit
@@ -34,7 +34,7 @@ fun InfoDialog(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        onDismiss
+                        onDismiss()
                         navController.navigate(Screens.SignIn.route)
                     }
                 ) {
