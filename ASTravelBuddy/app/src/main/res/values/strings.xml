@@ -61,4 +61,5 @@
     <string name="like">Like icon</string>
     <string name="comment">Comment icon</string>
     <string name="wrong_password">Wrong password</string>
+    <string name="password_mismatch">Password mismatch</string>
 </resources>

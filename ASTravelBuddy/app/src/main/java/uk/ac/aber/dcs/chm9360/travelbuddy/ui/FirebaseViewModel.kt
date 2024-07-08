@@ -40,7 +40,7 @@ class FirebaseViewModel : ViewModel() {
 
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
-            repository.signIn(email, password) { isSuccess ->
+            repository.signInWithEmailAndPassword(email, password) { isSuccess ->
                 if (isSuccess) {
                     _authState.value = repository.getCurrentUser()
                 }
@@ -50,7 +50,7 @@ class FirebaseViewModel : ViewModel() {
 
     fun signUp(email: String, password: String, username: String) {
         viewModelScope.launch {
-            repository.signUp(email, password, username) { isSuccess ->
+            repository.signUpWithEmailAndPassword(email, password, username) { isSuccess ->
                 if (isSuccess) {
                     _authState.value = repository.getCurrentUser()
                 }

@@ -29,7 +29,7 @@ class FirebaseRepository {
         return auth.currentUser
     }
 
-    fun signIn(email: String, password: String, onResult: (Boolean) -> Unit) {
+    fun signInWithEmailAndPassword(email: String, password: String, onResult: (Boolean) -> Unit) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -40,7 +40,7 @@ class FirebaseRepository {
             }
     }
 
-    fun signUp(email: String, password: String, username: String, onResult: (Boolean) -> Unit) {
+    fun signUpWithEmailAndPassword(email: String, password: String, username: String, onResult: (Boolean) -> Unit) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {

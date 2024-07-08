@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -158,7 +159,7 @@ fun SignUpScreen(
             }
         )
         Text(
-            text = errorMessage,
+            text = "",
             color = MaterialTheme.colorScheme.error
         )
 
@@ -166,6 +167,9 @@ fun SignUpScreen(
             onClick = {
                 if (password == passwordConfirmation) {
                     firebaseViewModel.signUp(email, password, username)
+                    showVerificationDialog = true
+                } else {
+                    Toast.makeText(context, R.string.password_mismatch, Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier
