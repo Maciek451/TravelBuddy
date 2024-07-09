@@ -65,4 +65,8 @@
     <string name="verification_email_sent">Verification email sent</string>
     <string name="sign_up_failed">Sign up failed</string>
     <string name="unknown_error">Unknown error</string>
+    <string name="account_deleted">Account deleted succesfully</string>
+    <string name="failed_to_delete_account">Failed to delete the account</string>
+    <string name="data_removed">All data removed</string>
+    <string name="failed_to_remove_data">Failed to remove data</string>
 </resources>

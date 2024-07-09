@@ -96,14 +96,33 @@ fun AppBarWithArrowBack(
                         expanded = isMenuExpanded,
                         onDismissRequest = { isMenuExpanded = false }
                     ) {
-                        // Define your menu items here
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.delete_account)) },
-                            onClick = { }
+                            onClick = {
+                                firebaseViewModel.deleteUserAccount { isSuccess ->
+                                    if (isSuccess) {
+                                        firebaseViewModel.signOut()
+                                        navController.navigate(Screens.SignIn.route) {
+                                            popUpTo(0)
+                                        }
+                                        Toast.makeText(context, R.string.account_deleted, Toast.LENGTH_LONG).show()
+                                    } else {
+                                        Toast.makeText(context, R.string.failed_to_delete_account, Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.remove_all_data)) },
-                            onClick = { }
+                            onClick = {
+                                firebaseViewModel.removeAllUserData { isSuccess ->
+                                    if (isSuccess) {
+                                        Toast.makeText(context, R.string.data_removed, Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(context, R.string.failed_to_remove_data, Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.log_out)) },

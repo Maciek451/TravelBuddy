@@ -96,24 +96,97 @@ class FirebaseViewModel : ViewModel() {
         return auth.currentUser != null
     }
 
-    fun getCurrentUser(): FirebaseUser? {
-        return auth.currentUser
+    fun deleteUserAccount(onResult: (Boolean) -> Unit) {
+        val user = auth.currentUser
+        val userId = user?.uid
+        if (userId != null) {
+            val batch = db.batch()
+
+            val userDocRef = db.collection("users").document(userId)
+            batch.delete(userDocRef)
+
+            db.collection("phrases")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    for (document in snapshot.documents) {
+                        val docRef = db.collection("phrases").document(document.id)
+                        batch.delete(docRef)
+                    }
+
+                    batch.commit()
+                        .addOnSuccessListener {
+                            user.delete()
+                                .addOnSuccessListener {
+                                    auth.signOut()
+                                    _authState.value = null
+                                    onResult(true)
+                                }
+                                .addOnFailureListener {
+                                    onResult(false)
+                                }
+                        }
+                        .addOnFailureListener {
+                            onResult(false)
+                        }
+                }
+                .addOnFailureListener {
+                    onResult(false)
+                }
+        } else {
+            onResult(false)
+        }
+    }
+
+    fun removeAllUserData(onResult: (Boolean) -> Unit) {
+        phrasesData.get()
+            .addOnSuccessListener { snapshot ->
+                val batch = db.batch()
+                snapshot.documents.forEach { doc ->
+                    val ref = phrasesData.document(doc.id)
+                    batch.delete(ref)
+                }
+                batch.commit()
+                    .addOnSuccessListener {
+                        onResult(true)
+                    }
+                    .addOnFailureListener {
+                        onResult(false)
+                    }
+            }
+            .addOnFailureListener {
+                onResult(false)
+            }
     }
 
     fun fetchPhrases() {
-        viewModelScope.launch {
-            phrasesData.get()
-                .addOnSuccessListener { snapshot ->
-                    val phrases = snapshot.toObjects(Phrase::class.java)
-                    _phrases.value = phrases
-                }
-                .addOnFailureListener { }
+        val user = auth.currentUser
+        if (user != null) {
+            viewModelScope.launch {
+                db.collection("users").document(user.uid)
+                    .collection("phrases")
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        val phrases = snapshot.toObjects(Phrase::class.java)
+                        _phrases.value = phrases
+                    }
+                    .addOnFailureListener { }
+            }
         }
     }
 
     fun addPhrase(phrase: Phrase) {
-        phrasesData.add(phrase)
-            .addOnSuccessListener { fetchPhrases() }
-            .addOnFailureListener { }
+        val user = auth.currentUser
+        if (user != null) {
+            viewModelScope.launch {
+                db.collection("users").document(user.uid)
+                    .collection("phrases")
+                    .add(phrase)
+                    .addOnSuccessListener {
+                        fetchPhrases() // Refresh phrases after adding
+                    }
+                    .addOnFailureListener { }
+            }
+        }
     }
 }
