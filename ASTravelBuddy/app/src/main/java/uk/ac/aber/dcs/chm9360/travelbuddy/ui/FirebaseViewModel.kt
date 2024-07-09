@@ -3,12 +3,16 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.AuthenticationState
 
 class FirebaseViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
@@ -32,7 +36,7 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
-    fun signIn(email: String, password: String, callback: (Boolean, Boolean) -> Unit) {
+    fun signIn(email: String, password: String, callback: (Int) -> Unit) {
         viewModelScope.launch {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
@@ -41,15 +45,30 @@ class FirebaseViewModel : ViewModel() {
                         val isVerified = user?.isEmailVerified ?: false
                         _authState.value = user
 
-                        callback(true, isVerified)
+                        if (isVerified) {
+                            callback(AuthenticationState.LOGGED_IN_SUCCESSFULLY)
+                        } else {
+                            callback(AuthenticationState.USER_IS_NOT_VERIFIED)
+                        }
                     } else {
-                        callback(false, false)
+                        val exception = task.exception
+                        when (exception) {
+                            is FirebaseAuthInvalidCredentialsException -> {
+                                callback(AuthenticationState.PASSWORD_WRONG)
+                            }
+                            is FirebaseAuthInvalidUserException -> {
+                                callback(AuthenticationState.ACCOUNT_DOES_NOT_EXIST)
+                            }
+                            else -> {
+                                callback(AuthenticationState.OTHER)
+                            }
+                        }
                     }
                 }
         }
     }
 
-    fun signUp(email: String, password: String, username: String, onResult: (Boolean) -> Unit) {
+    fun signUp(email: String, password: String, username: String, callback: (Int) -> Unit) {
         viewModelScope.launch {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
@@ -64,16 +83,33 @@ class FirebaseViewModel : ViewModel() {
                             db.collection("users").document(userId).set(userMap)
                                 .addOnSuccessListener {
                                     _authState.value = auth.currentUser
-                                    sendVerificationEmail(onResult)
+                                    sendVerificationEmail { isSuccess ->
+                                        if (isSuccess) {
+                                            callback(AuthenticationState.SIGNED_UP_SUCCESSFULLY)
+                                        } else {
+                                            callback(AuthenticationState.OTHER)
+                                        }
+                                    }
                                 }
                                 .addOnFailureListener {
-                                    onResult(false)
+                                    callback(AuthenticationState.OTHER)
                                 }
                         } else {
-                            onResult(false)
+                            callback(AuthenticationState.OTHER)
                         }
                     } else {
-                        onResult(false)
+                        val exception = task.exception
+                        when (exception) {
+                            is FirebaseAuthUserCollisionException -> {
+                                callback(AuthenticationState.USER_ALREADY_EXISTS)
+                            }
+                            is FirebaseAuthInvalidCredentialsException -> {
+                                callback(AuthenticationState.EMAIL_WRONG_FORMAT)
+                            }
+                            else -> {
+                                callback(AuthenticationState.OTHER)
+                            }
+                        }
                     }
                 }
         }

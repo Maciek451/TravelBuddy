@@ -34,6 +34,7 @@ import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.AuthenticationState
 
 @Composable
 fun SignUpScreen(
@@ -166,12 +167,28 @@ fun SignUpScreen(
         Button(
             onClick = {
                 if (password == passwordConfirmation) {
-                    firebaseViewModel.signUp(email, password, username) { isSuccess ->
-                        if (isSuccess) {
-                            Toast.makeText(context, R.string.verification_email_sent, Toast.LENGTH_SHORT).show()
-                            showVerificationDialog = true
-                        } else {
-                            Toast.makeText(context, R.string.sign_up_failed, Toast.LENGTH_SHORT).show()
+                    firebaseViewModel.signUp(email, password, username) { errorCode ->
+                        when (errorCode) {
+                            AuthenticationState.SIGNED_UP_SUCCESSFULLY -> {
+                                Toast.makeText(context, R.string.verification_email_sent, Toast.LENGTH_SHORT).show()
+                                showVerificationDialog = true
+                            }
+                            AuthenticationState.USER_ALREADY_EXISTS -> {
+                                errorMessage = context.getString(R.string.error_user_already_exists)
+                                Toast.makeText(context, R.string.error_user_already_exists, Toast.LENGTH_SHORT).show()
+                            }
+                            AuthenticationState.EMAIL_WRONG_FORMAT -> {
+                                errorMessage = context.getString(R.string.error_wrong_email_format)
+                                Toast.makeText(context, R.string.error_wrong_email_format, Toast.LENGTH_SHORT).show()
+                            }
+                            AuthenticationState.PASSWORD_WRONG_FORMAT -> {
+                                errorMessage = context.getString(R.string.error_wrong_password_format)
+                                Toast.makeText(context, R.string.error_wrong_password_format, Toast.LENGTH_SHORT).show()
+                            }
+                            else -> {
+                                errorMessage = context.getString(R.string.unknown_error)
+                                Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 } else {

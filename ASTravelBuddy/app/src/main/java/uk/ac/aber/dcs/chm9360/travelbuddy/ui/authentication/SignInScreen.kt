@@ -41,6 +41,7 @@ import com.google.firebase.ktx.Firebase
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.AuthenticationState
 
 @Composable
 fun SignInScreen(
@@ -143,13 +144,27 @@ fun SignInScreen(
 
         Button(
             onClick = {
-                firebaseViewModel.signIn(email, password) { isSuccess, isVerified ->
-                    if (isSuccess) {
-                        if (isVerified) {
-                            navController.navigate(Screens.MyTrips.route) {
-                            }
-                        } else {
+                firebaseViewModel.signIn(email, password) { errorCode ->
+                    when (errorCode) {
+                        AuthenticationState.LOGGED_IN_SUCCESSFULLY -> {
+                            Toast.makeText(context, R.string.login_success, Toast.LENGTH_SHORT).show()
+                            navController.navigate(Screens.MyTrips.route)
+                        }
+                        AuthenticationState.USER_IS_NOT_VERIFIED -> {
                             showVerificationDialog = true
+                            Toast.makeText(context, R.string.error_user_not_verified, Toast.LENGTH_SHORT).show()
+                        }
+                        AuthenticationState.PASSWORD_WRONG -> {
+                            errorMessage = context.getString(R.string.error_wrong_password)
+                            Toast.makeText(context, R.string.error_wrong_password, Toast.LENGTH_SHORT).show()
+                        }
+                        AuthenticationState.ACCOUNT_DOES_NOT_EXIST -> {
+                            errorMessage = context.getString(R.string.error_account_does_not_exist)
+                            Toast.makeText(context, R.string.error_account_does_not_exist, Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {
+                            errorMessage = context.getString(R.string.unknown_error)
+                            Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

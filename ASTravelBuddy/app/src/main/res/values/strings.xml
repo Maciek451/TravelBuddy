@@ -69,4 +69,11 @@
     <string name="failed_to_delete_account">Failed to delete the account</string>
     <string name="data_removed">All data removed</string>
     <string name="failed_to_remove_data">Failed to remove data</string>
+    <string name="login_success">Logged in</string>
+    <string name="error_user_not_verified">User is not verified</string>
+    <string name="error_wrong_password">Wrong password</string>
+    <string name="error_account_does_not_exist">Account does not exist</string>
+    <string name="error_user_already_exists">User already exists</string>
+    <string name="error_wrong_email_format">Wrong email format</string>
+    <string name="error_wrong_password_format">Wrong password format</string>
 </resources>
