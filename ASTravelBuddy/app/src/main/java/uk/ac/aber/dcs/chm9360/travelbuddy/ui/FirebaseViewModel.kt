@@ -22,38 +22,34 @@ class FirebaseViewModel : ViewModel() {
     val authState: StateFlow<FirebaseUser?> get() = _authState
 
     init {
+        observeAuthState()
         fetchPhrases()
     }
 
-    fun addPhrase(phrase: Phrase) {
-        phrasesData.add(phrase)
-            .addOnSuccessListener { fetchPhrases() }
-            .addOnFailureListener { }
-    }
-
-    fun fetchPhrases() {
-        viewModelScope.launch {
-            phrasesData.get()
-                .addOnSuccessListener { snapshot ->
-                    val phrases = snapshot.toObjects(Phrase::class.java)
-                    _phrases.value = phrases
-                }
-                .addOnFailureListener { }
+    private fun observeAuthState() {
+        auth.addAuthStateListener { firebaseAuth ->
+            _authState.value = firebaseAuth.currentUser
         }
     }
 
-    fun signIn(email: String, password: String) {
+    fun signIn(email: String, password: String, callback: (Boolean, Boolean) -> Unit) {
         viewModelScope.launch {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        _authState.value = auth.currentUser
+                        val user = auth.currentUser
+                        val isVerified = user?.isEmailVerified ?: false
+                        _authState.value = user
+
+                        callback(true, isVerified)
+                    } else {
+                        callback(false, false) // Sign-in failed
                     }
                 }
         }
     }
 
-    fun signUp(email: String, password: String, username: String) {
+    fun signUp(email: String, password: String, username: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
@@ -68,9 +64,16 @@ class FirebaseViewModel : ViewModel() {
                             db.collection("users").document(userId).set(userMap)
                                 .addOnSuccessListener {
                                     _authState.value = auth.currentUser
+                                    sendVerificationEmail(onResult)
                                 }
-                                .addOnFailureListener { }
+                                .addOnFailureListener {
+                                    onResult(false)
+                                }
+                        } else {
+                            onResult(false)
                         }
+                    } else {
+                        onResult(false)
                     }
                 }
         }
@@ -79,5 +82,38 @@ class FirebaseViewModel : ViewModel() {
     fun signOut() {
         auth.signOut()
         _authState.value = null
+    }
+
+    fun sendVerificationEmail(onResult: (Boolean) -> Unit) {
+        val user = auth.currentUser
+        user?.sendEmailVerification()
+            ?.addOnCompleteListener { task ->
+                onResult(task.isSuccessful)
+            }
+    }
+
+    fun isUserLoggedIn(): Boolean {
+        return auth.currentUser != null
+    }
+
+    fun getCurrentUser(): FirebaseUser? {
+        return auth.currentUser
+    }
+
+    fun fetchPhrases() {
+        viewModelScope.launch {
+            phrasesData.get()
+                .addOnSuccessListener { snapshot ->
+                    val phrases = snapshot.toObjects(Phrase::class.java)
+                    _phrases.value = phrases
+                }
+                .addOnFailureListener { }
+        }
+    }
+
+    fun addPhrase(phrase: Phrase) {
+        phrasesData.add(phrase)
+            .addOnSuccessListener { fetchPhrases() }
+            .addOnFailureListener { }
     }
 }

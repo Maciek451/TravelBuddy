@@ -166,8 +166,14 @@ fun SignUpScreen(
         Button(
             onClick = {
                 if (password == passwordConfirmation) {
-                    firebaseViewModel.signUp(email, password, username)
-                    showVerificationDialog = true
+                    firebaseViewModel.signUp(email, password, username) { isSuccess ->
+                        if (isSuccess) {
+                            Toast.makeText(context, R.string.verification_email_sent, Toast.LENGTH_SHORT).show()
+                            showVerificationDialog = true
+                        } else {
+                            Toast.makeText(context, R.string.sign_up_failed, Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 } else {
                     Toast.makeText(context, R.string.password_mismatch, Toast.LENGTH_SHORT).show()
                 }

@@ -12,12 +12,10 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.R
 
 @Composable
 fun VerificationDialog(
-    navController: NavHostController,
     showDialog: Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onResendEmail: () -> Unit
 ) {
-    val context = LocalContext.current
-
     if (showDialog) {
         AlertDialog(
             onDismissRequest = onDismiss,
@@ -28,7 +26,6 @@ fun VerificationDialog(
                 )
             },
             text = {
-
                 Text(
                     text = stringResource(id = R.string.verification_needed_content),
                     fontSize = 15.sp
@@ -36,7 +33,10 @@ fun VerificationDialog(
             },
             confirmButton = {
                 TextButton(
-                    onClick = onDismiss
+                    onClick = {
+                        onResendEmail()
+                        onDismiss()
+                    }
                 ) {
                     Text(stringResource(R.string.resend_email))
                 }

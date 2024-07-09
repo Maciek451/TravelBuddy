@@ -39,7 +39,7 @@
     <string name="create_account">Create an account</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="verification_needed_title">Verification needed</string>
-    <string name="verification_needed_content">We\\\'re sorry, but it looks like your account is not yet verified. To access all of our services, you\\\'ll need to verify your account. You can get a verification link sent to your email again.</string>
+    <string name="verification_needed_content">We\'re sorry, but it looks like your account is not yet verified. To access all of our services, you\'ll need to verify your account. You can get a verification link sent to your email again.</string>
     <string name="resend_email">Resend email</string>
     <string name="try_again">Try again</string>
     <string name="confirm_password">Confirm password</string>
@@ -62,4 +62,7 @@
     <string name="comment">Comment icon</string>
     <string name="wrong_password">Wrong password</string>
     <string name="password_mismatch">Password mismatch</string>
+    <string name="verification_email_sent">Verification email sent</string>
+    <string name="sign_up_failed">Sign up failed</string>
+    <string name="unknown_error">Unknown error</string>
 </resources>

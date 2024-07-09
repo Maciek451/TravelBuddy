@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -60,9 +61,17 @@ fun SignInScreen(
     )
 
     VerificationDialog(
-        navController = navController,
         showDialog = showVerificationDialog,
-        onDismiss = { showVerificationDialog = false }
+        onDismiss = { showVerificationDialog = false },
+        onResendEmail = {
+            firebaseViewModel.sendVerificationEmail { isSuccess ->
+                if (isSuccess) {
+                    Toast.makeText(context, "Verification email resent", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Failed to resend verification email", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     )
 
     Column(
@@ -128,13 +137,22 @@ fun SignInScreen(
             }
         )
         Text(
-            text = errorMessage,
+            text = "",
             color = MaterialTheme.colorScheme.error
         )
 
         Button(
             onClick = {
-                firebaseViewModel.signIn(email, password)
+                firebaseViewModel.signIn(email, password) { isSuccess, isVerified ->
+                    if (isSuccess) {
+                        if (isVerified) {
+                            navController.navigate(Screens.MyTrips.route) {
+                            }
+                        } else {
+                            showVerificationDialog = true
+                        }
+                    }
+                }
             },
             modifier = Modifier
                 .padding(top = 10.dp),
@@ -178,3 +196,14 @@ fun SignInScreen(
         }
     }
 }
+
+//val authState by firebaseViewModel.authState.collectAsState()
+//
+//if (authState != null && !authState!!.isEmailVerified) {
+//    showVerificationDialog = true
+//} else if (authState != null && authState!!.isEmailVerified) {
+//    navController.navigate(Screens.MyTrips.route) {
+//        popUpTo(navController.graph.startDestinationId)
+//        launchSingleTop = true
+//    }
+//}

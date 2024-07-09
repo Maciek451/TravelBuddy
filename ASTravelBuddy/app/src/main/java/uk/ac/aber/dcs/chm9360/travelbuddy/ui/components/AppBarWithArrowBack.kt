@@ -20,8 +20,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +36,8 @@ fun AppBarWithArrowBack(
     tripMenu: Boolean = false,
     showSaveButton: Boolean = false,
     navDestination: String? = null,
-    onSave: (() -> Unit)? = null
+    onSave: (() -> Unit)? = null,
+    firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -105,6 +108,7 @@ fun AppBarWithArrowBack(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.log_out)) },
                             onClick = {
+                                firebaseViewModel.signOut()
                                 navController.navigate(Screens.SignIn.route) { popUpTo(0) }
                                 Toast.makeText(context, R.string.signedOut, Toast.LENGTH_SHORT).show()
                             }
