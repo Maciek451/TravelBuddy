@@ -43,7 +43,7 @@ class FirebaseViewModel : ViewModel() {
 
                         callback(true, isVerified)
                     } else {
-                        callback(false, false) // Sign-in failed
+                        callback(false, false)
                     }
                 }
         }
@@ -183,7 +183,7 @@ class FirebaseViewModel : ViewModel() {
                     .collection("phrases")
                     .add(phrase)
                     .addOnSuccessListener {
-                        fetchPhrases() // Refresh phrases after adding
+                        fetchPhrases()
                     }
                     .addOnFailureListener { }
             }

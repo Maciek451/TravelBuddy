@@ -196,14 +196,3 @@ fun SignInScreen(
         }
     }
 }
-
-//val authState by firebaseViewModel.authState.collectAsState()
-//
-//if (authState != null && !authState!!.isEmailVerified) {
-//    showVerificationDialog = true
-//} else if (authState != null && authState!!.isEmailVerified) {
-//    navController.navigate(Screens.MyTrips.route) {
-//        popUpTo(navController.graph.startDestinationId)
-//        launchSingleTop = true
-//    }
-//}
