@@ -36,8 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
@@ -144,7 +142,7 @@ fun SignInScreen(
 
         Button(
             onClick = {
-                firebaseViewModel.signIn(email, password) { errorCode ->
+                firebaseViewModel.signInWithEmailAndPassword(email, password) { errorCode ->
                     when (errorCode) {
                         AuthenticationState.LOGGED_IN_SUCCESSFULLY -> {
                             Toast.makeText(context, R.string.login_success, Toast.LENGTH_SHORT).show()

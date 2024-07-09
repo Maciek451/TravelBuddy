@@ -36,7 +36,7 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
-    fun signIn(email: String, password: String, callback: (Int) -> Unit) {
+    fun signInWithEmailAndPassword(email: String, password: String, callback: (Int) -> Unit) {
         viewModelScope.launch {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
@@ -68,7 +68,7 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
-    fun signUp(email: String, password: String, username: String, callback: (Int) -> Unit) {
+    fun signUpWithEmailAndPassword(email: String, password: String, username: String, callback: (Int) -> Unit) {
         viewModelScope.launch {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
