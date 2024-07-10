@@ -9,7 +9,7 @@
     <string name="account_button">Account icon</string>
     <string name="arrow_back">Arrow back icon</string>
     <string name="add_icon">Add icon</string>
-    <string name="add_a_trip">Add a\n trip</string>
+    <string name="add_a_trip">Add a trip</string>
     <string name="add_a_phrase">Add a phrase</string>
     <string name="add_a_friend">Add a friend</string>
     <string name="account">Account</string>
@@ -65,7 +65,7 @@
     <string name="verification_email_sent">Verification email sent</string>
     <string name="sign_up_failed">Sign up failed</string>
     <string name="unknown_error">Unknown error</string>
-    <string name="account_deleted">Account deleted succesfully</string>
+    <string name="account_deleted">Account deleted successfully</string>
     <string name="failed_to_delete_account">Failed to delete the account</string>
     <string name="data_removed">All data removed</string>
     <string name="failed_to_remove_data">Failed to remove data</string>
@@ -90,4 +90,12 @@
     <string name="dark_theme">Dark</string>
     <string name="light_theme">Light</string>
     <string name="select_theme">Select theme</string>
+    <string name="select_language">Select language</string>
+    <string name="english">English</string>
+    <string name="polish">Polish</string>
+    <string name="trip_saved">Trip saved</string>
+    <string name="trip_title">Trip title</string>
+    <string name="destination">Destination</string>
+    <string name="start_date">Start date</string>
+    <string name="end_date">End date</string>
 </resources>

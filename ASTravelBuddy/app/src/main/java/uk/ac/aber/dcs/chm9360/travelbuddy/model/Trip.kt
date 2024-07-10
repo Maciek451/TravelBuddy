@@ -6,4 +6,4 @@ data class Trip(
     val startDate: String = "",
     val endDate: String = "",
     val friends: List<String> = emptyList()
-    )
+)

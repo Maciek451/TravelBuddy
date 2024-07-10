@@ -8,14 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,41 +20,39 @@ import androidx.compose.ui.unit.dp
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 
 @Composable
-fun ThemeSelectionDialog(
+fun LanguageSelectionDialog(
     showDialog: Boolean,
-    currentTheme: Int,
+    currentLanguage: Int,
     onDismiss: () -> Unit,
-    onThemeSelected: (Int) -> Unit
+    onLanguageSelected: (Int) -> Unit
 ) {
-    val selectedTheme = rememberSaveable { mutableIntStateOf(currentTheme) }
-
     if (showDialog) {
         AlertDialog(
             onDismissRequest = onDismiss,
             title = {
                 Text(
-                    text = stringResource(id = R.string.select_theme),
+                    text = stringResource(id = R.string.select_language),
                     modifier = Modifier.fillMaxWidth()
                 )
             },
             text = {
                 Column {
                     RadioButtonOption(
-                        text = stringResource(id = R.string.light_theme),
-                        isSelected = selectedTheme.intValue == 0,
-                        onSelect = { selectedTheme.intValue = 0 }
+                        text = stringResource(id = R.string.english),
+                        isSelected = currentLanguage == 0,
+                        onSelect = { onLanguageSelected(0) }
                     )
                     RadioButtonOption(
-                        text = stringResource(id = R.string.dark_theme),
-                        isSelected = selectedTheme.intValue == 1,
-                        onSelect = { selectedTheme.intValue = 1 }
+                        text = stringResource(id = R.string.polish),
+                        isSelected = currentLanguage == 1,
+                        onSelect = { onLanguageSelected(1) }
                     )
                 }
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        onThemeSelected(selectedTheme.intValue)
+                        onLanguageSelected(currentLanguage)
                         onDismiss()
                     }
                 ) {

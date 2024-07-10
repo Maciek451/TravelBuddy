@@ -1,29 +1,19 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui
 
-import android.app.Activity
-import android.content.Intent
 import android.util.Log
-import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.AuthenticationState
 
 class FirebaseViewModel : ViewModel() {
@@ -36,6 +26,9 @@ class FirebaseViewModel : ViewModel() {
 
     private val _phrases = MutableStateFlow<List<Phrase>>(emptyList())
     val phrases: StateFlow<List<Phrase>> get() = _phrases
+
+    private val _trips = MutableStateFlow<List<Trip>>(emptyList())
+    val trips: StateFlow<List<Trip>> get() = _trips
 
     private val _authState = MutableStateFlow<FirebaseUser?>(auth.currentUser)
     val authState: StateFlow<FirebaseUser?> get() = _authState
@@ -282,6 +275,37 @@ class FirebaseViewModel : ViewModel() {
                     .add(phrase)
                     .addOnSuccessListener {
                         fetchPhrases()
+                    }
+                    .addOnFailureListener { }
+            }
+        }
+    }
+
+    fun fetchTrips() {
+        val user = auth.currentUser
+        if (user != null) {
+            viewModelScope.launch {
+                db.collection("users").document(user.uid)
+                    .collection("trips")
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        val trips = snapshot.toObjects(Trip::class.java)
+                        _trips.value = trips
+                    }
+                    .addOnFailureListener { }
+            }
+        }
+    }
+
+    fun addTrip(trip: Trip) {
+        val user = auth.currentUser
+        if (user != null) {
+            viewModelScope.launch {
+                db.collection("users").document(user.uid)
+                    .collection("trips")
+                    .add(trip)
+                    .addOnSuccessListener {
+                        fetchTrips()
                     }
                     .addOnFailureListener { }
             }

@@ -23,12 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -61,6 +63,8 @@ fun AccountScreen(
 
     val showUpdateDialog = rememberSaveable { mutableStateOf(false) }
     val showThemeDialog = rememberSaveable { mutableStateOf(false) }
+    val showLanguageDialog = rememberSaveable { mutableStateOf(false) }
+    val currentLanguage by rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchUsername()
@@ -76,6 +80,14 @@ fun AccountScreen(
         currentTheme = 0,
         onDismiss = { showThemeDialog.value = false },
         onThemeSelected = { }
+    )
+    LanguageSelectionDialog(
+        showDialog = showLanguageDialog.value,
+        currentLanguage = currentLanguage,
+        onDismiss = { showLanguageDialog.value = false },
+        onLanguageSelected = {
+            showLanguageDialog.value = false
+        }
     )
 
     Column {
@@ -108,7 +120,7 @@ fun AccountScreen(
         SettingsList(
             items = listOf(
                 R.string.terms_of_service to navigateToTermsOfService,
-                R.string.language to navigateToLanguage,
+                R.string.language to { showLanguageDialog.value = true },
                 R.string.theme to { showThemeDialog.value = true },
                 R.string.about to navigateToAbout
             )
