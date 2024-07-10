@@ -87,4 +87,7 @@
     <string name="update_username">Update your username</string>
     <string name="username_updated">Username updated</string>
     <string name="username_update_failed">Username update failed</string>
+    <string name="dark_theme">Dark</string>
+    <string name="light_theme">Light</string>
+    <string name="select_theme">Select theme</string>
 </resources>

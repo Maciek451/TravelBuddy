@@ -60,10 +60,23 @@ fun AccountScreen(
     val username by firebaseViewModel.username.collectAsState()
 
     val showUpdateDialog = rememberSaveable { mutableStateOf(false) }
+    val showThemeDialog = rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchUsername()
     }
+
+    EditUsernameDialog(
+        showDialog = showUpdateDialog.value,
+        onDismiss = { showUpdateDialog.value = false },
+        firebaseViewModel = firebaseViewModel
+    )
+    ThemeSelectionDialog(
+        showDialog = showThemeDialog.value,
+        currentTheme = 0,
+        onDismiss = { showThemeDialog.value = false },
+        onThemeSelected = { }
+    )
 
     Column {
         AppBarWithArrowBack(navController, appBarTitle = appBarTitle)
@@ -78,11 +91,6 @@ fun AccountScreen(
         ) {
             Text(text = stringResource(id = R.string.edit_profile))
         }
-        EditUsernameDialog(
-            showDialog = showUpdateDialog.value,
-            onDismiss = { showUpdateDialog.value = false },
-            firebaseViewModel = firebaseViewModel
-        )
         SettingsList(
             items = listOf(
                 R.string.your_friends to navigateToFriends,
@@ -101,7 +109,7 @@ fun AccountScreen(
             items = listOf(
                 R.string.terms_of_service to navigateToTermsOfService,
                 R.string.language to navigateToLanguage,
-                R.string.theme to navigateToTheme,
+                R.string.theme to { showThemeDialog.value = true },
                 R.string.about to navigateToAbout
             )
         )
