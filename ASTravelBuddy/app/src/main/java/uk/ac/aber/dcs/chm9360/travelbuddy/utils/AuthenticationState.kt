@@ -4,14 +4,11 @@ object AuthenticationState {
     var userId = ""
     var userEmail = ""
 
-    // Log in error codes
     const val LOGGED_IN_SUCCESSFULLY = 0
     const val PASSWORD_WRONG = 1
     const val ACCOUNT_DOES_NOT_EXIST = 2
     const val OTHER = 3
     const val USER_IS_NOT_VERIFIED = 7
-
-    // Sign up error codes
     const val SIGNED_UP_SUCCESSFULLY = 0
     const val USER_ALREADY_EXISTS = 4
     const val EMAIL_WRONG_FORMAT = 5

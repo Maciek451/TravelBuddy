@@ -20,6 +20,9 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,19 +32,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 
 @Composable
 fun AccountScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
     val appBarTitle = R.string.account
-    val username = "Maciej Traczyk"
-    val email = "maciektraczyk123@gmail.com"
-    val monogram = "M"
     val navigateToFriends: () -> Unit = { }
     val navigateToPreferences: () -> Unit = { }
     val navigateToTermsOfService: () -> Unit = { }
@@ -49,9 +52,18 @@ fun AccountScreen(
     val navigateToTheme: () -> Unit = { }
     val navigateToAbout: () -> Unit = { navController.navigate(Screens.About.route) }
 
+    val authState by firebaseViewModel.authState.collectAsState()
+    val email = authState?.email ?: "email not available"
+    val monogram = email.firstOrNull()?.uppercase() ?: ""
+    val username by firebaseViewModel.username.collectAsState()
+
+    LaunchedEffect(Unit) {
+        firebaseViewModel.fetchUsername()
+    }
+
     Column {
         AppBarWithArrowBack(navController, appBarTitle = appBarTitle)
-        UserCard(username, email, monogram)
+        UserCard(username ?: "", email, monogram)
         Button(
             onClick = { },
             modifier = Modifier

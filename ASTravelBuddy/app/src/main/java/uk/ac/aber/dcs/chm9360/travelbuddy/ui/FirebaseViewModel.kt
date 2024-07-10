@@ -3,6 +3,7 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -18,8 +19,12 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.utils.AuthenticationState
 
 class FirebaseViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
+    private lateinit var signInWithGoogleClient: GoogleSignInClient
     private val db = FirebaseFirestore.getInstance()
     private val phrasesData = db.collection("phrases")
+
+    private val _username = MutableStateFlow<String?>(null)
+    val username: StateFlow<String?> get() = _username
 
     private val _phrases = MutableStateFlow<List<Phrase>>(emptyList())
     val phrases: StateFlow<List<Phrase>> get() = _phrases
@@ -37,6 +42,8 @@ class FirebaseViewModel : ViewModel() {
             _authState.value = firebaseAuth.currentUser
         }
     }
+
+    
 
     fun signInWithEmailAndPassword(email: String, password: String, callback: (Int) -> Unit) {
         viewModelScope.launch {
@@ -62,6 +69,7 @@ class FirebaseViewModel : ViewModel() {
                                     else -> callback(AuthenticationState.OTHER)
                                 }
                             }
+
                             else -> {
                                 callback(AuthenticationState.OTHER)
                             }
@@ -71,7 +79,12 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
-    fun signUpWithEmailAndPassword(email: String, password: String, username: String, callback: (Int) -> Unit) {
+    fun signUpWithEmailAndPassword(
+        email: String,
+        password: String,
+        username: String,
+        callback: (Int) -> Unit
+    ) {
         viewModelScope.launch {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
@@ -106,9 +119,11 @@ class FirebaseViewModel : ViewModel() {
                             is FirebaseAuthUserCollisionException -> {
                                 callback(AuthenticationState.USER_ALREADY_EXISTS)
                             }
+
                             is FirebaseAuthInvalidCredentialsException -> {
                                 callback(AuthenticationState.EMAIL_WRONG_FORMAT)
                             }
+
                             else -> {
                                 callback(AuthenticationState.OTHER)
                             }
@@ -205,6 +220,19 @@ class FirebaseViewModel : ViewModel() {
             .addOnFailureListener {
                 onResult(false)
             }
+    }
+
+    fun fetchUsername() {
+        val user = auth.currentUser
+        if (user != null) {
+            db.collection("users").document(user.uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    val username = document.getString("username")
+                    _username.value = username
+                }
+                .addOnFailureListener { }
+        }
     }
 
     fun fetchPhrases() {
