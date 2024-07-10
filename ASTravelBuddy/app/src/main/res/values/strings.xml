@@ -76,4 +76,11 @@
     <string name="error_user_already_exists">User already exists</string>
     <string name="error_wrong_email_format">Wrong email format</string>
     <string name="error_wrong_password_format">Wrong password format</string>
+    <string name="password_too_short">Password is too short</string>
+    <string name="error_wrong_password_or_email">Wrong password or email</string>
+    <string name="password_reset_email_failed">Email failed to send</string>
+    <string name="password_reset_email_sent">Email sent</string>
+    <string name="send">Send</string>
+    <string name="cancel">Cancel</string>
+    <string name="reset_your_password">Reset your password</string>
 </resources>

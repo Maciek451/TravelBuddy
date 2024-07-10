@@ -1,21 +1,15 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication
 
-import androidx.compose.foundation.layout.Arrangement
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,91 +17,82 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 
 @Composable
 fun ForgotPasswordDialog(
-    navController: NavHostController,
     showDialog: Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    firebaseViewModel: FirebaseViewModel
 ) {
-    var email by rememberSaveable {
-        mutableStateOf("")
-    }
-
+    var email by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
 
     if (showDialog) {
-        Dialog(
-            onDismissRequest = onDismiss
-        ) {
-            Surface(
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.surface
-            ) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = {
+                Text(
+                    text = stringResource(id = R.string.reset_your_password),
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
                 Column(
                     modifier = Modifier
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
-                )
-                {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick =
-                                onDismiss
-                            )
-                        {
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = stringResource(id = R.string.close_icon),
-                                modifier = Modifier.alpha(0.7f),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                        Text(
-                            text = stringResource(id = R.string.reset_password),
-                            fontSize = 20.sp
-                        )
-
-                        IconButton(
-                            onClick = {
-                                email = ""
-                                showDialog
-                            },
-                            enabled = email.isNotEmpty()
-                        )
-                        {
-                            Icon(
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = stringResource(id = R.string.save_button),
-                                modifier = Modifier.alpha(0.7f),
-                            )
-                        }
-                    }
-
+                ) {
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("") },
+                        label = { Text(stringResource(id = R.string.email_address)) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                            .padding(horizontal = 8.dp)
                     )
                 }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (email.isNotEmpty()) {
+                            firebaseViewModel.sendPasswordResetEmail(email) { isSuccess ->
+                                if (isSuccess) {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.password_reset_email_sent),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    onDismiss()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.password_reset_email_failed),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    },
+                    enabled = email.isNotEmpty()
+                ) {
+                    Text(stringResource(id = R.string.send))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(id = R.string.cancel))
+                }
             }
-        }
+        )
     }
 }

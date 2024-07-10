@@ -1,11 +1,13 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,13 +53,14 @@ class FirebaseViewModel : ViewModel() {
                             callback(AuthenticationState.USER_IS_NOT_VERIFIED)
                         }
                     } else {
-                        val exception = task.exception
-                        when (exception) {
+                        when (val exception = task.exception) {
                             is FirebaseAuthInvalidCredentialsException -> {
-                                callback(AuthenticationState.PASSWORD_WRONG)
-                            }
-                            is FirebaseAuthInvalidUserException -> {
-                                callback(AuthenticationState.ACCOUNT_DOES_NOT_EXIST)
+                                Log.d("Test", exception.toString())
+                                when (exception.errorCode) {
+                                    "ERROR_INVALID_CREDENTIAL" -> callback(AuthenticationState.PASSWORD_WRONG)
+                                    "ERROR_INVALID_EMAIL" -> callback(AuthenticationState.EMAIL_WRONG_FORMAT)
+                                    else -> callback(AuthenticationState.OTHER)
+                                }
                             }
                             else -> {
                                 callback(AuthenticationState.OTHER)
@@ -126,6 +129,15 @@ class FirebaseViewModel : ViewModel() {
             ?.addOnCompleteListener { task ->
                 onResult(task.isSuccessful)
             }
+    }
+
+    fun sendPasswordResetEmail(email: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    onResult(task.isSuccessful)
+                }
+        }
     }
 
     fun isUserLoggedIn(): Boolean {

@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -166,33 +167,39 @@ fun SignUpScreen(
 
         Button(
             onClick = {
-                if (password == passwordConfirmation) {
-                    firebaseViewModel.signUpWithEmailAndPassword(email, password, username) { errorCode ->
-                        when (errorCode) {
-                            AuthenticationState.SIGNED_UP_SUCCESSFULLY -> {
-                                Toast.makeText(context, R.string.verification_email_sent, Toast.LENGTH_SHORT).show()
-                                showVerificationDialog = true
-                            }
-                            AuthenticationState.USER_ALREADY_EXISTS -> {
-                                errorMessage = context.getString(R.string.error_user_already_exists)
-                                Toast.makeText(context, R.string.error_user_already_exists, Toast.LENGTH_SHORT).show()
-                            }
-                            AuthenticationState.EMAIL_WRONG_FORMAT -> {
-                                errorMessage = context.getString(R.string.error_wrong_email_format)
-                                Toast.makeText(context, R.string.error_wrong_email_format, Toast.LENGTH_SHORT).show()
-                            }
-                            AuthenticationState.PASSWORD_WRONG_FORMAT -> {
-                                errorMessage = context.getString(R.string.error_wrong_password_format)
-                                Toast.makeText(context, R.string.error_wrong_password_format, Toast.LENGTH_SHORT).show()
-                            }
-                            else -> {
-                                errorMessage = context.getString(R.string.unknown_error)
-                                Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT).show()
+                when {
+                    password != passwordConfirmation -> {
+                        Toast.makeText(context, R.string.password_mismatch, Toast.LENGTH_SHORT).show()
+                    }
+                    password.length < 6 -> {
+                        Toast.makeText(context, R.string.password_too_short, Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        firebaseViewModel.signUpWithEmailAndPassword(email, password, username) { errorCode ->
+                            when (errorCode) {
+                                AuthenticationState.SIGNED_UP_SUCCESSFULLY -> {
+                                    Toast.makeText(context, R.string.verification_email_sent, Toast.LENGTH_SHORT).show()
+                                    showVerificationDialog = true
+                                }
+                                AuthenticationState.USER_ALREADY_EXISTS -> {
+                                    errorMessage = context.getString(R.string.error_user_already_exists)
+                                    Toast.makeText(context, R.string.error_user_already_exists, Toast.LENGTH_SHORT).show()
+                                }
+                                AuthenticationState.EMAIL_WRONG_FORMAT -> {
+                                    errorMessage = context.getString(R.string.error_wrong_email_format)
+                                    Toast.makeText(context, R.string.error_wrong_email_format, Toast.LENGTH_SHORT).show()
+                                }
+                                AuthenticationState.PASSWORD_WRONG_FORMAT -> {
+                                    errorMessage = context.getString(R.string.password_too_short)
+                                    Toast.makeText(context, R.string.password_too_short, Toast.LENGTH_SHORT).show()
+                                }
+                                else -> {
+                                    errorMessage = context.getString(R.string.unknown_error)
+                                    Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
                     }
-                } else {
-                    Toast.makeText(context, R.string.password_mismatch, Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier

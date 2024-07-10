@@ -54,9 +54,9 @@ fun SignInScreen(
     var showVerificationDialog by remember { mutableStateOf(false) }
 
     ForgotPasswordDialog(
-        navController = navController,
         showDialog = showPasswordDialog,
-        onDismiss = { showPasswordDialog = false }
+        onDismiss = { showPasswordDialog = false },
+        firebaseViewModel = firebaseViewModel
     )
 
     VerificationDialog(
@@ -153,12 +153,16 @@ fun SignInScreen(
                             Toast.makeText(context, R.string.error_user_not_verified, Toast.LENGTH_SHORT).show()
                         }
                         AuthenticationState.PASSWORD_WRONG -> {
-                            errorMessage = context.getString(R.string.error_wrong_password)
-                            Toast.makeText(context, R.string.error_wrong_password, Toast.LENGTH_SHORT).show()
+                            errorMessage = context.getString(R.string.error_wrong_password_or_email)
+                            Toast.makeText(context, R.string.error_wrong_password_or_email, Toast.LENGTH_SHORT).show()
                         }
                         AuthenticationState.ACCOUNT_DOES_NOT_EXIST -> {
                             errorMessage = context.getString(R.string.error_account_does_not_exist)
                             Toast.makeText(context, R.string.error_account_does_not_exist, Toast.LENGTH_SHORT).show()
+                        }
+                        AuthenticationState.EMAIL_WRONG_FORMAT -> {
+                            errorMessage = context.getString(R.string.error_wrong_email_format)
+                            Toast.makeText(context, R.string.error_wrong_email_format, Toast.LENGTH_SHORT).show()
                         }
                         else -> {
                             errorMessage = context.getString(R.string.unknown_error)
