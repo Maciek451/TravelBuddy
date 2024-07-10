@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +59,8 @@ fun AccountScreen(
     val monogram = email.firstOrNull()?.uppercase() ?: ""
     val username by firebaseViewModel.username.collectAsState()
 
+    val showUpdateDialog = rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchUsername()
     }
@@ -65,13 +69,20 @@ fun AccountScreen(
         AppBarWithArrowBack(navController, appBarTitle = appBarTitle)
         UserCard(username ?: "", email, monogram)
         Button(
-            onClick = { },
+            onClick = {
+                showUpdateDialog.value = true
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
             Text(text = stringResource(id = R.string.edit_profile))
         }
+        EditUsernameDialog(
+            showDialog = showUpdateDialog.value,
+            onDismiss = { showUpdateDialog.value = false },
+            firebaseViewModel = firebaseViewModel
+        )
         SettingsList(
             items = listOf(
                 R.string.your_friends to navigateToFriends,

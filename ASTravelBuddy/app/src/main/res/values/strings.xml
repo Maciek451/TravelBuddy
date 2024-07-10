@@ -83,4 +83,8 @@
     <string name="send">Send</string>
     <string name="cancel">Cancel</string>
     <string name="reset_your_password">Reset your password</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="update_username">Update your username</string>
+    <string name="username_updated">Username updated</string>
+    <string name="username_update_failed">Username update failed</string>
 </resources>

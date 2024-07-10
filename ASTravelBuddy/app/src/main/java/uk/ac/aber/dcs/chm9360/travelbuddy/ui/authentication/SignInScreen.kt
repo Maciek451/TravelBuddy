@@ -177,6 +177,7 @@ fun SignInScreen(
         ) {
             Text(text = stringResource(id = R.string.sign_in_button))
         }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()

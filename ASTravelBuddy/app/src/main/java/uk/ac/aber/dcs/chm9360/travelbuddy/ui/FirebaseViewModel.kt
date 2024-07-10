@@ -1,25 +1,33 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.AuthenticationState
 
 class FirebaseViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
-    private lateinit var signInWithGoogleClient: GoogleSignInClient
     private val db = FirebaseFirestore.getInstance()
     private val phrasesData = db.collection("phrases")
 
@@ -42,8 +50,6 @@ class FirebaseViewModel : ViewModel() {
             _authState.value = firebaseAuth.currentUser
         }
     }
-
-    
 
     fun signInWithEmailAndPassword(email: String, password: String, callback: (Int) -> Unit) {
         viewModelScope.launch {
@@ -225,13 +231,29 @@ class FirebaseViewModel : ViewModel() {
     fun fetchUsername() {
         val user = auth.currentUser
         if (user != null) {
-            db.collection("users").document(user.uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    val username = document.getString("username")
-                    _username.value = username
+            viewModelScope.launch {
+                try {
+                    val document = db.collection("users").document(user.uid).get().await()
+                    val fetchedUsername = document.getString("username")
+                    _username.value = fetchedUsername
+                } catch (_: Exception) {
                 }
-                .addOnFailureListener { }
+            }
+        }
+    }
+
+    fun updateUsername(newUsername: String, callback: (Boolean) -> Unit) {
+        val user = auth.currentUser
+        if (user != null) {
+            db.collection("users").document(user.uid)
+                .update("username", newUsername)
+                .addOnSuccessListener {
+                    _username.value = newUsername
+                    callback(true)
+                }
+                .addOnFailureListener {
+                    callback(false)
+                }
         }
     }
 
