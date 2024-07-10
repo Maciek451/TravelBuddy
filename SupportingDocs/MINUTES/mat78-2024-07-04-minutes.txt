@@ -1,0 +1,54 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: LL-E36, Thursday, 4th July 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Thursday, 4th July 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. Implement authentication functionality using firebase
+ACTION: mat78 
+Status: Ongoing
+
+2. Create data classes for storage. 
+ACTION: mat78
+Status: Ongoing
+
+3. Continue working on different screens. 
+ACTION: mat78
+Status: Ongoing
+
+4. Continue working on firestore functionality for trips features
+ACTION: mat78
+Status: Not started
+
+5. Create a skeleton of MSc dissertation. 
+ACTION: mat78
+Status: Done
+
+Other tasks
+===========
+6. Submit ethics form
+ACTION: mat78
+Status: Done and approved
+
+New business 
+============
+1. Implement authentication functionality using firebase
+ACTION: mat78 
+
+2. Create data classes for storage. 
+ACTION: mat78
+
+3. Continue working on different screens. 
+ACTION: mat78
+
+4. Continue working on firestore functionality for trips features
+ACTION: mat78
+
+AOB 
+=== 
+None
