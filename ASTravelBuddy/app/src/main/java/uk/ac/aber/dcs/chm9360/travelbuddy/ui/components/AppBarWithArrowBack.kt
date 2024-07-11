@@ -24,6 +24,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.DeleteAccountDialog
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.RemoveAllDataDialog
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,8 +42,46 @@ fun AppBarWithArrowBack(
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    var showDeleteAccountDialog by rememberSaveable { mutableStateOf(false) }
+    var showRemoveDataDialog by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
+
+    DeleteAccountDialog(
+        showDialog = showDeleteAccountDialog,
+        onDismiss = { showDeleteAccountDialog = false },
+        onDeleteAccount = {
+            firebaseViewModel.deleteUserAccount { isSuccess ->
+                if (isSuccess) {
+                    firebaseViewModel.signOut()
+                    navController.navigate(Screens.SignIn.route) {
+                        popUpTo(0)
+                    }
+                    Toast.makeText(context, R.string.account_deleted, Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(context, R.string.failed_to_delete_account, Toast.LENGTH_LONG)
+                        .show()
+                }
+                showDeleteAccountDialog = false
+            }
+        }
+    )
+
+    RemoveAllDataDialog(
+        showDialog = showRemoveDataDialog,
+        onDismiss = { showRemoveDataDialog = false },
+        onDataRemoved = {
+            firebaseViewModel.removeAllUserData { isSuccess ->
+                if (isSuccess) {
+                    Toast.makeText(context, R.string.data_removed, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, R.string.failed_to_remove_data, Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+            showRemoveDataDialog = false
+        }
+    )
 
     CenterAlignedTopAppBar(
         title = { Text(stringResource(id = appBarTitle)) },
@@ -63,7 +103,7 @@ fun AppBarWithArrowBack(
                 }
             }
             if (showRemoveIcon) {
-                IconButton(onClick = {  }) {
+                IconButton(onClick = { }) {
                     Icon(
                         Icons.Outlined.DeleteSweep,
                         contentDescription = stringResource(R.string.delete_sweep_icon)
@@ -99,29 +139,15 @@ fun AppBarWithArrowBack(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.delete_account)) },
                             onClick = {
-                                firebaseViewModel.deleteUserAccount { isSuccess ->
-                                    if (isSuccess) {
-                                        firebaseViewModel.signOut()
-                                        navController.navigate(Screens.SignIn.route) {
-                                            popUpTo(0)
-                                        }
-                                        Toast.makeText(context, R.string.account_deleted, Toast.LENGTH_LONG).show()
-                                    } else {
-                                        Toast.makeText(context, R.string.failed_to_delete_account, Toast.LENGTH_LONG).show()
-                                    }
-                                }
+                                showDeleteAccountDialog = true
+                                isMenuExpanded = false
                             }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.remove_all_data)) },
                             onClick = {
-                                firebaseViewModel.removeAllUserData { isSuccess ->
-                                    if (isSuccess) {
-                                        Toast.makeText(context, R.string.data_removed, Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        Toast.makeText(context, R.string.failed_to_remove_data, Toast.LENGTH_SHORT).show()
-                                    }
-                                }
+                                showRemoveDataDialog = true
+                                isMenuExpanded = false
                             }
                         )
                         DropdownMenuItem(
@@ -129,7 +155,9 @@ fun AppBarWithArrowBack(
                             onClick = {
                                 firebaseViewModel.signOut()
                                 navController.navigate(Screens.SignIn.route) { popUpTo(0) }
-                                Toast.makeText(context, R.string.signedOut, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, R.string.signedOut, Toast.LENGTH_SHORT)
+                                    .show()
+                                isMenuExpanded = false
                             }
                         )
                     }

@@ -104,4 +104,10 @@
     <string name="no_phrases_text">No phrases added</string>
     <string name="empty_notifications_screen_icon">Empty notifications screen icon</string>
     <string name="no_notifications_text">No notifications</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_text_upper">CONFIRM</string>
+    <string name="confirm_text_description">To confirm, type \'CONFIRM\' in the text field below.</string>
+    <string name="confirm_headline">Confirm account deletion</string>
+    <string name="confirm">Confirm</string>
+    <string name="remove_headline">Confirm data removal</string>
 </resources>
