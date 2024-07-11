@@ -1,0 +1,58 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: MS Teams, Thursday, 11th July 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Thursday, 11th July 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. Implement authentication functionality using firebase
+ACTION: mat78 
+Status: Done
+Sign-up, sign-in and forget password are done. 
+Sign-in using Google will be done if time permits. 
+
+2. Create data classes for storage. 
+ACTION: mat78
+Status: Done
+
+3. Continue working on different screens. 
+ACTION: mat78
+Status: Ongoing
+Add trip screens: Done
+Account details: email address and username are fetched from firestore
+
+4. Continue working on firestore functionality for trips features
+ACTION: mat78
+Status: Ongoing
+
+Other works
+===========
+5. Implement delete account and remove all data functionalities. 
+ACTION: mat78
+Status: Ongoing
+Functionalities are implemented but requires some bug fixing and troubleshooting.
+
+New business 
+============
+1. Continue working on different screens. 
+ACTION: mat78
+
+2. Add an interactive map by finding relevant API.
+ACTION: mat78
+
+3. Continue working on firestore functionality for trips features.
+ACTION: mat78
+
+4. Implement "Your Friends" functionality.
+ACTION: mat78
+
+5. Implement delete account and remove all data functionalities. 
+ACTION: mat78
+
+AOB 
+=== 
+None
