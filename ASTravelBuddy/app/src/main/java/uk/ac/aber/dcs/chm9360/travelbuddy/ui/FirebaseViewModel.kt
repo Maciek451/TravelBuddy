@@ -20,6 +20,7 @@ class FirebaseViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
     private val phrasesData = db.collection("phrases")
+    private val tripsData = db.collection("trips")
 
     private val _username = MutableStateFlow<String?>(null)
     val username: StateFlow<String?> get() = _username
@@ -36,6 +37,7 @@ class FirebaseViewModel : ViewModel() {
     init {
         observeAuthState()
         fetchPhrases()
+        fetchTrips()
     }
 
     private fun observeAuthState() {
@@ -160,28 +162,58 @@ class FirebaseViewModel : ViewModel() {
 
     fun deleteUserAccount(onResult: (Boolean) -> Unit) {
         val user = auth.currentUser
-        val userId = user?.uid
-        if (userId != null) {
-            val batch = db.batch()
-
-            val userDocRef = db.collection("users").document(userId)
-            batch.delete(userDocRef)
-
-            db.collection("phrases")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    for (document in snapshot.documents) {
-                        val docRef = db.collection("phrases").document(document.id)
-                        batch.delete(docRef)
-                    }
-
-                    batch.commit()
+        if (user != null) {
+            removeAllUserData { success ->
+                if (success) {
+                    val userDocRef = db.collection("users").document(user.uid)
+                    userDocRef.delete()
                         .addOnSuccessListener {
                             user.delete()
                                 .addOnSuccessListener {
                                     auth.signOut()
                                     _authState.value = null
+                                    onResult(true)
+                                }
+                                .addOnFailureListener {
+                                    onResult(false)
+                                }
+                        }
+                        .addOnFailureListener {
+                            onResult(false)
+                        }
+                } else {
+                    onResult(false)
+                }
+            }
+        } else {
+            onResult(false)
+        }
+    }
+
+    fun removeAllUserData(onResult: (Boolean) -> Unit) {
+        val user = auth.currentUser
+        if (user != null) {
+            val batch = db.batch()
+            val userDocRef = db.collection("users").document(user.uid)
+
+            userDocRef.collection("phrases")
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    for (document in snapshot.documents) {
+                        val docRef = userDocRef.collection("phrases").document(document.id)
+                        batch.delete(docRef)
+                    }
+
+                    userDocRef.collection("trips")
+                        .get()
+                        .addOnSuccessListener { tripSnapshot ->
+                            for (document in tripSnapshot.documents) {
+                                val docRef = userDocRef.collection("trips").document(document.id)
+                                batch.delete(docRef)
+                            }
+
+                            batch.commit()
+                                .addOnSuccessListener {
                                     onResult(true)
                                 }
                                 .addOnFailureListener {
@@ -198,27 +230,6 @@ class FirebaseViewModel : ViewModel() {
         } else {
             onResult(false)
         }
-    }
-
-    fun removeAllUserData(onResult: (Boolean) -> Unit) {
-        phrasesData.get()
-            .addOnSuccessListener { snapshot ->
-                val batch = db.batch()
-                snapshot.documents.forEach { doc ->
-                    val ref = phrasesData.document(doc.id)
-                    batch.delete(ref)
-                }
-                batch.commit()
-                    .addOnSuccessListener {
-                        onResult(true)
-                    }
-                    .addOnFailureListener {
-                        onResult(false)
-                    }
-            }
-            .addOnFailureListener {
-                onResult(false)
-            }
     }
 
     fun fetchUsername() {
