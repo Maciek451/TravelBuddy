@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.NoLuggage
+import androidx.compose.material.icons.filled.SpeakerNotesOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -35,9 +37,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -87,13 +91,17 @@ fun FriendsScreen(
                 }
                 when (selectedTabIndex) {
                     0 -> {
-                        //content goes here
+                            EmptyTripsScreen()
                     }
                     1 -> {
-                        LazyColumn {
-                            items(phrases) { phrase ->
-                                PhraseCard(phrase, username = "User")
+                        if (phrases.isNotEmpty()) {
+                            LazyColumn {
+                                items(phrases) { phrase ->
+                                    PhraseCard(phrase, username = "User")
+                                }
                             }
+                        } else {
+                            EmptyPhrasesScreen()
                         }
                     }
                 }
@@ -169,5 +177,53 @@ fun PhraseCard(phrase: Phrase, username: String) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun EmptyTripsScreen() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            modifier = Modifier
+                .size(100.dp)
+                .alpha(0.3f),
+            imageVector = Icons.Default.NoLuggage,
+            contentDescription = stringResource(id = R.string.empty_trips_screen_icon)
+        )
+        Text(
+            modifier = Modifier
+                .alpha(0.3f),
+            text = stringResource(id = R.string.no_trips_text),
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun EmptyPhrasesScreen() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            modifier = Modifier
+                .size(100.dp)
+                .alpha(0.3f),
+            imageVector = Icons.Default.SpeakerNotesOff,
+            contentDescription = stringResource(id = R.string.empty_phrases_screen_icon)
+        )
+        Text(
+            modifier = Modifier
+                .alpha(0.3f),
+            text = stringResource(id = R.string.no_phrases_text),
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center
+        )
     }
 }

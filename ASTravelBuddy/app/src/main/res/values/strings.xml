@@ -98,4 +98,10 @@
     <string name="destination">Destination</string>
     <string name="start_date">Start date</string>
     <string name="end_date">End date</string>
+    <string name="empty_trips_screen_icon">Empty trips screen icon</string>
+    <string name="no_trips_text">No trips added</string>
+    <string name="empty_phrases_screen_icon">Empty phrases screen icon</string>
+    <string name="no_phrases_text">No phrases added</string>
+    <string name="empty_notifications_screen_icon">Empty notifications screen icon</string>
+    <string name="no_notifications_text">No notifications</string>
 </resources>

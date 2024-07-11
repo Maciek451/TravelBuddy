@@ -13,6 +13,8 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,6 +28,8 @@ fun LanguageSelectionDialog(
     onDismiss: () -> Unit,
     onLanguageSelected: (Int) -> Unit
 ) {
+    val selectedLanguage = rememberSaveable { mutableIntStateOf(currentLanguage) }
+
     if (showDialog) {
         AlertDialog(
             onDismissRequest = onDismiss,
@@ -39,13 +43,13 @@ fun LanguageSelectionDialog(
                 Column {
                     RadioButtonOption(
                         text = stringResource(id = R.string.english),
-                        isSelected = currentLanguage == 0,
-                        onSelect = { onLanguageSelected(0) }
+                        isSelected = selectedLanguage.intValue == 0,
+                        onSelect = { selectedLanguage.intValue = 0 }
                     )
                     RadioButtonOption(
                         text = stringResource(id = R.string.polish),
-                        isSelected = currentLanguage == 1,
-                        onSelect = { onLanguageSelected(1) }
+                        isSelected = selectedLanguage.intValue == 1,
+                        onSelect = { selectedLanguage.intValue = 1 }
                     )
                 }
             },
