@@ -2,7 +2,6 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui.add
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,9 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Luggage
 import androidx.compose.material.icons.filled.PersonAdd
@@ -66,9 +62,9 @@ fun AddBottomSheet(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 16.dp)
                 ) {
-                    AddButton(R.string.add_a_trip, Icons.Default.Luggage) { navController.navigate(Screens.AddTrip.route) }
-                    AddButton(R.string.add_a_phrase, Icons.Default.FormatQuote) { navController.navigate(Screens.AddPhrase.route) }
-                    AddButton(R.string.add_a_friend, Icons.Default.PersonAdd) { navController.navigate(Screens.AddFriend.route) }
+                    AddButton(R.string.add_trip_bottom_sheet, Icons.Default.Luggage) { navController.navigate(Screens.AddTrip.route) }
+                    AddButton(R.string.add_phrase_bottom_sheet, Icons.Default.FormatQuote) { navController.navigate(Screens.AddPhrase.route) }
+                    AddButton(R.string.add_friend_bottom_sheet, Icons.Default.PersonAdd) { navController.navigate(Screens.AddFriend.route) }
                 }
             }
         }

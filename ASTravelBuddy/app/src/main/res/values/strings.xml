@@ -110,4 +110,7 @@
     <string name="confirm_headline">Confirm account deletion</string>
     <string name="confirm">Confirm</string>
     <string name="remove_headline">Confirm data removal</string>
+    <string name="add_trip_bottom_sheet">Add\n trip</string>
+    <string name="add_phrase_bottom_sheet">Add\n phrase</string>
+    <string name="add_friend_bottom_sheet">Add\n friend</string>
 </resources>
