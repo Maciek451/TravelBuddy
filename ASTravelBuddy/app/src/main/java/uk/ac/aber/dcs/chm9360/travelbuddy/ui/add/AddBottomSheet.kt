@@ -62,9 +62,18 @@ fun AddBottomSheet(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 16.dp)
                 ) {
-                    AddButton(R.string.add_trip_bottom_sheet, Icons.Default.Luggage) { navController.navigate(Screens.AddTrip.route) }
-                    AddButton(R.string.add_phrase_bottom_sheet, Icons.Default.FormatQuote) { navController.navigate(Screens.AddPhrase.route) }
-                    AddButton(R.string.add_friend_bottom_sheet, Icons.Default.PersonAdd) { navController.navigate(Screens.AddFriend.route) }
+                    AddButton(R.string.add_trip_bottom_sheet, Icons.Default.Luggage) {
+                        navController.navigate(Screens.AddTrip.route)
+                        onDismiss()
+                    }
+                    AddButton(R.string.add_phrase_bottom_sheet, Icons.Default.FormatQuote) {
+                        navController.navigate(Screens.AddPhrase.route)
+                        onDismiss()
+                    }
+                    AddButton(R.string.add_friend_bottom_sheet, Icons.Default.PersonAdd) {
+                        navController.navigate(Screens.AddFriend.route)
+                        onDismiss()
+                    }
                 }
             }
         }
@@ -89,8 +98,7 @@ private fun AddButton(
         Button(
             onClick = onClick,
             shape = CircleShape,
-            modifier = Modifier
-                .size(80.dp),
+            modifier = Modifier.size(80.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Icon(icon, contentDescription = stringResource(id = R.string.add_icon), modifier = Modifier.size(50.dp))

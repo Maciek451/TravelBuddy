@@ -104,13 +104,21 @@ fun FriendItem(user: User, onDeleteClick: () -> Unit) {
             .clickable { },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = user.username,
-            style = MaterialTheme.typography.bodyLarge,
+        Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp)
-        )
+        ) {
+            Text(
+                text = user.username,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = user.email,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            )
+        }
         IconButton(onClick = onDeleteClick) {
             Icon(
                 imageVector = Icons.Default.Delete,

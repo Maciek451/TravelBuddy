@@ -275,11 +275,12 @@ class FirebaseViewModel : ViewModel() {
                         val userDoc = snapshot.documents[0]
                         val friendId = userDoc.id
                         val friendUsername = userDoc.getString("username") ?: ""
+                        val friendEmail = userDoc.getString("email") ?: ""
                         checkIfFriendExists(currentUser.uid, friendId) { exists ->
                             if (exists) {
                                 callback(false, "Friend is already added")
                             } else {
-                                addFriend(currentUser.uid, friendId, friendUsername) { success ->
+                                addFriend(currentUser.uid, friendId, friendUsername, friendEmail) { success ->
                                     if (success) {
                                         callback(true, "Friend added successfully")
                                     } else {
@@ -304,11 +305,12 @@ class FirebaseViewModel : ViewModel() {
                         val userDoc = snapshot.documents[0]
                         val friendId = userDoc.id
                         val friendUsername = userDoc.getString("username") ?: ""
+                        val friendEmail = userDoc.getString("email") ?: ""
                         checkIfFriendExists(currentUser.uid, friendId) { exists ->
                             if (exists) {
                                 callback(false, "Friend is already added")
                             } else {
-                                addFriend(currentUser.uid, friendId, friendUsername) { success ->
+                                addFriend(currentUser.uid, friendId, friendUsername, friendEmail) { success ->
                                     if (success) {
                                         callback(true, "Friend added successfully")
                                     } else {
@@ -341,11 +343,12 @@ class FirebaseViewModel : ViewModel() {
             .addOnFailureListener { callback(false) }
     }
 
-    private fun addFriend(currentUserId: String, friendId: String, friendUsername: String, callback: (Boolean) -> Unit) {
+    private fun addFriend(currentUserId: String, friendId: String, friendUsername: String, friendEmail: String, callback: (Boolean) -> Unit) {
         val currentUserRef = db.collection("users").document(currentUserId)
         val friendData = mapOf(
             "userId" to friendId,
-            "username" to friendUsername
+            "username" to friendUsername,
+            "email" to friendEmail
         )
 
         currentUserRef.collection("friends").document(friendId).set(friendData)
@@ -376,7 +379,13 @@ class FirebaseViewModel : ViewModel() {
                     .collection("friends")
                     .get()
                     .addOnSuccessListener { snapshot ->
-                        val friends = snapshot.toObjects(User::class.java)
+                        val friends = snapshot.map { document ->
+                            User(
+                                userId = document.id,
+                                username = document.getString("username") ?: "",
+                                email = document.getString("email") ?: ""
+                            )
+                        }
                         _friends.value = friends
                     }
                     .addOnFailureListener { }

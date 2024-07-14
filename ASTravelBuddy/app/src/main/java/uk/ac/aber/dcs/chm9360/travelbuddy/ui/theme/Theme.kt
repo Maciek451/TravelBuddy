@@ -217,7 +217,7 @@ val unspecified_scheme = ColorFamily(
 
 @Composable
 fun TravelBuddyTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,
     dynamicColor: Boolean = false,
     content: @Composable() () -> Unit
 ) {
