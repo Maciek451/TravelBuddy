@@ -23,7 +23,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -46,6 +48,11 @@ fun FriendsListScreen(
 ) {
     val title = R.string.your_friends
     val friends by firebaseViewModel.friends.collectAsState()
+
+    var showConfirmDialog by rememberSaveable { mutableStateOf(false) }
+
+    // Needs to be 'remember' to avoid recomposition
+    var friendToRemove by remember { mutableStateOf<User?>(null) }
 
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchFriends()
@@ -77,21 +84,30 @@ fun FriendsListScreen(
             LazyColumn {
                 items(friends) { friend ->
                     FriendItem(friend, onDeleteClick = {
-                        firebaseViewModel.removeFriend(friend.userId) { success ->
-                            if (success) {
-                                messageText.value =
-                                    context.getString(R.string.friend_removed_successfully)
-                            } else {
-                                messageText.value =
-                                    context.getString(R.string.failed_to_remove_friend)
-                            }
-                            showMessage.value = true
-                        }
-                    }
-                    )
+                        friendToRemove = friend
+                        showConfirmDialog = true
+                    })
                 }
             }
         }
+    }
+
+    if (showConfirmDialog && friendToRemove != null) {
+        ConfirmFriendRemovalDialog(
+            showDialog = showConfirmDialog,
+            onDismiss = { showConfirmDialog = false },
+            onRemoveConfirmed = {
+                firebaseViewModel.removeFriend(friendToRemove!!.userId) { success ->
+                    if (success) {
+                        messageText.value = context.getString(R.string.friend_removed_successfully)
+                    } else {
+                        messageText.value = context.getString(R.string.failed_to_remove_friend)
+                    }
+                    showMessage.value = true
+                }
+                showConfirmDialog = false
+            }
+        )
     }
 }
 

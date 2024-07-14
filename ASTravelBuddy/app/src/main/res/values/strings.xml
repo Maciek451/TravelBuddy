@@ -125,4 +125,7 @@
     <string name="details">Details</string>
     <string name="trip_start_date">Start Date: %1$s</string>
     <string name="trip_end_date">End Date: %1$s</string>
+    <string name="remove_friend_headline">Confirm to remove</string>
+    <string name="confirm_remove_friend">Click confirm to remove selected friend</string>
+    <string name="remove">Remove</string>
 </resources>
