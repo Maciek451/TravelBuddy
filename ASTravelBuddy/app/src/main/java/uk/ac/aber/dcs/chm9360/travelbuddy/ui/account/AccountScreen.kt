@@ -30,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,15 +48,13 @@ fun AccountScreen(
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
     val appBarTitle = R.string.account
-    val navigateToFriends: () -> Unit = { }
+    val navigateToFriendsList: () -> Unit = { navController.navigate(Screens.FriendsList.route) }
     val navigateToPreferences: () -> Unit = { }
     val navigateToTermsOfService: () -> Unit = { }
-    val navigateToLanguage: () -> Unit = { }
-    val navigateToTheme: () -> Unit = { }
     val navigateToAbout: () -> Unit = { navController.navigate(Screens.About.route) }
 
     val authState by firebaseViewModel.authState.collectAsState()
-    val email = authState?.email ?: "email not available"
+    val email = authState?.email ?: stringResource(id = R.string.email_not_available)
     val monogram = email.firstOrNull()?.uppercase() ?: ""
     val username by firebaseViewModel.username.collectAsState()
 
@@ -79,7 +76,9 @@ fun AccountScreen(
         showDialog = showThemeDialog.value,
         currentTheme = 0,
         onDismiss = { showThemeDialog.value = false },
-        onThemeSelected = { }
+        onThemeSelected = {
+            showThemeDialog.value = false
+        }
     )
     LanguageSelectionDialog(
         showDialog = showLanguageDialog.value,
@@ -105,7 +104,7 @@ fun AccountScreen(
         }
         SettingsList(
             items = listOf(
-                R.string.your_friends to navigateToFriends,
+                R.string.your_friends to navigateToFriendsList,
                 R.string.preferences to navigateToPreferences,
             )
         )

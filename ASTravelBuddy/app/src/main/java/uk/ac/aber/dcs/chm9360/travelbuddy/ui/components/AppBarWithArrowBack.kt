@@ -37,7 +37,6 @@ fun AppBarWithArrowBack(
     showRemoveIcon: Boolean = false,
     tripMenu: Boolean = false,
     showSaveButton: Boolean = false,
-    navDestination: String? = null,
     onSave: (() -> Unit)? = null,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {

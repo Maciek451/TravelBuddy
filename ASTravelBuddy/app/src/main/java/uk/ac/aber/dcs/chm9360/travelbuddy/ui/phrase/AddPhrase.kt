@@ -49,7 +49,6 @@ fun AddPhraseScreen(
             appBarTitle = title,
             showSaveButton = true,
             showMoreIcon = false,
-            navDestination = nextDestination,
             onSave = {
                 val newPhrase = Phrase(language, phrase, translation)
                 firebaseViewModel.addPhrase(newPhrase)

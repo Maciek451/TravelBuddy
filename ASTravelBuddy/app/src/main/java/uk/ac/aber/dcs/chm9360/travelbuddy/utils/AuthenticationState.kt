@@ -1,9 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.utils
 
 object AuthenticationState {
-    var userId = ""
-    var userEmail = ""
-
     const val LOGGED_IN_SUCCESSFULLY = 0
     const val PASSWORD_WRONG = 1
     const val ACCOUNT_DOES_NOT_EXIST = 2

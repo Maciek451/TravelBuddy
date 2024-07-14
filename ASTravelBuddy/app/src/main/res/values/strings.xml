@@ -113,4 +113,16 @@
     <string name="add_trip_bottom_sheet">Add\n trip</string>
     <string name="add_phrase_bottom_sheet">Add\n phrase</string>
     <string name="add_friend_bottom_sheet">Add\n friend</string>
+    <string name="email_or_displayname">Email or display name</string>
+    <string name="email_not_available">Email not available</string>
+    <string name="verification_email_resent">Verification email resent</string>
+    <string name="failed_to_resend_verification_email">Failed to resend verification email</string>
+    <string name="friend_added_successfully">Friend added successfully</string>
+    <string name="friend_removed_successfully">Friend removed successfully</string>
+    <string name="failed_to_remove_friend">Failed to remove friend</string>
+    <string name="no_friends_text">No friends added</string>
+    <string name="empty_friends_screen_icon">No friends icon</string>
+    <string name="details">Details</string>
+    <string name="trip_start_date">Start Date: %1$s</string>
+    <string name="trip_end_date">End Date: %1$s</string>
 </resources>

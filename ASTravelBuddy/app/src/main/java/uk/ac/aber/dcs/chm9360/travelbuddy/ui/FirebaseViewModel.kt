@@ -14,13 +14,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.User
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.AuthenticationState
 
 class FirebaseViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
-    private val phrasesData = db.collection("phrases")
-    private val tripsData = db.collection("trips")
 
     private val _username = MutableStateFlow<String?>(null)
     val username: StateFlow<String?> get() = _username
@@ -34,10 +33,14 @@ class FirebaseViewModel : ViewModel() {
     private val _authState = MutableStateFlow<FirebaseUser?>(auth.currentUser)
     val authState: StateFlow<FirebaseUser?> get() = _authState
 
+    private val _friends = MutableStateFlow<List<User>>(emptyList())
+    val friends: StateFlow<List<User>> get() = _friends
+
     init {
         observeAuthState()
         fetchPhrases()
         fetchTrips()
+        fetchFriends()
     }
 
     private fun observeAuthState() {
@@ -63,7 +66,6 @@ class FirebaseViewModel : ViewModel() {
                     } else {
                         when (val exception = task.exception) {
                             is FirebaseAuthInvalidCredentialsException -> {
-                                Log.d("Test", exception.toString())
                                 when (exception.errorCode) {
                                     "ERROR_INVALID_CREDENTIAL" -> callback(AuthenticationState.PASSWORD_WRONG)
                                     "ERROR_INVALID_EMAIL" -> callback(AuthenticationState.EMAIL_WRONG_FORMAT)
@@ -261,19 +263,171 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
-    fun fetchPhrases() {
+    fun findAndAddFriend(emailOrUsername: String, callback: (Boolean, String) -> Unit) {
+        val currentUser = auth.currentUser ?: return callback(false, "User not authenticated")
+
+        fun searchByEmail(email: String) {
+            db.collection("users")
+                .whereEqualTo("email", email)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (!snapshot.isEmpty) {
+                        val userDoc = snapshot.documents[0]
+                        val friendId = userDoc.id
+                        val friendUsername = userDoc.getString("username") ?: ""
+                        checkIfFriendExists(currentUser.uid, friendId) { exists ->
+                            if (exists) {
+                                callback(false, "Friend is already added")
+                            } else {
+                                addFriend(currentUser.uid, friendId, friendUsername) { success ->
+                                    if (success) {
+                                        callback(true, "Friend added successfully")
+                                    } else {
+                                        callback(false, "Failed to add friend")
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        callback(false, "No user found with this email")
+                    }
+                }
+                .addOnFailureListener { callback(false, "Failed to search by email") }
+        }
+
+        fun searchByUsername(username: String) {
+            db.collection("users")
+                .whereEqualTo("username", username)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (!snapshot.isEmpty) {
+                        val userDoc = snapshot.documents[0]
+                        val friendId = userDoc.id
+                        val friendUsername = userDoc.getString("username") ?: ""
+                        checkIfFriendExists(currentUser.uid, friendId) { exists ->
+                            if (exists) {
+                                callback(false, "Friend is already added")
+                            } else {
+                                addFriend(currentUser.uid, friendId, friendUsername) { success ->
+                                    if (success) {
+                                        callback(true, "Friend added successfully")
+                                    } else {
+                                        callback(false, "Failed to add friend")
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        callback(false, "No user found with this username")
+                    }
+                }
+                .addOnFailureListener { callback(false, "Failed to search by username") }
+        }
+
+        if (emailOrUsername.contains("@")) {
+            searchByEmail(emailOrUsername)
+        } else {
+            searchByUsername(emailOrUsername)
+        }
+    }
+
+    private fun checkIfFriendExists(currentUserId: String, friendId: String, callback: (Boolean) -> Unit) {
+        val currentUserRef = db.collection("users").document(currentUserId)
+        currentUserRef.collection("friends").document(friendId)
+            .get()
+            .addOnSuccessListener { document ->
+                callback(document.exists())
+            }
+            .addOnFailureListener { callback(false) }
+    }
+
+    private fun addFriend(currentUserId: String, friendId: String, friendUsername: String, callback: (Boolean) -> Unit) {
+        val currentUserRef = db.collection("users").document(currentUserId)
+        val friendData = mapOf(
+            "userId" to friendId,
+            "username" to friendUsername
+        )
+
+        currentUserRef.collection("friends").document(friendId).set(friendData)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+
+    fun removeFriend(friendId: String, callback: (Boolean) -> Unit) {
+        val currentUser = auth.currentUser ?: return callback(false)
+
+        val currentUserRef = db.collection("users").document(currentUser.uid)
+        currentUserRef.collection("friends").document(friendId)
+            .delete()
+            .addOnSuccessListener {
+                fetchFriends()
+                callback(true)
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
+
+    fun fetchFriends() {
         val user = auth.currentUser
         if (user != null) {
             viewModelScope.launch {
                 db.collection("users").document(user.uid)
-                    .collection("phrases")
+                    .collection("friends")
                     .get()
                     .addOnSuccessListener { snapshot ->
-                        val phrases = snapshot.toObjects(Phrase::class.java)
-                        _phrases.value = phrases
+                        val friends = snapshot.toObjects(User::class.java)
+                        _friends.value = friends
                     }
                     .addOnFailureListener { }
             }
+        }
+    }
+
+    fun fetchPhrases() {
+        val user = auth.currentUser
+        if (user != null) {
+            viewModelScope.launch {
+                try {
+                    val userPhrasesSnapshot = db.collection("users").document(user.uid)
+                        .collection("phrases")
+                        .get()
+                        .await()
+
+                    val userPhrases = userPhrasesSnapshot.toObjects(Phrase::class.java)
+
+                    val friends = fetchFriendsList(user.uid)
+                    val friendPhrases = mutableListOf<Phrase>()
+
+                    friends.forEach { friend ->
+                        val friendPhrasesSnapshot = db.collection("users").document(friend.userId)
+                            .collection("phrases")
+                            .get()
+                            .await()
+
+                        friendPhrases.addAll(friendPhrasesSnapshot.toObjects(Phrase::class.java))
+                    }
+
+                    val allPhrases = userPhrases + friendPhrases
+
+                    _phrases.value = allPhrases
+                } catch (e: Exception) {
+                    Log.e("FirebaseViewModel", "Error fetching phrases", e)
+                }
+            }
+        }
+    }
+
+    private suspend fun fetchFriendsList(userId: String): List<User> {
+        return try {
+            val friendsSnapshot = db.collection("users").document(userId)
+                .collection("friends")
+                .get()
+                .await()
+
+            friendsSnapshot.toObjects(User::class.java)
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 

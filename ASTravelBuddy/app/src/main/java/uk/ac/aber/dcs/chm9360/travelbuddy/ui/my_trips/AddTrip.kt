@@ -50,7 +50,6 @@ fun AddTripScreen(
             appBarTitle = title,
             showSaveButton = true,
             showMoreIcon = false,
-            navDestination = nextDestination,
             onSave = {
                 val newTrip = Trip(
                     tripTitle,

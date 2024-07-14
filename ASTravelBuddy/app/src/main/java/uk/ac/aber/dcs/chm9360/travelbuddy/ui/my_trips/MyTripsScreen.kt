@@ -80,7 +80,6 @@ fun MyTripsScreen(
             }
         }
     }
-
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchTrips()
     }
@@ -111,14 +110,14 @@ fun TripCard(
                     .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
             ) {
                 Text(
-                    text = "Start Date: ${trip.startDate}",
+                    text = stringResource(id = R.string.trip_start_date, trip.startDate),
                     style = MaterialTheme.typography.bodyMedium
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = "End Date: ${trip.endDate}",
+                    text = stringResource(id = R.string.trip_end_date, trip.endDate),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -142,7 +141,7 @@ fun TripCard(
                     .align(Alignment.End)
                     .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
             ) {
-                Text(text = "Details")
+                Text(text = stringResource(id = R.string.details))
             }
         }
     }

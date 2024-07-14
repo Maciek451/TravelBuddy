@@ -46,12 +46,12 @@ fun SignInScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
     var errorMessage by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
-    var showPasswordDialog by remember { mutableStateOf(false) }
-    var showVerificationDialog by remember { mutableStateOf(false) }
+    var showPasswordDialog by rememberSaveable { mutableStateOf(false) }
+    var showVerificationDialog by rememberSaveable { mutableStateOf(false) }
 
     ForgotPasswordDialog(
         showDialog = showPasswordDialog,
@@ -65,9 +65,9 @@ fun SignInScreen(
         onResendEmail = {
             firebaseViewModel.sendVerificationEmail { isSuccess ->
                 if (isSuccess) {
-                    Toast.makeText(context, "Verification email resent", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.verification_email_resent, Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(context, "Failed to resend verification email", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.failed_to_resend_verification_email, Toast.LENGTH_SHORT).show()
                 }
             }
         }

@@ -2,15 +2,9 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui.notifications
 
 import android.app.Notification
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material3.Icon
@@ -35,10 +29,7 @@ fun NotificationScreen(
     val notifications = listOf<Notification>()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
     ) {
         AppBarWithArrowBack(
             navController = navController,
@@ -46,10 +37,10 @@ fun NotificationScreen(
             showMoreIcon = false,
             showRemoveIcon = true
         )
-        if (notifications.isNotEmpty()) {
-            // Future code here
-        } else {
+        if (notifications.isEmpty()) {
             EmptyNotificationScreen()
+        } else {
+            //TODO
         }
     }
 }
@@ -61,7 +52,6 @@ fun EmptyNotificationScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(300.dp))
         Icon(
             modifier = Modifier
                 .size(100.dp)
@@ -74,6 +64,7 @@ fun EmptyNotificationScreen() {
                 .alpha(0.3f),
             text = stringResource(id = R.string.no_notifications_text),
             fontSize = 20.sp,
+            textAlign = TextAlign.Center
         )
     }
 }

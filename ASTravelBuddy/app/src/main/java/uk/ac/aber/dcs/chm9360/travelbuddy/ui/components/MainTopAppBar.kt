@@ -19,7 +19,6 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 fun MainTopAppBar(
     navController: NavHostController,
     appBarTitle: String,
-    onClick: Boolean
 ) {
     TopAppBar(
         title = {

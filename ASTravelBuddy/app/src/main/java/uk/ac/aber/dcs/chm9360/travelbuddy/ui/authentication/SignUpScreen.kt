@@ -1,6 +1,5 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,10 +42,10 @@ fun SignUpScreen(
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
     val title = R.string.app_name
-    var email by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordConfirmation by remember { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordConfirmation by rememberSaveable { mutableStateOf("") }
     var showVerificationDialog by rememberSaveable { mutableStateOf(false) }
 
     var errorMessage by rememberSaveable { mutableStateOf("") }
