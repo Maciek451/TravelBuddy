@@ -83,7 +83,4 @@ dependencies {
 
     //DataStore
     implementation(libs.androidx.datastore.preferences)
-
-    //Date and Time Pickers
-    implementation(libs.datetime)
 }
