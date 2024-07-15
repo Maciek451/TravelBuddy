@@ -224,7 +224,7 @@ fun TravelBuddyTheme(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    val themePreference by context.themePreferenceFlow.collectAsState(initial = 0)
+    val themePreference by context.themePreferenceFlow.collectAsState(initial = 2)
     val darkTheme = when (themePreference) {
         1 -> true
         2 -> isSystemInDarkTheme()

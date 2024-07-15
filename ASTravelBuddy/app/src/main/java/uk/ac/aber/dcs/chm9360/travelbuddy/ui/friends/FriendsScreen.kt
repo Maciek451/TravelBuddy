@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.NoLuggage
 import androidx.compose.material.icons.filled.SpeakerNotesOff
@@ -33,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,6 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
@@ -59,6 +62,9 @@ fun FriendsScreen(
     val appBarTitle = stringResource(R.string.friends)
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val phrases by firebaseViewModel.phrases.collectAsState()
+    val isRefreshing by firebaseViewModel.isRefreshing.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
+    val coroutineScope = rememberCoroutineScope()
 
     TopLevelScaffold(
         navController = navController,
@@ -91,17 +97,26 @@ fun FriendsScreen(
                 }
                 when (selectedTabIndex) {
                     0 -> {
-                            EmptyTripsScreen()
+                        EmptyTripsScreen()
                     }
                     1 -> {
-                        if (phrases.isNotEmpty()) {
-                            LazyColumn {
-                                items(phrases) { phrase ->
-                                    PhraseCard(phrase, username = "User")
+                        SwipeRefresh(
+                            state = swipeRefreshState,
+                            onRefresh = {
+                                coroutineScope.launch {
+                                    firebaseViewModel.refreshPhrases()
                                 }
                             }
-                        } else {
-                            EmptyPhrasesScreen()
+                        ) {
+                            if (phrases.isNotEmpty()) {
+                                LazyColumn {
+                                    items(phrases) { phrase ->
+                                        PhraseCard(phrase)
+                                    }
+                                }
+                            } else {
+                                EmptyPhrasesScreen()
+                            }
                         }
                     }
                 }
@@ -111,7 +126,7 @@ fun FriendsScreen(
 }
 
 @Composable
-fun PhraseCard(phrase: Phrase, username: String) {
+fun PhraseCard(phrase: Phrase) {
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -132,14 +147,14 @@ fun PhraseCard(phrase: Phrase, username: String) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = username.take(1).uppercase(),
+                        text = phrase.username.take(1).uppercase(),
                         color = Color.White,
                         fontSize = 20.sp,
                     )
                 }
                 Spacer(modifier = Modifier.width(15.dp))
                 Text(
-                    text = username,
+                    text = phrase.username,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -159,22 +174,11 @@ fun PhraseCard(phrase: Phrase, username: String) {
                 fontSize = 20.sp,
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = stringResource(R.string.like)
-                    )
-                }
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Comment,
-                        contentDescription = stringResource(R.string.comment)
-                    )
-                }
+            IconButton(onClick = { }) {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = stringResource(R.string.like)
+                )
             }
         }
     }

@@ -36,6 +36,9 @@ class FirebaseViewModel : ViewModel() {
     private val _friends = MutableStateFlow<List<User>>(emptyList())
     val friends: StateFlow<List<User>> get() = _friends
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> get() = _isRefreshing
+
     init {
         observeAuthState()
         fetchPhrases()
@@ -263,6 +266,69 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
+    private suspend fun fetchFriendsList(userId: String): List<User> {
+        return try {
+            val friendsSnapshot = db.collection("users").document(userId)
+                .collection("friends")
+                .get()
+                .await()
+
+            friendsSnapshot.toObjects(User::class.java)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    fun fetchFriends() {
+        val user = auth.currentUser
+        if (user != null) {
+            viewModelScope.launch {
+                db.collection("users").document(user.uid)
+                    .collection("friends")
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        val friends = snapshot.map { document ->
+                            User(
+                                userId = document.id,
+                                username = document.getString("username") ?: "",
+                                email = document.getString("email") ?: ""
+                            )
+                        }
+                        _friends.value = friends
+                    }
+                    .addOnFailureListener { }
+            }
+        }
+    }
+
+    private fun addFriend(currentUserId: String, friendId: String, friendUsername: String, friendEmail: String, callback: (Boolean) -> Unit) {
+        val currentUserRef = db.collection("users").document(currentUserId)
+        val friendData = mapOf(
+            "userId" to friendId,
+            "username" to friendUsername,
+            "email" to friendEmail
+        )
+
+        currentUserRef.collection("friends").document(friendId).set(friendData)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+
+    fun removeFriend(friendId: String, callback: (Boolean) -> Unit) {
+        val currentUser = auth.currentUser ?: return callback(false)
+
+        val currentUserRef = db.collection("users").document(currentUser.uid)
+        currentUserRef.collection("friends").document(friendId)
+            .delete()
+            .addOnSuccessListener {
+                fetchFriends()
+                callback(true)
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
+
     fun findAndAddFriend(emailOrUsername: String, callback: (Boolean, String) -> Unit) {
         val currentUser = auth.currentUser ?: return callback(false, "User not authenticated")
 
@@ -343,78 +409,36 @@ class FirebaseViewModel : ViewModel() {
             .addOnFailureListener { callback(false) }
     }
 
-    private fun addFriend(currentUserId: String, friendId: String, friendUsername: String, friendEmail: String, callback: (Boolean) -> Unit) {
-        val currentUserRef = db.collection("users").document(currentUserId)
-        val friendData = mapOf(
-            "userId" to friendId,
-            "username" to friendUsername,
-            "email" to friendEmail
-        )
-
-        currentUserRef.collection("friends").document(friendId).set(friendData)
-            .addOnSuccessListener { callback(true) }
-            .addOnFailureListener { callback(false) }
-    }
-
-    fun removeFriend(friendId: String, callback: (Boolean) -> Unit) {
-        val currentUser = auth.currentUser ?: return callback(false)
-
-        val currentUserRef = db.collection("users").document(currentUser.uid)
-        currentUserRef.collection("friends").document(friendId)
-            .delete()
-            .addOnSuccessListener {
-                fetchFriends()
-                callback(true)
-            }
-            .addOnFailureListener {
-                callback(false)
-            }
-    }
-
-    fun fetchFriends() {
-        val user = auth.currentUser
-        if (user != null) {
-            viewModelScope.launch {
-                db.collection("users").document(user.uid)
-                    .collection("friends")
-                    .get()
-                    .addOnSuccessListener { snapshot ->
-                        val friends = snapshot.map { document ->
-                            User(
-                                userId = document.id,
-                                username = document.getString("username") ?: "",
-                                email = document.getString("email") ?: ""
-                            )
-                        }
-                        _friends.value = friends
-                    }
-                    .addOnFailureListener { }
-            }
-        }
-    }
-
     fun fetchPhrases() {
-        val user = auth.currentUser
-        if (user != null) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            val user = auth.currentUser
+            if (user != null) {
+                _isRefreshing.value = true
                 try {
                     val userPhrasesSnapshot = db.collection("users").document(user.uid)
                         .collection("phrases")
                         .get()
                         .await()
 
-                    val userPhrases = userPhrasesSnapshot.toObjects(Phrase::class.java)
+                    val userPhrases = userPhrasesSnapshot.documents.mapNotNull { document ->
+                        document.toObject(Phrase::class.java)
+                            ?.copy(username = document.getString("username") ?: "")
+                    }
 
                     val friends = fetchFriendsList(user.uid)
                     val friendPhrases = mutableListOf<Phrase>()
 
-                    friends.forEach { friend ->
+                    for (friend in friends) {
                         val friendPhrasesSnapshot = db.collection("users").document(friend.userId)
                             .collection("phrases")
                             .get()
                             .await()
 
-                        friendPhrases.addAll(friendPhrasesSnapshot.toObjects(Phrase::class.java))
+                        val phrases = friendPhrasesSnapshot.documents.mapNotNull { document ->
+                            document.toObject(Phrase::class.java)?.copy(username = friend.username)
+                        }
+
+                        friendPhrases.addAll(phrases)
                     }
 
                     val allPhrases = userPhrases + friendPhrases
@@ -422,21 +446,10 @@ class FirebaseViewModel : ViewModel() {
                     _phrases.value = allPhrases
                 } catch (e: Exception) {
                     Log.e("FirebaseViewModel", "Error fetching phrases", e)
+                } finally {
+                    _isRefreshing.value = false
                 }
             }
-        }
-    }
-
-    private suspend fun fetchFriendsList(userId: String): List<User> {
-        return try {
-            val friendsSnapshot = db.collection("users").document(userId)
-                .collection("friends")
-                .get()
-                .await()
-
-            friendsSnapshot.toObjects(User::class.java)
-        } catch (e: Exception) {
-            emptyList()
         }
     }
 
@@ -444,15 +457,26 @@ class FirebaseViewModel : ViewModel() {
         val user = auth.currentUser
         if (user != null) {
             viewModelScope.launch {
-                db.collection("users").document(user.uid)
-                    .collection("phrases")
-                    .add(phrase)
-                    .addOnSuccessListener {
-                        fetchPhrases()
-                    }
-                    .addOnFailureListener { }
+                try {
+                    val userDocument = db.collection("users").document(user.uid).get().await()
+                    val username = userDocument.getString("username") ?: "Unknown User"
+
+                    val phraseWithUsername = phrase.copy(username = username)
+                    db.collection("users").document(user.uid)
+                        .collection("phrases")
+                        .add(phraseWithUsername)
+                        .await()
+
+                    fetchPhrases()
+                } catch (e: Exception) {
+                    Log.e("FirebaseViewModel", "Error adding phrase", e)
+                }
             }
         }
+    }
+
+    fun refreshPhrases() {
+        fetchPhrases()
     }
 
     fun fetchTrips() {

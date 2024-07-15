@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 
 val Context.dataStore by preferencesDataStore(name = "settings")
 val Context.themePreferenceFlow get() = dataStore.data.map { preferences ->
-    preferences[PreferencesKeys.THEME_KEY] ?: 0
+    preferences[PreferencesKeys.THEME_KEY] ?: 2
 }
 
 object PreferencesKeys {
