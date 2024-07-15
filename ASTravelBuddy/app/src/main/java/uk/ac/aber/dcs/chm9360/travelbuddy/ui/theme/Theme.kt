@@ -11,11 +11,14 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.themePreferenceFlow
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -217,16 +220,21 @@ val unspecified_scheme = ColorFamily(
 
 @Composable
 fun TravelBuddyTheme(
-    darkTheme: Boolean = false,
     dynamicColor: Boolean = false,
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current
+    val themePreference by context.themePreferenceFlow.collectAsState(initial = 0)
+    val darkTheme = when (themePreference) {
+        1 -> true
+        2 -> isSystemInDarkTheme()
+        else -> false
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> darkScheme
         else -> lightScheme
     }

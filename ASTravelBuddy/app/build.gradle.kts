@@ -78,5 +78,12 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
 
+    // Play Services
     implementation(libs.play.services.auth)
+
+    //DataStore
+    implementation(libs.androidx.datastore.preferences)
+
+    //Date and Time Pickers
+    implementation(libs.datetime)
 }

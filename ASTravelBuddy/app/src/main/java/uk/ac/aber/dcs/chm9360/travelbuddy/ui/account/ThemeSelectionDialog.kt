@@ -13,13 +13,20 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.saveThemePreference
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.themePreferenceFlow
 
 @Composable
 fun ThemeSelectionDialog(
@@ -28,7 +35,14 @@ fun ThemeSelectionDialog(
     onDismiss: () -> Unit,
     onThemeSelected: (Int) -> Unit
 ) {
-    val selectedTheme = rememberSaveable { mutableIntStateOf(currentTheme) }
+    val context = LocalContext.current
+    val selectedThemeState = rememberSaveable { mutableIntStateOf(currentTheme) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        val savedTheme = context.themePreferenceFlow.first()
+        selectedThemeState.intValue = savedTheme
+    }
 
     if (showDialog) {
         AlertDialog(
@@ -43,21 +57,29 @@ fun ThemeSelectionDialog(
                 Column {
                     RadioButtonOption(
                         text = stringResource(id = R.string.light_theme),
-                        isSelected = selectedTheme.intValue == 0,
-                        onSelect = { selectedTheme.intValue = 0 }
+                        isSelected = selectedThemeState.intValue == 0,
+                        onSelect = { selectedThemeState.intValue = 0 }
                     )
                     RadioButtonOption(
                         text = stringResource(id = R.string.dark_theme),
-                        isSelected = selectedTheme.intValue == 1,
-                        onSelect = { selectedTheme.intValue = 1 }
+                        isSelected = selectedThemeState.intValue == 1,
+                        onSelect = { selectedThemeState.intValue = 1 }
+                    )
+                    RadioButtonOption(
+                        text = stringResource(id = R.string.system_default),
+                        isSelected = selectedThemeState.intValue == 2,
+                        onSelect = { selectedThemeState.intValue = 2 }
                     )
                 }
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        onThemeSelected(selectedTheme.intValue)
-                        onDismiss()
+                        coroutineScope.launch {
+                            saveThemePreference(context, selectedThemeState.intValue)
+                            onThemeSelected(selectedThemeState.intValue)
+                            onDismiss()
+                        }
                     }
                 ) {
                     Text(text = stringResource(id = R.string.save))
