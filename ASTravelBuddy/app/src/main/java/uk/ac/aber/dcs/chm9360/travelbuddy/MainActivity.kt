@@ -1,10 +1,12 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,6 +20,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.AddTripScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.about.AboutScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.AccountScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.ProfileScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SignInScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SignUpScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.ExploreScreen
@@ -34,6 +37,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.theme.TravelBuddyTheme
 class MainActivity : ComponentActivity() {
     private val firebaseViewModel: FirebaseViewModel by viewModels()
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -50,13 +54,13 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Screens.SignIn.route
                     }
-
                     BuildNavigationGraph(navController, startDestination)
                 }
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @Composable
     private fun BuildNavigationGraph(
         navController: NavHostController,
@@ -79,6 +83,7 @@ class MainActivity : ComponentActivity() {
             composable(Screens.AddPhrase.route) { AddPhraseScreen(navController) }
             composable(Screens.AddFriend.route) { AddFriendScreen(navController) }
             composable(Screens.FriendsList.route) { FriendsListScreen(navController) }
+            composable(Screens.Profile.route) { ProfileScreen(navController) }
         }
     }
 }

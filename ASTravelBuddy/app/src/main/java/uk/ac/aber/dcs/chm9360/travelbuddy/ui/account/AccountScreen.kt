@@ -58,7 +58,6 @@ fun AccountScreen(
     val monogram = email.firstOrNull()?.uppercase() ?: ""
     val username by firebaseViewModel.username.collectAsState()
 
-    val showUpdateDialog = rememberSaveable { mutableStateOf(false) }
     val showThemeDialog = rememberSaveable { mutableStateOf(false) }
     val showLanguageDialog = rememberSaveable { mutableStateOf(false) }
     val currentLanguage by rememberSaveable { mutableIntStateOf(0) }
@@ -67,11 +66,6 @@ fun AccountScreen(
         firebaseViewModel.fetchUsername()
     }
 
-    EditUsernameDialog(
-        showDialog = showUpdateDialog.value,
-        onDismiss = { showUpdateDialog.value = false },
-        firebaseViewModel = firebaseViewModel
-    )
     ThemeSelectionDialog(
         showDialog = showThemeDialog.value,
         currentTheme = 0,
@@ -94,7 +88,7 @@ fun AccountScreen(
         UserCard(username ?: "", email, monogram)
         Button(
             onClick = {
-                showUpdateDialog.value = true
+                navController.navigate(Screens.Profile.route)
             },
             modifier = Modifier
                 .fillMaxWidth()

@@ -17,6 +17,7 @@ sealed class Screens(
     object AddPhrase: Screens("add_phrase")
     object AddFriend: Screens("add_friend")
     object FriendsList: Screens("list_of_friends")
+    object Profile: Screens("profile")
 }
 
 val screens = listOf(

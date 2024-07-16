@@ -129,4 +129,6 @@
     <string name="confirm_remove_friend">Click confirm to remove selected friend</string>
     <string name="remove">Remove</string>
     <string name="system_default">System default</string>
+    <string name="profile">Profile</string>
+    <string name="edit_icon">Edit icon</string>
 </resources>
