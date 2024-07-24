@@ -1,0 +1,68 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: MS Teams, Wednesday, 17th July 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Wednesday, 17th July 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. Continue working on different screens. 
+ACTION: mat78
+Status: Ongoing
+
+2. Add an interactive map by finding relevant API.
+ACTION: mat78
+Status: Ongoing
+Found an advanced API, MapBox (https://www.mapbox.com/). Currently exploring it by following its tutorials. 
+Seems to have very good features. 
+Need to start implementing it.
+
+3. Continue working on firestore functionality for trips features.
+ACTION: mat78
+Status: Ongoing
+
+4. Implement "Your Friends" functionality.
+ACTION: mat78
+Status: Ongoing
+Implement friend approval process for adding friend. 
+
+5. Implement delete account and remove all data functionalities. 
+ACTION: mat78
+Status: Done
+
+Other Works
+===========
+6. Implement app themes (light, dark, system theme).
+ACTION: mat78
+Status: Done
+
+7. Implement "Edit Profile" functionality
+ACTION: mat78
+Status: Ongoing
+
+New business 
+============
+1. Implement date picker component in Add Trip screen. 
+ACTION: mat78
+
+2. Change 'Username' to "Display Name" at all places of its usage. 
+ACTION: mat78
+
+3. Implement the interactive map using identified MapBox API.
+ACTION: mat78
+
+4. Continue working on firestore functionality for trips features.
+ACTION: mat78
+
+5. Implement friend approval process for adding friend. 
+ACTION: mat78
+
+6. Implement "Edit Profile" functionality
+ACTION: mat78
+
+AOB 
+=== 
+None
