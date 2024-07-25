@@ -51,7 +51,7 @@
     <string name="save_button">Save button</string>
     <string name="email_address">Email address</string>
     <string name="password">Password</string>
-    <string name="username">Username</string>
+    <string name="username">Display name</string>
     <string name="signedOut">Signed out</string>
     <string name="save">Save</string>
     <string name="done_icon">Done icon</string>
@@ -84,9 +84,9 @@
     <string name="cancel">Cancel</string>
     <string name="reset_your_password">Reset your password</string>
     <string name="sign_in_with_google">Sign in with Google</string>
-    <string name="update_username">Update your username</string>
-    <string name="username_updated">Username updated</string>
-    <string name="username_update_failed">Username update failed</string>
+    <string name="update_username">Update your display name</string>
+    <string name="username_updated">Display name updated</string>
+    <string name="username_update_failed">Display update failed</string>
     <string name="dark_theme">Dark</string>
     <string name="light_theme">Light</string>
     <string name="select_theme">Select theme</string>
@@ -131,4 +131,5 @@
     <string name="system_default">System default</string>
     <string name="profile">Profile</string>
     <string name="edit_icon">Edit icon</string>
+    <string name="location_button">Location icon button</string>
 </resources>

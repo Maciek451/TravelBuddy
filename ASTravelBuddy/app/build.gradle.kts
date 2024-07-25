@@ -81,6 +81,7 @@ dependencies {
 
     // Play Services
     implementation(libs.play.services.auth)
+    implementation (libs.play.services.location)
 
     //DataStore
     implementation(libs.androidx.datastore.preferences)
@@ -88,4 +89,8 @@ dependencies {
     //DatePicker
     implementation(libs.core)
     implementation(libs.calendar)
+
+    //OpenStreetMap
+    implementation (libs.osmdroid.android)
+    implementation (libs.osmdroid.mapsforge)
 }
