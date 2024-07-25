@@ -329,74 +329,36 @@ class FirebaseViewModel : ViewModel() {
             }
     }
 
-    fun findAndAddFriend(emailOrUsername: String, callback: (Boolean, String) -> Unit) {
+    fun findAndAddFriend(email: String, callback: (Boolean, String) -> Unit) {
         val currentUser = auth.currentUser ?: return callback(false, "User not authenticated")
 
-        fun searchByEmail(email: String) {
-            db.collection("users")
-                .whereEqualTo("email", email)
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    if (!snapshot.isEmpty) {
-                        val userDoc = snapshot.documents[0]
-                        val friendId = userDoc.id
-                        val friendUsername = userDoc.getString("username") ?: ""
-                        val friendEmail = userDoc.getString("email") ?: ""
-                        checkIfFriendExists(currentUser.uid, friendId) { exists ->
-                            if (exists) {
-                                callback(false, "Friend is already added")
-                            } else {
-                                addFriend(currentUser.uid, friendId, friendUsername, friendEmail) { success ->
-                                    if (success) {
-                                        callback(true, "Friend added successfully")
-                                    } else {
-                                        callback(false, "Failed to add friend")
-                                    }
+        db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.isEmpty) {
+                    val userDoc = snapshot.documents[0]
+                    val friendId = userDoc.id
+                    val friendUsername = userDoc.getString("username") ?: ""
+                    val friendEmail = userDoc.getString("email") ?: ""
+                    checkIfFriendExists(currentUser.uid, friendId) { exists ->
+                        if (exists) {
+                            callback(false, "Friend is already added")
+                        } else {
+                            addFriend(currentUser.uid, friendId, friendUsername, friendEmail) { success ->
+                                if (success) {
+                                    callback(true, "Friend added successfully")
+                                } else {
+                                    callback(false, "Failed to add friend")
                                 }
                             }
                         }
-                    } else {
-                        callback(false, "No user found with this email")
                     }
+                } else {
+                    callback(false, "No user found with this email")
                 }
-                .addOnFailureListener { callback(false, "Failed to search by email") }
-        }
-
-        fun searchByUsername(username: String) {
-            db.collection("users")
-                .whereEqualTo("username", username)
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    if (!snapshot.isEmpty) {
-                        val userDoc = snapshot.documents[0]
-                        val friendId = userDoc.id
-                        val friendUsername = userDoc.getString("username") ?: ""
-                        val friendEmail = userDoc.getString("email") ?: ""
-                        checkIfFriendExists(currentUser.uid, friendId) { exists ->
-                            if (exists) {
-                                callback(false, "Friend is already added")
-                            } else {
-                                addFriend(currentUser.uid, friendId, friendUsername, friendEmail) { success ->
-                                    if (success) {
-                                        callback(true, "Friend added successfully")
-                                    } else {
-                                        callback(false, "Failed to add friend")
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        callback(false, "No user found with this username")
-                    }
-                }
-                .addOnFailureListener { callback(false, "Failed to search by username") }
-        }
-
-        if (emailOrUsername.contains("@")) {
-            searchByEmail(emailOrUsername)
-        } else {
-            searchByUsername(emailOrUsername)
-        }
+            }
+            .addOnFailureListener { callback(false, "Failed to search by email") }
     }
 
     private fun checkIfFriendExists(currentUserId: String, friendId: String, callback: (Boolean) -> Unit) {
