@@ -34,6 +34,10 @@ fun AddFriendScreen(
     val context = LocalContext.current
     var emailOrUsername by rememberSaveable { mutableStateOf("") }
 
+    val isSaveButtonEnabled by rememberSaveable(emailOrUsername) {
+        mutableStateOf(emailOrUsername.isNotBlank())
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,6 +47,7 @@ fun AddFriendScreen(
             appBarTitle = title,
             showSaveButton = true,
             showMoreIcon = false,
+            isSaveButtonEnabled = isSaveButtonEnabled,
             onSave = {
                 firebaseViewModel.findAndAddFriend(emailOrUsername) { success, message ->
                     if (success) {

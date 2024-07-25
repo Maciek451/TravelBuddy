@@ -40,15 +40,23 @@ fun AddPhraseScreen(
 
     val context = LocalContext.current
 
+    val isSaveButtonEnabled by rememberSaveable(language, phrase, translation) {
+        mutableStateOf(
+            language.isNotBlank() &&
+                    phrase.isNotBlank() &&
+                    translation.isNotBlank()
+        )
+    }
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         AppBarWithArrowBack(
             navController,
             appBarTitle = title,
             showSaveButton = true,
             showMoreIcon = false,
+            isSaveButtonEnabled = isSaveButtonEnabled,
             onSave = {
                 val newPhrase = Phrase(language, phrase, translation)
                 firebaseViewModel.addPhrase(newPhrase)
@@ -63,7 +71,9 @@ fun AddPhraseScreen(
             value = language,
             onValueChange = { language = it },
             label = { Text(stringResource(R.string.language)) },
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -72,7 +82,9 @@ fun AddPhraseScreen(
             value = phrase,
             onValueChange = { phrase = it },
             label = { Text(stringResource(R.string.phrase)) },
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -81,7 +93,9 @@ fun AddPhraseScreen(
             value = translation,
             onValueChange = { translation = it },
             label = { Text(stringResource(R.string.translation)) },
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp)
         )
     }
 }

@@ -60,6 +60,15 @@ fun AddTripScreen(
 
     val context = LocalContext.current
 
+    val isSaveButtonEnabled by rememberSaveable(tripTitle, destination, friends, startDate, endDate) {
+        mutableStateOf(
+            tripTitle.isNotBlank() &&
+                    destination.isNotBlank() &&
+                    friends.isNotBlank() &&
+                    startDate <= endDate
+        )
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -68,6 +77,7 @@ fun AddTripScreen(
             appBarTitle = title,
             showSaveButton = true,
             showMoreIcon = false,
+            isSaveButtonEnabled = isSaveButtonEnabled,
             onSave = {
                 val newTrip = Trip(
                     tripTitle,
@@ -112,7 +122,9 @@ fun AddTripScreen(
             value = tripTitle,
             onValueChange = { tripTitle = it },
             label = { Text(stringResource(R.string.trip_title)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -121,7 +133,9 @@ fun AddTripScreen(
             value = destination,
             onValueChange = { destination = it },
             label = { Text(stringResource(R.string.destination)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -130,7 +144,9 @@ fun AddTripScreen(
             value = friends,
             onValueChange = { friends = it },
             label = { Text(stringResource(R.string.friends)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         )
     }
 }

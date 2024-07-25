@@ -37,6 +37,7 @@ fun AppBarWithArrowBack(
     showRemoveIcon: Boolean = false,
     tripMenu: Boolean = false,
     showSaveButton: Boolean = false,
+    isSaveButtonEnabled: Boolean = true,
     onSave: (() -> Unit)? = null,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
@@ -94,7 +95,10 @@ fun AppBarWithArrowBack(
         },
         actions = {
             if (showSaveButton && onSave != null) {
-                IconButton(onClick = { onSave() }) {
+                IconButton(
+                    onClick = { onSave() },
+                    enabled = isSaveButtonEnabled
+                ) {
                     Icon(
                         Icons.Outlined.Done,
                         contentDescription = stringResource(R.string.done_icon)
@@ -102,7 +106,7 @@ fun AppBarWithArrowBack(
                 }
             }
             if (showRemoveIcon) {
-                IconButton(onClick = { }) {
+                IconButton(onClick = {  }) {
                     Icon(
                         Icons.Outlined.DeleteSweep,
                         contentDescription = stringResource(R.string.delete_sweep_icon)
@@ -123,11 +127,11 @@ fun AppBarWithArrowBack(
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.edit_trip)) },
-                            onClick = { }
+                            onClick = {  }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.remove_trip)) },
-                            onClick = { }
+                            onClick = {  }
                         )
                     }
                 } else {
