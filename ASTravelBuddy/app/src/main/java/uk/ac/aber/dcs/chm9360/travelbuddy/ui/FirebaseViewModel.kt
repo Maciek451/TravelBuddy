@@ -16,6 +16,9 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.User
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.AuthenticationState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class FirebaseViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
@@ -39,11 +42,15 @@ class FirebaseViewModel : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> get() = _isRefreshing
 
+    private val _creationDate = MutableStateFlow<String?>(null)
+    val creationDate: StateFlow<String?> get() = _creationDate
+
     init {
         observeAuthState()
         fetchPhrases()
         fetchTrips()
         fetchFriends()
+        fetchCreationDate()
     }
 
     private fun observeAuthState() {
@@ -142,6 +149,16 @@ class FirebaseViewModel : ViewModel() {
     fun signOut() {
         auth.signOut()
         _authState.value = null
+    }
+
+    fun fetchCreationDate() {
+        val user = auth.currentUser
+        if (user != null) {
+            val metadata = user.metadata
+            val creationTimestamp = metadata?.creationTimestamp ?: return
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            _creationDate.value = dateFormat.format(Date(creationTimestamp))
+        }
     }
 
     fun sendVerificationEmail(onResult: (Boolean) -> Unit) {
