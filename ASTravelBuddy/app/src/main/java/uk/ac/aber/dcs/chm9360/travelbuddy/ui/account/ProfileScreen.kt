@@ -68,9 +68,16 @@ fun ProfileScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        AppBarWithArrowBack(navController = navController, appBarTitle = title, showSaveButton = false, showMoreIcon = false)
+        AppBarWithArrowBack(
+            navController = navController,
+            appBarTitle = title,
+            showSaveButton = false,
+            showMoreIcon = false
+        )
 
         EditUsernameDialog(
             showDialog = showUsernameDialog.value,
@@ -78,10 +85,48 @@ fun ProfileScreen(
             firebaseViewModel = firebaseViewModel
         )
 
+        DeleteAccountDialog(
+            showDialog = showDeleteAccountDialog.value,
+            onDismiss = { showDeleteAccountDialog.value = false },
+            onDeleteAccount = {
+                firebaseViewModel.deleteUserAccount { isSuccess ->
+                    if (isSuccess) {
+                        firebaseViewModel.signOut()
+                        navController.navigate(Screens.SignIn.route) {
+                            popUpTo(0)
+                        }
+                        Toast.makeText(context, R.string.account_deleted, Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(
+                            context,
+                            R.string.failed_to_delete_account,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    showDeleteAccountDialog.value = false
+                }
+            }
+        )
+
+        RemoveAllDataDialog(
+            showDialog = showRemoveAllDataDialog.value,
+            onDismiss = { showRemoveAllDataDialog.value = false },
+            onDataRemoved = {
+                firebaseViewModel.removeAllUserData { isSuccess ->
+                    if (isSuccess) {
+                        Toast.makeText(context, R.string.data_removed, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, R.string.failed_to_remove_data, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    showRemoveAllDataDialog.value = false
+                }
+            }
+        )
+
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .fillMaxWidth(),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
@@ -138,7 +183,7 @@ fun ProfileScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(vertical = 16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
@@ -163,72 +208,28 @@ fun ProfileScreen(
                 )
             }
         }
-
         Spacer(modifier = Modifier.weight(1f))
-
-        Column(
+        Button(
+            onClick = { showRemoveAllDataDialog.value = true },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(vertical = 8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Red
+            )
         ) {
-            Button(
-                onClick = { showDeleteAccountDialog.value = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
-                )
-            ) {
-                Text(text = stringResource(id = R.string.delete_account), color = Color.White)
-            }
-            Button(
-                onClick = { showRemoveAllDataDialog.value = true },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
-                )
-            ) {
-                Text(text = stringResource(id = R.string.remove_all_data), color = Color.White)
-            }
+            Text(text = stringResource(id = R.string.remove_all_data), color = Color.White)
         }
-    }
-
-    if (showDeleteAccountDialog.value) {
-        DeleteAccountDialog(
-            showDialog = showDeleteAccountDialog.value,
-            onDismiss = { showDeleteAccountDialog.value = false },
-            onDeleteAccount = {
-                firebaseViewModel.deleteUserAccount { isSuccess ->
-                    if (isSuccess) {
-                        firebaseViewModel.signOut()
-                        navController.navigate(Screens.SignIn.route) {
-                            popUpTo(0)
-                        }
-                        Toast.makeText(context, R.string.account_deleted, Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(context, R.string.failed_to_delete_account, Toast.LENGTH_LONG).show()
-                    }
-                    showDeleteAccountDialog.value = false
-                }
-            }
-        )
-    }
-
-    if (showRemoveAllDataDialog.value) {
-        RemoveAllDataDialog(
-            showDialog = showRemoveAllDataDialog.value,
-            onDismiss = { showRemoveAllDataDialog.value = false },
-            onDataRemoved = {
-                firebaseViewModel.removeAllUserData { isSuccess ->
-                    if (isSuccess) {
-                        Toast.makeText(context, R.string.data_removed, Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, R.string.failed_to_remove_data, Toast.LENGTH_SHORT).show()
-                    }
-                    showRemoveAllDataDialog.value = false
-                }
-            }
-        )
+        Button(
+            onClick = { showDeleteAccountDialog.value = true },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Red
+            )
+        ) {
+            Text(text = stringResource(id = R.string.delete_account), color = Color.White)
+        }
     }
 }
