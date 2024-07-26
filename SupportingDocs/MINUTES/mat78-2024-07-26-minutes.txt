@@ -1,0 +1,61 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: MS Teams, Friday, 26th July 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Friday, 26th July 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. Implement date picker component in Add Trip screen. 
+ACTION: mat78
+Status: Done
+
+2. Change 'Username' to "Display Name" at all places of its usage. 
+ACTION: mat78
+Status: Done
+
+3. Implement the interactive map using identified MapBox API.
+ACTION: mat78
+Status: Paused
+Currently, implemented a map using OpenStreetMap in the app.
+Now, need to think and implement of use case(s), e.g., adding a marker when a user presses a location and then provide a route to the selected location from user's current location. 
+
+4. Continue working on firestore functionality for trips features.
+ACTION: mat78
+Status: Ongoing
+
+5. Implement friend approval process for adding friend. 
+ACTION: mat78
+Status: Ongoing
+
+6. Implement "Edit Profile" functionality
+ACTION: mat78
+Status: Done
+
+Other Tasks
+===========
+7. Implement "Explore" feature.
+ACTION: mat78
+Status: Ongoing.
+Added the components of search place and filters [recommended and popular]
+
+New business 
+============
+1. For map, think and implement use case(s), e.g., adding a marker when a user press a location and then provide a route to the selected location from current location. 
+ACTION: mat78
+
+2. Continue working on firestore functionality for trips features.
+ACTION: mat78
+
+3. Implement friend approval process for adding friend. 
+ACTION: mat78
+
+4. Continue implmenting "Explore" feature.
+ACTION: mat78
+
+AOB 
+=== 
+None
