@@ -70,7 +70,6 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         AppBarWithArrowBack(
             navController = navController,
@@ -126,7 +125,7 @@ fun ProfileScreen(
 
         Card(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
@@ -183,7 +182,7 @@ fun ProfileScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
@@ -213,7 +212,7 @@ fun ProfileScreen(
             onClick = { showRemoveAllDataDialog.value = true },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Red
             )
@@ -224,7 +223,7 @@ fun ProfileScreen(
             onClick = { showDeleteAccountDialog.value = true },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Red
             )
