@@ -113,7 +113,6 @@
     <string name="add_trip_bottom_sheet">Add\n trip</string>
     <string name="add_phrase_bottom_sheet">Add\n phrase</string>
     <string name="add_friend_bottom_sheet">Add\n friend</string>
-    <string name="email_or_displayname">Email or display name</string>
     <string name="email_not_available">Email not available</string>
     <string name="verification_email_resent">Verification email resent</string>
     <string name="failed_to_resend_verification_email">Failed to resend verification email</string>
@@ -139,4 +138,5 @@
     <string name="recommended">Recommended</string>
     <string name="popular">Popular</string>
     <string name="filters">"Filters: "</string>
+    <string name="sign_out">Sign out button</string>
 </resources>

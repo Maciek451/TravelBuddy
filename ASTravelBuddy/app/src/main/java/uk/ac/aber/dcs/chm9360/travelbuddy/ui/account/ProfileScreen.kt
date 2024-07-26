@@ -1,11 +1,13 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.account
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,6 +42,7 @@ import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,13 +57,19 @@ fun ProfileScreen(
     val username by firebaseViewModel.username.collectAsState()
     val creationDate by firebaseViewModel.creationDate.collectAsState()
     val showUsernameDialog = rememberSaveable { mutableStateOf(false) }
+    val showDeleteAccountDialog = rememberSaveable { mutableStateOf(false) }
+    val showRemoveAllDataDialog = rememberSaveable { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchUsername()
         firebaseViewModel.fetchCreationDate()
     }
 
-    Column {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
         AppBarWithArrowBack(navController = navController, appBarTitle = title, showSaveButton = false, showMoreIcon = false)
 
         EditUsernameDialog(
@@ -153,15 +164,71 @@ fun ProfileScreen(
             }
         }
 
-        Button(
+        Spacer(modifier = Modifier.weight(1f))
+
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            onClick = {
-
-            }
+                .padding(16.dp)
         ) {
-            Text(text = stringResource(id = R.string.change_email))
+            Button(
+                onClick = { showDeleteAccountDialog.value = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Red
+                )
+            ) {
+                Text(text = stringResource(id = R.string.delete_account), color = Color.White)
+            }
+            Button(
+                onClick = { showRemoveAllDataDialog.value = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Red
+                )
+            ) {
+                Text(text = stringResource(id = R.string.remove_all_data), color = Color.White)
+            }
         }
+    }
+
+    if (showDeleteAccountDialog.value) {
+        DeleteAccountDialog(
+            showDialog = showDeleteAccountDialog.value,
+            onDismiss = { showDeleteAccountDialog.value = false },
+            onDeleteAccount = {
+                firebaseViewModel.deleteUserAccount { isSuccess ->
+                    if (isSuccess) {
+                        firebaseViewModel.signOut()
+                        navController.navigate(Screens.SignIn.route) {
+                            popUpTo(0)
+                        }
+                        Toast.makeText(context, R.string.account_deleted, Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(context, R.string.failed_to_delete_account, Toast.LENGTH_LONG).show()
+                    }
+                    showDeleteAccountDialog.value = false
+                }
+            }
+        )
+    }
+
+    if (showRemoveAllDataDialog.value) {
+        RemoveAllDataDialog(
+            showDialog = showRemoveAllDataDialog.value,
+            onDismiss = { showRemoveAllDataDialog.value = false },
+            onDataRemoved = {
+                firebaseViewModel.removeAllUserData { isSuccess ->
+                    if (isSuccess) {
+                        Toast.makeText(context, R.string.data_removed, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, R.string.failed_to_remove_data, Toast.LENGTH_SHORT).show()
+                    }
+                    showRemoveAllDataDialog.value = false
+                }
+            }
+        )
     }
 }

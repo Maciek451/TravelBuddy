@@ -65,7 +65,7 @@ fun AddFriendScreen(
         OutlinedTextField(
             value = emailOrUsername,
             onValueChange = { emailOrUsername = it },
-            label = { Text(stringResource(R.string.email_or_displayname)) },
+            label = { Text(stringResource(R.string.email_address)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp)

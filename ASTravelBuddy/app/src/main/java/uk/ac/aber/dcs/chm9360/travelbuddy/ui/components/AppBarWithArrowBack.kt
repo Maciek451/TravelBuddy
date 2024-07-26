@@ -3,6 +3,8 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui.components
 import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Done
@@ -37,6 +39,7 @@ fun AppBarWithArrowBack(
     showRemoveIcon: Boolean = false,
     tripMenu: Boolean = false,
     showSaveButton: Boolean = false,
+    showSignOut: Boolean = false,
     isSaveButtonEnabled: Boolean = true,
     onSave: (() -> Unit)? = null,
     firebaseViewModel: FirebaseViewModel = viewModel()
@@ -106,11 +109,22 @@ fun AppBarWithArrowBack(
                 }
             }
             if (showRemoveIcon) {
-                IconButton(onClick = {  }) {
+                IconButton(onClick = { }) {
                     Icon(
                         Icons.Outlined.DeleteSweep,
                         contentDescription = stringResource(R.string.delete_sweep_icon)
                     )
+                }
+            }
+            if (showSignOut) {
+                IconButton(
+                    onClick = {
+                        firebaseViewModel.signOut()
+                        navController.navigate(Screens.SignIn.route) { popUpTo(0) }
+                        Toast.makeText(context, R.string.signedOut, Toast.LENGTH_SHORT).show()
+                    }
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = stringResource(R.string.sign_out))
                 }
             }
             if (showMoreIcon) {
@@ -127,41 +141,11 @@ fun AppBarWithArrowBack(
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.edit_trip)) },
-                            onClick = {  }
+                            onClick = { }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.remove_trip)) },
-                            onClick = {  }
-                        )
-                    }
-                } else {
-                    DropdownMenu(
-                        expanded = isMenuExpanded,
-                        onDismissRequest = { isMenuExpanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.delete_account)) },
-                            onClick = {
-                                showDeleteAccountDialog = true
-                                isMenuExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.remove_all_data)) },
-                            onClick = {
-                                showRemoveDataDialog = true
-                                isMenuExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.log_out)) },
-                            onClick = {
-                                firebaseViewModel.signOut()
-                                navController.navigate(Screens.SignIn.route) { popUpTo(0) }
-                                Toast.makeText(context, R.string.signedOut, Toast.LENGTH_SHORT)
-                                    .show()
-                                isMenuExpanded = false
-                            }
+                            onClick = { }
                         )
                     }
                 }

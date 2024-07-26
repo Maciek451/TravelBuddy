@@ -84,7 +84,7 @@ fun AccountScreen(
     )
 
     Column {
-        AppBarWithArrowBack(navController, appBarTitle = appBarTitle)
+        AppBarWithArrowBack(navController, appBarTitle = appBarTitle, showSignOut = true, showMoreIcon = false)
         UserCard(username ?: "", email, monogram)
         Button(
             onClick = {
