@@ -134,4 +134,6 @@
     <string name="location_button">Location icon button</string>
     <string name="account_creation_date">"Member since: "</string>
     <string name="change_email">Email address change</string>
+    <string name="search_icon">Search icon</string>
+    <string name="clear_icon">Clear icon</string>
 </resources>
