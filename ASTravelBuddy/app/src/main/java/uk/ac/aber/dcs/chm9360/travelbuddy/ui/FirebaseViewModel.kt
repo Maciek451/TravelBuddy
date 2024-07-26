@@ -82,7 +82,6 @@ class FirebaseViewModel : ViewModel() {
                                     else -> callback(AuthenticationState.OTHER)
                                 }
                             }
-
                             else -> {
                                 callback(AuthenticationState.OTHER)
                             }
@@ -217,26 +216,31 @@ class FirebaseViewModel : ViewModel() {
         if (user != null) {
             val batch = db.batch()
             val userDocRef = db.collection("users").document(user.uid)
-
             userDocRef.collection("phrases")
                 .get()
-                .addOnSuccessListener { snapshot ->
-                    for (document in snapshot.documents) {
-                        val docRef = userDocRef.collection("phrases").document(document.id)
-                        batch.delete(docRef)
+                .addOnSuccessListener { phrasesSnapshot ->
+                    for (document in phrasesSnapshot.documents) {
+                        batch.delete(document.reference)
                     }
-
                     userDocRef.collection("trips")
                         .get()
-                        .addOnSuccessListener { tripSnapshot ->
-                            for (document in tripSnapshot.documents) {
-                                val docRef = userDocRef.collection("trips").document(document.id)
-                                batch.delete(docRef)
+                        .addOnSuccessListener { tripsSnapshot ->
+                            for (document in tripsSnapshot.documents) {
+                                batch.delete(document.reference)
                             }
-
-                            batch.commit()
-                                .addOnSuccessListener {
-                                    onResult(true)
+                            userDocRef.collection("friends")
+                                .get()
+                                .addOnSuccessListener { friendsSnapshot ->
+                                    for (document in friendsSnapshot.documents) {
+                                        batch.delete(document.reference)
+                                    }
+                                    batch.commit()
+                                        .addOnSuccessListener {
+                                            onResult(true)
+                                        }
+                                        .addOnFailureListener {
+                                            onResult(false)
+                                        }
                                 }
                                 .addOnFailureListener {
                                     onResult(false)

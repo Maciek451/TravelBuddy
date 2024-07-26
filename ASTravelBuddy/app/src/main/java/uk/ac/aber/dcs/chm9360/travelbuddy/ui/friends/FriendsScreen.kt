@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.NoLuggage
@@ -97,7 +99,7 @@ fun FriendsScreen(
                 }
                 when (selectedTabIndex) {
                     0 -> {
-                        EmptyTripsScreen()
+                        EmptyTripsScreen(firebaseViewModel = firebaseViewModel)
                     }
                     1 -> {
                         SwipeRefresh(
@@ -115,7 +117,7 @@ fun FriendsScreen(
                                     }
                                 }
                             } else {
-                                EmptyPhrasesScreen()
+                                EmptyPhrasesScreen(firebaseViewModel = firebaseViewModel)
                             }
                         }
                     }
@@ -185,49 +187,79 @@ fun PhraseCard(phrase: Phrase) {
 }
 
 @Composable
-fun EmptyTripsScreen() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+fun EmptyTripsScreen(firebaseViewModel: FirebaseViewModel = viewModel()) {
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
+    val coroutineScope = rememberCoroutineScope()
+
+    SwipeRefresh(
+        state = swipeRefreshState,
+        onRefresh = {
+            coroutineScope.launch {
+                firebaseViewModel.fetchTrips()
+            }
+        }
     ) {
-        Icon(
+        Column(
             modifier = Modifier
-                .size(100.dp)
-                .alpha(0.3f),
-            imageVector = Icons.Default.NoLuggage,
-            contentDescription = stringResource(id = R.string.empty_trips_screen_icon)
-        )
-        Text(
-            modifier = Modifier
-                .alpha(0.3f),
-            text = stringResource(id = R.string.no_trips_text),
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center
-        )
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(100.dp)
+                    .alpha(0.3f),
+                imageVector = Icons.Default.NoLuggage,
+                contentDescription = stringResource(id = R.string.empty_trips_screen_icon)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                modifier = Modifier.alpha(0.3f),
+                text = stringResource(id = R.string.no_trips_text),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
 @Composable
-fun EmptyPhrasesScreen() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+fun EmptyPhrasesScreen(firebaseViewModel: FirebaseViewModel = viewModel()) {
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
+    val coroutineScope = rememberCoroutineScope()
+
+    SwipeRefresh(
+        state = swipeRefreshState,
+        onRefresh = {
+            coroutineScope.launch {
+                firebaseViewModel.refreshPhrases()
+            }
+        }
     ) {
-        Icon(
+        Column(
             modifier = Modifier
-                .size(100.dp)
-                .alpha(0.3f),
-            imageVector = Icons.Default.SpeakerNotesOff,
-            contentDescription = stringResource(id = R.string.empty_phrases_screen_icon)
-        )
-        Text(
-            modifier = Modifier
-                .alpha(0.3f),
-            text = stringResource(id = R.string.no_phrases_text),
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center
-        )
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(100.dp)
+                    .alpha(0.3f),
+                imageVector = Icons.Default.SpeakerNotesOff,
+                contentDescription = stringResource(id = R.string.empty_phrases_screen_icon)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                modifier = Modifier.alpha(0.3f),
+                text = stringResource(id = R.string.no_phrases_text),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
