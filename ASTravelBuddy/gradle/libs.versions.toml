@@ -25,6 +25,7 @@ osmdroidAndroidCore = "6.2.2"
 osmdroidMapsforge = "6.1.11"
 playServicesAuth = "21.2.0"
 playServicesLocation = "21.3.0"
+composeMaterial = "1.3.1"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -60,6 +61,7 @@ osmdroid-android-core = { module = "org.osmdroid:osmdroid-android-core", version
 osmdroid-mapsforge = { module = "org.osmdroid:osmdroid-mapsforge", version.ref = "osmdroidMapsforge" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

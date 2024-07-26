@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.accompanist.swiperefresh.v0263beta)
     implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.compose.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

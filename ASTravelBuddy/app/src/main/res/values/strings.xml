@@ -136,4 +136,7 @@
     <string name="change_email">Email address change</string>
     <string name="search_icon">Search icon</string>
     <string name="clear_icon">Clear icon</string>
+    <string name="recommended">Recommended</string>
+    <string name="popular">Popular</string>
+    <string name="filters">"Filters: "</string>
 </resources>
