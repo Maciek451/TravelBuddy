@@ -19,6 +19,10 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,13 +41,15 @@ fun TripDetailsScreen(
 ) {
     val trip = Utils.trip
     val appBarTitle = trip?.title
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         if (appBarTitle != null) {
             AppBarWithArrowBack(
                 navController = navController,
                 appBarTitle = appBarTitle,
-                tripMenu = true
+                tripMenu = true,
+                onRemoveTrip = { showConfirmDialog = true }
             )
 
             Column(
@@ -121,6 +127,22 @@ fun TripDetailsScreen(
             Text(
                 text = "No trip data available",
                 modifier = Modifier.padding(16.dp)
+            )
+        }
+        if (showConfirmDialog) {
+            ConfirmTripRemovalDialog(
+                showDialog = showConfirmDialog,
+                onDismiss = { showConfirmDialog = false },
+                onRemoveConfirmed = {
+                    trip?.let { tripToRemove ->
+                        firebaseViewModel.removeTrip(tripToRemove) { isSuccess ->
+                            if (isSuccess) {
+                                navController.popBackStack()
+                            }
+                        }
+                    }
+                    showConfirmDialog = false
+                }
             )
         }
     }

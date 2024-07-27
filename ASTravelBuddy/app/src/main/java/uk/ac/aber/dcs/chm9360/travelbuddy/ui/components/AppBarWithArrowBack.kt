@@ -26,8 +26,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
-import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.DeleteAccountDialog
-import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.RemoveAllDataDialog
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,49 +40,11 @@ fun AppBarWithArrowBack(
     showSignOut: Boolean = false,
     isSaveButtonEnabled: Boolean = true,
     onSave: (() -> Unit)? = null,
-    firebaseViewModel: FirebaseViewModel = viewModel()
+    firebaseViewModel: FirebaseViewModel = viewModel(),
+    onRemoveTrip: () -> Unit = {}
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
-    var showDeleteAccountDialog by rememberSaveable { mutableStateOf(false) }
-    var showRemoveDataDialog by rememberSaveable { mutableStateOf(false) }
-
     val context = LocalContext.current
-
-    DeleteAccountDialog(
-        showDialog = showDeleteAccountDialog,
-        onDismiss = { showDeleteAccountDialog = false },
-        onDeleteAccount = {
-            firebaseViewModel.deleteUserAccount { isSuccess ->
-                if (isSuccess) {
-                    firebaseViewModel.signOut()
-                    navController.navigate(Screens.SignIn.route) {
-                        popUpTo(0)
-                    }
-                    Toast.makeText(context, R.string.account_deleted, Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(context, R.string.failed_to_delete_account, Toast.LENGTH_LONG)
-                        .show()
-                }
-                showDeleteAccountDialog = false
-            }
-        }
-    )
-
-    RemoveAllDataDialog(
-        showDialog = showRemoveDataDialog,
-        onDismiss = { showRemoveDataDialog = false },
-        onDataRemoved = {
-            firebaseViewModel.removeAllUserData { isSuccess ->
-                if (isSuccess) {
-                    Toast.makeText(context, R.string.data_removed, Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, R.string.failed_to_remove_data, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-            showRemoveDataDialog = false
-        }
-    )
 
     CenterAlignedTopAppBar(
         title = { Text(appBarTitle) },
@@ -145,11 +105,11 @@ fun AppBarWithArrowBack(
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.edit_trip)) },
-                            onClick = {  }
+                            onClick = { }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.remove_trip)) },
-                            onClick = {  }
+                            onClick = { onRemoveTrip() }
                         )
                     }
                 }

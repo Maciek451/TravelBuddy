@@ -56,15 +56,13 @@ fun AddTripScreen(
     var destination by rememberSaveable { mutableStateOf("") }
     var startDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
     var endDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
-    var friends by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
 
-    val isSaveButtonEnabled by rememberSaveable(tripTitle, destination, friends, startDate, endDate) {
+    val isSaveButtonEnabled by rememberSaveable(tripTitle, destination, startDate, endDate) {
         mutableStateOf(
             tripTitle.isNotBlank() &&
                     destination.isNotBlank() &&
-                    friends.isNotBlank() &&
                     startDate <= endDate
         )
     }
@@ -73,18 +71,18 @@ fun AddTripScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         AppBarWithArrowBack(
-            navController,
+            navController = navController,
             appBarTitle = title,
             showSaveButton = true,
             showMoreIcon = false,
             isSaveButtonEnabled = isSaveButtonEnabled,
             onSave = {
                 val newTrip = Trip(
-                    tripTitle,
-                    destination,
-                    startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                    endDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                    friends.split(",").map { it.trim() })
+                    title = tripTitle,
+                    destination = destination,
+                    startDate = startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                    endDate = endDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                )
                 firebaseViewModel.addTrip(newTrip)
                 Toast.makeText(context, R.string.trip_saved, Toast.LENGTH_SHORT).show()
                 navController.navigate(nextDestination)
