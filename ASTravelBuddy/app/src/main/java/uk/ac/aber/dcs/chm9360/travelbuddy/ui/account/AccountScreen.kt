@@ -47,7 +47,7 @@ fun AccountScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val appBarTitle = R.string.account
+    val appBarTitle = stringResource(id = R.string.account)
     val navigateToFriendsList: () -> Unit = { navController.navigate(Screens.FriendsList.route) }
     val navigateToPreferences: () -> Unit = { }
     val navigateToTermsOfService: () -> Unit = { }

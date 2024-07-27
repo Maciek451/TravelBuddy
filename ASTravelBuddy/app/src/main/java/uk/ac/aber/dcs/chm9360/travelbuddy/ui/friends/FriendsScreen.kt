@@ -61,7 +61,7 @@ fun FriendsScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val appBarTitle = stringResource(R.string.friends)
+    val appBarTitle = stringResource(id = R.string.friends)
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val phrases by firebaseViewModel.phrases.collectAsState()
     val isRefreshing by firebaseViewModel.isRefreshing.collectAsState()

@@ -41,7 +41,7 @@ fun SignUpScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val title = R.string.app_name
+    val title = stringResource(id = R.string.app_name)
     var email by rememberSaveable { mutableStateOf("") }
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }

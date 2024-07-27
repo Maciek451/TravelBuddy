@@ -492,4 +492,24 @@ class FirebaseViewModel : ViewModel() {
             }
         }
     }
+
+    fun removeTrip(tripId: String, onComplete: (Boolean) -> Unit) {
+        val user = auth.currentUser
+        if (user != null) {
+            viewModelScope.launch {
+                db.collection("users").document(user.uid)
+                    .collection("trips").document(tripId)
+                    .delete()
+                    .addOnSuccessListener {
+                        fetchTrips()
+                        onComplete(true)
+                    }
+                    .addOnFailureListener {
+                        onComplete(false)
+                    }
+            }
+        } else {
+            onComplete(false)
+        }
+    }
 }

@@ -30,7 +30,7 @@ fun AddFriendScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val title = R.string.add_a_friend
+    val title = stringResource(id = R.string.add_a_friend)
     val context = LocalContext.current
     var emailOrUsername by rememberSaveable { mutableStateOf("") }
 

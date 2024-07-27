@@ -37,7 +37,7 @@ fun AboutScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AppBarWithArrowBack(navController, title, false)
+        AppBarWithArrowBack(navController, title.toString(), false)
         Column(
             modifier = Modifier
                 .fillMaxSize()

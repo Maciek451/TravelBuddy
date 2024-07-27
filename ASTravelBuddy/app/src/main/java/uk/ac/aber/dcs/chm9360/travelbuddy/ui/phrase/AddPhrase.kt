@@ -31,7 +31,7 @@ fun AddPhraseScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val title = R.string.add_a_phrase
+    val title = stringResource(id = R.string.add_a_phrase)
     val nextDestination = Screens.Friends.route
 
     var language by rememberSaveable { mutableStateOf("") }

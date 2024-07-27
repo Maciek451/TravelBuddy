@@ -3,8 +3,7 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui.components
 import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Done
@@ -21,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,7 +34,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 @Composable
 fun AppBarWithArrowBack(
     navController: NavHostController,
-    appBarTitle: Int,
+    appBarTitle: String,
     showMoreIcon: Boolean = true,
     showRemoveIcon: Boolean = false,
     tripMenu: Boolean = false,
@@ -89,7 +87,7 @@ fun AppBarWithArrowBack(
     )
 
     CenterAlignedTopAppBar(
-        title = { Text(stringResource(id = appBarTitle)) },
+        title = { Text(appBarTitle) },
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
@@ -127,7 +125,7 @@ fun AppBarWithArrowBack(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
                         contentDescription = stringResource(R.string.sign_out),
                         tint = MaterialTheme.colorScheme.error
                     )
@@ -147,11 +145,11 @@ fun AppBarWithArrowBack(
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.edit_trip)) },
-                            onClick = { }
+                            onClick = {  }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.remove_trip)) },
-                            onClick = { }
+                            onClick = {  }
                         )
                     }
                 }

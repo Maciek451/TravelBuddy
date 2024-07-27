@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.NoLuggage
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -42,13 +41,15 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 
 @Composable
 fun MyTripsScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val appBarTitle = stringResource(R.string.my_trips)
+    val appBarTitle = stringResource(id = R.string.my_trips)
     val trips by firebaseViewModel.trips.collectAsState()
 
     TopLevelScaffold(
@@ -70,7 +71,8 @@ fun MyTripsScreen(
                         TripCard(
                             trip = trip,
                             onItemClick = {
-
+                                Utils.trip = trip
+                                navController.navigate(Screens.TripDetails.route)
                             }
                         )
                     }
@@ -85,7 +87,6 @@ fun MyTripsScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripCard(
     trip: Trip,
@@ -96,7 +97,6 @@ fun TripCard(
             .padding(8.dp)
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp),
-        onClick = onItemClick
     ) {
         Column {
             Text(

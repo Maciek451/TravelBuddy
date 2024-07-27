@@ -49,7 +49,7 @@ fun AddTripScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val title = R.string.add_a_trip
+    val title = stringResource(id = R.string.add_a_trip)
     val nextDestination = Screens.MyTrips.route
 
     var tripTitle by rememberSaveable { mutableStateOf("") }
@@ -133,17 +133,6 @@ fun AddTripScreen(
             value = destination,
             onValueChange = { destination = it },
             label = { Text(stringResource(R.string.destination)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = friends,
-            onValueChange = { friends = it },
-            label = { Text(stringResource(R.string.friends)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)

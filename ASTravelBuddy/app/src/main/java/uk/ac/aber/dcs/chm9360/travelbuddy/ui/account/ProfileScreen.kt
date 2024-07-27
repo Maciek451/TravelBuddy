@@ -50,7 +50,7 @@ fun ProfileScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val title = R.string.profile
+    val title = stringResource(id = R.string.profile)
     val authState by firebaseViewModel.authState.collectAsState()
     val email = authState?.email ?: stringResource(id = R.string.email_not_available)
     val monogram = email.firstOrNull()?.uppercase() ?: ""

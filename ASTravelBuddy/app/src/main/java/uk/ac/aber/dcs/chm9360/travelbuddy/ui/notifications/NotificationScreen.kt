@@ -36,7 +36,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
 fun NotificationScreen(
     navController: NavHostController
 ) {
-    val appBarTitle = R.string.notifications
+    val appBarTitle = stringResource(id = R.string.notifications)
     val context = LocalContext.current
 
     Column(

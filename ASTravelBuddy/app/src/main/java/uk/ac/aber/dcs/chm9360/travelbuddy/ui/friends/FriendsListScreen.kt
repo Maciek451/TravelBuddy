@@ -54,7 +54,7 @@ fun FriendsListScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val title = R.string.your_friends
+    val title = stringResource(id = R.string.your_friends)
     val friends by firebaseViewModel.friends.collectAsState()
 
     var showConfirmDialog by rememberSaveable { mutableStateOf(false) }

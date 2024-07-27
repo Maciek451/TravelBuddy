@@ -4,6 +4,7 @@ sealed class Screens(
     val route: String
 ) {
     object MyTrips : Screens("my_trips")
+    object TripDetails : Screens("trip_details")
     object Map : Screens("map")
     object AddSheet : Screens("add")
     object Explore : Screens("explore")
