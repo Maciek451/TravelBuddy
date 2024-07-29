@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.NoLuggage
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,7 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,7 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
@@ -47,10 +51,19 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 @Composable
 fun MyTripsScreen(
     navController: NavHostController,
+    retrofitViewModel: RetrofitViewModel = viewModel(),
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
     val appBarTitle = stringResource(id = R.string.my_trips)
     val trips by firebaseViewModel.trips.collectAsState()
+    val imageUrls by retrofitViewModel.imageUrls.collectAsState()
+    val imageLoadingStates by retrofitViewModel.imageLoadingStates.collectAsState()
+
+    LaunchedEffect(trips) {
+        trips.forEach { trip ->
+            retrofitViewModel.fetchImage(trip.destination)
+        }
+    }
 
     TopLevelScaffold(
         navController = navController,
@@ -68,8 +81,13 @@ fun MyTripsScreen(
                         .fillMaxSize()
                 ) {
                     items(trips) { trip ->
+                        val imageUrl = imageUrls[trip.destination]
+                        val isLoading = imageLoadingStates[trip.destination] ?: false
+
                         TripCard(
                             trip = trip,
+                            imageUrl = imageUrl,
+                            isLoading = isLoading,
                             onItemClick = {
                                 Utils.trip = trip
                                 navController.navigate(Screens.TripDetails.route)
@@ -90,6 +108,8 @@ fun MyTripsScreen(
 @Composable
 fun TripCard(
     trip: Trip,
+    imageUrl: String?,
+    isLoading: Boolean,
     onItemClick: () -> Unit
 ) {
     Card(
@@ -125,14 +145,32 @@ fun TripCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(Color.LightGray)
-                    .padding(bottom = 8.dp)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(0.dp)
             ) {
-                Text(
-                    text = "Destination Image",
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(48.dp)
+                            .padding(16.dp)
+                    )
+                } else if (imageUrl != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = imageUrl),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.failed_to_load_image),
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(16.dp)
+                    )
+                }
             }
 
             Button(

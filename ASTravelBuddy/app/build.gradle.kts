@@ -94,4 +94,10 @@ dependencies {
     //OpenStreetMap
     implementation (libs.osmdroid.android)
     implementation (libs.osmdroid.mapsforge)
+
+    //Retrofit
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.kotlinx.coroutines.android)
+    implementation (libs.coil.compose)
 }
