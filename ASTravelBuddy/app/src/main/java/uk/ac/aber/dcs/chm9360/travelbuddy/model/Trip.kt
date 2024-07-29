@@ -13,5 +13,5 @@ data class Trip(
 data class ChecklistItem(
     val id: String = "",
     val task: String = "",
-    val isChecked: Boolean = false
+    val checked: String = ""
 )

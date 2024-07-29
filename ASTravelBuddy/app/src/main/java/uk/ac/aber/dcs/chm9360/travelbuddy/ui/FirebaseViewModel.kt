@@ -466,6 +466,7 @@ class FirebaseViewModel : ViewModel() {
                 tripRef.get().addOnSuccessListener { document ->
                     if (document.exists()) {
                         val trip = document.toObject(Trip::class.java)
+                        Log.d("debug", trip.toString())
                         onComplete(trip?.checklist ?: emptyList())
                     }
                 }.addOnFailureListener {

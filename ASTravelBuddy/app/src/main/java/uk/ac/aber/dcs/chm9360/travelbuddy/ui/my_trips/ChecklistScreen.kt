@@ -13,6 +13,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,8 +44,8 @@ fun ChecklistScreen(
     val trip = Utils.trip
     val appBarTitle = stringResource(id = R.string.checklist)
     var checklist by remember { mutableStateOf(trip?.checklist ?: emptyList()) }
-    val uncheckedItems = checklist.filter { !it.isChecked }
-    val checkedItems = checklist.filter { it.isChecked }
+    val uncheckedItems = checklist.filter { it.checked == "false" }
+    val checkedItems = checklist.filter { it.checked == "true" }
 
     LaunchedEffect(trip?.id) {
         trip?.id?.let { tripId ->
@@ -57,7 +57,7 @@ fun ChecklistScreen(
     }
 
     fun addItem() {
-        val newItem = ChecklistItem(id = UUID.randomUUID().toString(), task = "", isChecked = false)
+        val newItem = ChecklistItem(id = UUID.randomUUID().toString(), task = "", checked = false.toString())
         checklist = uncheckedItems + newItem + checkedItems
     }
 
@@ -93,7 +93,7 @@ fun ChecklistScreen(
                     ChecklistItemView(
                         item = item,
                         onItemCheckedChange = { item, isChecked ->
-                            val updatedItem = item.copy(isChecked = isChecked)
+                            val updatedItem = item.copy(checked = isChecked.toString())
                             updateItem(updatedItem)
                             trip?.id?.let { tripId ->
                                 firebaseViewModel.updateChecklistItem(tripId, updatedItem)
@@ -119,7 +119,7 @@ fun ChecklistScreen(
                     ChecklistItemView(
                         item = item,
                         onItemCheckedChange = { item, isChecked ->
-                            val updatedItem = item.copy(isChecked = isChecked)
+                            val updatedItem = item.copy(checked = isChecked.toString())
                             updateItem(updatedItem)
                             trip?.id?.let { tripId ->
                                 firebaseViewModel.updateChecklistItem(tripId, updatedItem)
@@ -148,13 +148,13 @@ fun ChecklistItemView(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
-            checked = item.isChecked,
+            checked = item.checked == "true",
             onCheckedChange = { isChecked ->
-                onItemCheckedChange(item.copy(isChecked = isChecked), isChecked)
+                onItemCheckedChange(item.copy(checked = isChecked.toString()), isChecked)
             },
             colors = CheckboxDefaults.colors(
-                checkedColor = Color.Green,
-                uncheckedColor = Color.Red
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.error
             )
         )
 
