@@ -208,27 +208,34 @@ fun ProfileScreen(
             }
         }
         Spacer(modifier = Modifier.weight(1f))
-        Button(
-            onClick = { showRemoveAllDataDialog.value = true },
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Red
-            )
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = stringResource(id = R.string.remove_all_data), color = Color.White)
-        }
-        Button(
-            onClick = { showDeleteAccountDialog.value = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Red
-            )
-        ) {
-            Text(text = stringResource(id = R.string.delete_account), color = Color.White)
+            Button(
+                onClick = { showRemoveAllDataDialog.value = true },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Red
+                )
+            ) {
+                Text(text = stringResource(id = R.string.remove_all_data), color = Color.White)
+            }
+            Button(
+                onClick = { showDeleteAccountDialog.value = true },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Red
+                )
+            ) {
+                Text(text = stringResource(id = R.string.delete_account), color = Color.White)
+            }
         }
     }
 }
