@@ -104,7 +104,7 @@ fun AppBarWithArrowBack(
                         onDismissRequest = { isMenuExpanded = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.edit_trip)) },
+                            text = { Text(stringResource(R.string.edit_details)) },
                             onClick = { }
                         )
                         DropdownMenuItem(

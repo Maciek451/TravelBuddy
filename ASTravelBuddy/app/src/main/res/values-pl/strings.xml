@@ -33,7 +33,7 @@
     <string name="app_description">TravelBuddy upraszcza planowanie podróży, umożliwiając tworzenie i zarządzanie spersonalizowanymi itinerarzami oraz dzielenie się swoimi doświadczeniami z podróży i odkrywanie nowych miejsc bez wysiłku.</string>
     <string name="creator">Twórca</string>
     <string name="remove_trip">Usuń wycieczkę</string>
-    <string name="edit_trip">Edytuj wycieczkę</string>
+    <string name="edit_details">Edytuj wycieczkę</string>
     <string name="notifications">Centrum powiadomień</string>
     <string name="delete_sweep_icon">ikona usuwania</string>
     <string name="sign_in_button">Zaloguj się</string>

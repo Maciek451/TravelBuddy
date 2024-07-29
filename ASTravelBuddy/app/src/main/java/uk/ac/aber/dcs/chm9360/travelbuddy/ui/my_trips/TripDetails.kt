@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 
 @Composable
@@ -101,7 +102,9 @@ fun TripDetailsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
-                        .clickable {  },
+                        .clickable {
+                            navController.navigate(Screens.TripPlan.route)
+                        },
                     elevation = CardDefaults.cardElevation(4.dp),
                 ) {
                     Text(
@@ -114,7 +117,10 @@ fun TripDetailsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
-                        .clickable {  },
+                        .clickable {
+                            Utils.trip = trip
+                            navController.navigate(Screens.Checklist.route)
+                        },
                     elevation = CardDefaults.cardElevation(4.dp),
                 ) {
                     Text(

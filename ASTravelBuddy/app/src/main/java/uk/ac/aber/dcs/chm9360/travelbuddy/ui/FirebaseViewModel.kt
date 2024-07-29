@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.ChecklistItem
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.User
@@ -403,11 +404,14 @@ class FirebaseViewModel : ViewModel() {
             viewModelScope.launch {
                 db.collection("users").document(user.uid)
                     .collection("trips")
-                    .get()
-                    .addOnSuccessListener { snapshot ->
-                        _trips.value = snapshot.toObjects(Trip::class.java)
+                    .addSnapshotListener { snapshot, e ->
+                        if (e != null) {
+                            Log.e("FirebaseViewModel", "Error fetching trips", e)
+                            return@addSnapshotListener
+                        }
+                        val tripsList = snapshot?.toObjects(Trip::class.java) ?: emptyList()
+                        _trips.value = tripsList
                     }
-                    .addOnFailureListener { Log.e("FirebaseViewModel", "Error fetching trips") }
             }
         }
     }
@@ -436,5 +440,59 @@ class FirebaseViewModel : ViewModel() {
                     .addOnFailureListener { onComplete(false) }
             }
         } ?: onComplete(false)
+    }
+
+    fun updateTrip(updatedTrip: Trip) {
+        auth.currentUser?.let { user ->
+            viewModelScope.launch {
+                try {
+                    db.collection("users").document(user.uid)
+                        .collection("trips").document(updatedTrip.id)
+                        .set(updatedTrip)
+                        .addOnSuccessListener { fetchTrips() }
+                        .addOnFailureListener { Log.e("FirebaseViewModel", "Error updating trip") }
+                } catch (e: Exception) {
+                    Log.e("FirebaseViewModel", "Error updating trip", e)
+                }
+            }
+        }
+    }
+
+    fun fetchChecklist(tripId: String, onComplete: (List<ChecklistItem>) -> Unit) {
+        auth.currentUser?.let { user ->
+            viewModelScope.launch {
+                val tripRef = db.collection("users").document(user.uid)
+                    .collection("trips").document(tripId)
+                tripRef.get().addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val trip = document.toObject(Trip::class.java)
+                        onComplete(trip?.checklist ?: emptyList())
+                    }
+                }.addOnFailureListener {
+                    Log.e("FirebaseViewModel", "Error fetching checklist", it)
+                }
+            }
+        }
+    }
+
+    fun updateChecklistItem(tripId: String, updatedItem: ChecklistItem) {
+        auth.currentUser?.let { user ->
+            viewModelScope.launch {
+                val tripRef = db.collection("users").document(user.uid)
+                    .collection("trips").document(tripId)
+
+                tripRef.get().addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val trip = document.toObject(Trip::class.java)
+                        val updatedChecklist = trip?.checklist?.map {
+                            if (it.id == updatedItem.id) updatedItem else it
+                        } ?: listOf(updatedItem)
+                        tripRef.update("checklist", updatedChecklist)
+                    }
+                }.addOnFailureListener {
+                    Log.e("FirebaseViewModel", "Error updating checklist item", it)
+                }
+            }
+        }
     }
 }

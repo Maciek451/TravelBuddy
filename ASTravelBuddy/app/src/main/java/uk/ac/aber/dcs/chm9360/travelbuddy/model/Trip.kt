@@ -6,5 +6,12 @@ data class Trip(
     val destination: String = "",
     val startDate: String = "",
     val endDate: String = "",
-    val friends: List<String> = emptyList()
+    val friends: List<String> = emptyList(),
+    val checklist: List<ChecklistItem> = emptyList()
+)
+
+data class ChecklistItem(
+    val id: String = "",
+    val task: String = "",
+    val isChecked: Boolean = false
 )
