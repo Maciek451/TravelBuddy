@@ -61,7 +61,7 @@ fun AddPhraseScreen(
                 val newPhrase = Phrase(language, phrase, translation)
                 firebaseViewModel.addPhrase(newPhrase)
                 Toast.makeText(context, R.string.phrase_saved, Toast.LENGTH_SHORT).show()
-                navController.navigate(nextDestination)
+                navController.navigate(nextDestination) { popUpTo(0) }
             }
         )
 

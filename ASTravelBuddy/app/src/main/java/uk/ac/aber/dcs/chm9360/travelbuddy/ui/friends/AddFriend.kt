@@ -52,7 +52,7 @@ fun AddFriendScreen(
                 firebaseViewModel.findAndAddFriend(emailOrUsername) { success, message ->
                     if (success) {
                         Toast.makeText(context, R.string.friend_added_successfully, Toast.LENGTH_SHORT).show()
-                        navController.navigate(Screens.Friends.route)
+                        navController.navigate(Screens.Friends.route) { popUpTo(0) }
                     } else {
                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }

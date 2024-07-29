@@ -143,4 +143,7 @@
     <string name="current_email_address">Current email address</string>
     <string name="new_email_address">New email address</string>
     <string name="confirm_remove_trip">Click confirm to remove selected friend</string>
+    <string name="city">City</string>
+    <string name="country">Country</string>
+    <string name="failed_to_load_image">Failed to load image</string>
 </resources>
