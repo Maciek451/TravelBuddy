@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -109,9 +111,17 @@ fun ChecklistScreen(
                         onClick = { addItem() },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(start = 16.dp, end = 16.dp)
                     ) {
-                        Text(text = stringResource(id = R.string.add_item_button))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.list_item_button),
+                            )
+                        }
                     }
                 }
 
@@ -141,6 +151,8 @@ fun ChecklistItemView(
     onItemTextChange: (ChecklistItem, String) -> Unit,
     onItemDelete: (ChecklistItem) -> Unit
 ) {
+    var isTextFieldFocused by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -157,17 +169,22 @@ fun ChecklistItemView(
                 uncheckedColor = MaterialTheme.colorScheme.error
             )
         )
-
         OutlinedTextField(
             value = item.task,
-            onValueChange = { newText -> onItemTextChange(item, newText) },
+            onValueChange = { newText ->
+                onItemTextChange(item, newText)
+            },
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp)
+                .onFocusChanged { focusState ->
+                    isTextFieldFocused = focusState.isFocused
+                }
         )
-
-        IconButton(onClick = { onItemDelete(item) }) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = stringResource(id = R.string.delete_icon))
+        if (isTextFieldFocused) {
+            IconButton(onClick = { onItemDelete(item) }) {
+                Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(id = R.string.close_icon))
+            }
         }
     }
 }
