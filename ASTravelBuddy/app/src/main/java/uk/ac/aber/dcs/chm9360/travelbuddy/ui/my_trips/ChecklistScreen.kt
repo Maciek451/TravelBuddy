@@ -9,13 +9,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +44,8 @@ fun ChecklistScreen(
     val trip = Utils.trip
     val appBarTitle = stringResource(id = R.string.checklist)
     var checklist by remember { mutableStateOf(trip?.checklist ?: emptyList()) }
+    val uncheckedItems = checklist.filter { !it.isChecked }
+    val checkedItems = checklist.filter { it.isChecked }
 
     LaunchedEffect(trip?.id) {
         trip?.id?.let { tripId ->
@@ -56,7 +58,7 @@ fun ChecklistScreen(
 
     fun addItem() {
         val newItem = ChecklistItem(id = UUID.randomUUID().toString(), task = "", isChecked = false)
-        checklist = checklist + newItem
+        checklist = uncheckedItems + newItem + checkedItems
     }
 
     fun updateItem(updatedItem: ChecklistItem) {
@@ -85,27 +87,47 @@ fun ChecklistScreen(
             onSave = { saveChecklist() }
         )
 
-        LazyColumn {
-            items(checklist) { item ->
-                ChecklistItemView(
-                    item = item,
-                    onItemCheckedChange = { item, isChecked ->
-                        val updatedItem = item.copy(isChecked = isChecked)
-                        updateItem(updatedItem)
-                        trip?.id?.let { tripId ->
-                            firebaseViewModel.updateChecklistItem(tripId, updatedItem)
-                        }
-                    },
-                    onItemTextChange = { item, newText -> updateItem(item.copy(task = newText)) },
-                    onItemDelete = { removeItem(it) }
-                )
-            }
+        Column {
+            LazyColumn {
+                items(uncheckedItems) { item ->
+                    ChecklistItemView(
+                        item = item,
+                        onItemCheckedChange = { item, isChecked ->
+                            val updatedItem = item.copy(isChecked = isChecked)
+                            updateItem(updatedItem)
+                            trip?.id?.let { tripId ->
+                                firebaseViewModel.updateChecklistItem(tripId, updatedItem)
+                            }
+                        },
+                        onItemTextChange = { item, newText -> updateItem(item.copy(task = newText)) },
+                        onItemDelete = { removeItem(it) }
+                    )
+                }
 
-            item {
-                Button(onClick = { addItem() }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)) {
-                    Text(text = stringResource(id = R.string.add_item_button))
+                item {
+                    TextButton(
+                        onClick = { addItem() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Text(text = stringResource(id = R.string.add_item_button))
+                    }
+                }
+
+                items(checkedItems) { item ->
+                    ChecklistItemView(
+                        item = item,
+                        onItemCheckedChange = { item, isChecked ->
+                            val updatedItem = item.copy(isChecked = isChecked)
+                            updateItem(updatedItem)
+                            trip?.id?.let { tripId ->
+                                firebaseViewModel.updateChecklistItem(tripId, updatedItem)
+                            }
+                        },
+                        onItemTextChange = { item, newText -> updateItem(item.copy(task = newText)) },
+                        onItemDelete = { removeItem(it) }
+                    )
                 }
             }
         }
@@ -128,7 +150,7 @@ fun ChecklistItemView(
         Checkbox(
             checked = item.isChecked,
             onCheckedChange = { isChecked ->
-                onItemCheckedChange(item, isChecked)
+                onItemCheckedChange(item.copy(isChecked = isChecked), isChecked)
             },
             colors = CheckboxDefaults.colors(
                 checkedColor = Color.Green,
