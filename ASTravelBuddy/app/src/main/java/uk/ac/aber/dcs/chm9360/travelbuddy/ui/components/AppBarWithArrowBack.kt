@@ -16,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -27,6 +28,7 @@ import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +47,13 @@ fun AppBarWithArrowBack(
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+    val trip = Utils.trip
+
+    DisposableEffect(Unit) {
+        onDispose {
+            isMenuExpanded = false
+        }
+    }
 
     CenterAlignedTopAppBar(
         title = { Text(appBarTitle) },
@@ -105,11 +114,18 @@ fun AppBarWithArrowBack(
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.edit_details)) },
-                            onClick = { }
+                            onClick = {
+                                Utils.trip = trip
+                                navController.navigate(Screens.EditTrip.route)
+                                isMenuExpanded = false
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.remove_trip)) },
-                            onClick = { onRemoveTrip() }
+                            onClick = {
+                                onRemoveTrip()
+                                isMenuExpanded = false
+                            }
                         )
                     }
                 }

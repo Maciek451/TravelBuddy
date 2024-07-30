@@ -5,6 +5,7 @@ sealed class Screens(
 ) {
     object MyTrips : Screens("my_trips")
     object TripDetails : Screens("trip_details")
+    object EditTrip : Screens("edit_trip")
     object Checklist : Screens("checklist")
     object TripPlan : Screens("trip_plan")
     object Map : Screens("map")

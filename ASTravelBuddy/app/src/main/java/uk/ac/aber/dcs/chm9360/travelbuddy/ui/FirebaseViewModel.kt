@@ -442,15 +442,20 @@ class FirebaseViewModel : ViewModel() {
         } ?: onComplete(false)
     }
 
-    fun updateTrip(updatedTrip: Trip) {
+    fun updateTrip(updatedTrip: Trip, onSuccess: () -> Unit = {}) {
         auth.currentUser?.let { user ->
             viewModelScope.launch {
                 try {
                     db.collection("users").document(user.uid)
                         .collection("trips").document(updatedTrip.id)
                         .set(updatedTrip)
-                        .addOnSuccessListener { fetchTrips() }
-                        .addOnFailureListener { Log.e("FirebaseViewModel", "Error updating trip") }
+                        .addOnSuccessListener {
+                            fetchTrips()
+                            onSuccess()
+                        }
+                        .addOnFailureListener {
+                            Log.e("FirebaseViewModel", "Error updating trip")
+                        }
                 } catch (e: Exception) {
                     Log.e("FirebaseViewModel", "Error updating trip", e)
                 }

@@ -29,6 +29,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.FriendsListScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.FriendsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.map.MapScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.ChecklistScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.EditTripScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.MyTripsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripDetailsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripPlanScreen
@@ -75,6 +76,7 @@ class MainActivity : ComponentActivity() {
         ) {
             composable(Screens.MyTrips.route) { MyTripsScreen(navController) }
             composable(Screens.TripDetails.route) { TripDetailsScreen(navController) }
+            composable(Screens.EditTrip.route) { EditTripScreen(navController) }
             composable(Screens.Checklist.route) { ChecklistScreen(navController) }
             composable(Screens.TripPlan.route) { TripPlanScreen(navController) }
             composable(Screens.Map.route) { MapScreen(navController) }

@@ -158,4 +158,5 @@
     <string name="checklist_colon">Checklist:</string>
     <string name="trip_plan_colon">Trip plan:</string>
     <string name="destination_detail">Destination: %1$s</string>
+    <string name="trip_updated">Trip updated</string>
 </resources>
