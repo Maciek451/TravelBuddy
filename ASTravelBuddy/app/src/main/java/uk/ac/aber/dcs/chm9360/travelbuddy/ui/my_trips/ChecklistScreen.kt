@@ -15,12 +15,16 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,7 +34,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -211,13 +217,9 @@ fun ChecklistItemView(
             checked = item.checked == "true",
             onCheckedChange = { isChecked ->
                 onItemCheckedChange(item.copy(checked = isChecked.toString()), isChecked)
-            },
-            colors = CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary,
-                uncheckedColor = MaterialTheme.colorScheme.error
-            )
+            }
         )
-        TextField(
+        OutlinedTextField(
             value = item.task,
             onValueChange = { newText ->
                 onItemTextChange(item, newText)
@@ -226,6 +228,11 @@ fun ChecklistItemView(
                 fontSize = 20.sp,
                 textDecoration = if (item.checked == "true") TextDecoration.LineThrough else TextDecoration.None,
                 color = MaterialTheme.colorScheme.onSurface
+            ),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = Color.Transparent,
             ),
             modifier = Modifier
                 .weight(1f)
