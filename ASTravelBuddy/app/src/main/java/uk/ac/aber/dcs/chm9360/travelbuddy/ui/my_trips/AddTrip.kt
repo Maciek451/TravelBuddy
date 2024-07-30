@@ -69,6 +69,7 @@ fun AddTripScreen(
     val showCityList by retrofitViewModel.showCityList.collectAsState()
     val showCountryList by retrofitViewModel.showCountryList.collectAsState()
     var searchType by rememberSaveable { mutableStateOf("city") }
+    var isDropdownVisible by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
     val isSaveButtonEnabled by rememberSaveable(tripTitle, destination, startDate, endDate) {
@@ -186,6 +187,7 @@ fun AddTripScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp)
+                .clickable { isDropdownVisible = !isDropdownVisible }
         )
 
         if (loading) {

@@ -130,15 +130,14 @@ fun ChecklistScreen(
                             modifier = Modifier
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                modifier = Modifier.padding(start = 8.dp),
                                 imageVector = Icons.Default.Add,
                                 contentDescription = null
                             )
                             Text(
-                                modifier = Modifier.padding(start = 20.dp),
+                                modifier = Modifier.padding(start = 8.dp),
                                 fontSize = 18.sp,
                                 text = stringResource(id = R.string.list_item_button),
                             )
@@ -157,15 +156,14 @@ fun ChecklistScreen(
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start
+                                horizontalArrangement = Arrangement.Center
                             ) {
                                 Icon(
-                                    modifier = Modifier.padding(start = 8.dp),
                                     imageVector = if (isCheckedListVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                     contentDescription = null
                                 )
                                 Text(
-                                    modifier = Modifier.padding(start = 20.dp),
+                                    modifier = Modifier.padding(start = 8.dp),
                                     fontSize = 18.sp,
                                     text = stringResource(
                                         id = R.string.checked_items,
