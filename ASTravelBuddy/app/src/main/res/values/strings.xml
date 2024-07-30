@@ -148,5 +148,7 @@
     <string name="failed_to_load_image">Failed to load image</string>
     <string name="delete_icon">Delete icon</string>
     <string name="checklist">Checklist</string>
-    <string name="list_item_button">+ List item</string>
+    <string name="list_item_button">List item</string>
+    <string name="checked_items">%1$d checked item%2$s</string>
+    <string name="s">s</string>
 </resources>

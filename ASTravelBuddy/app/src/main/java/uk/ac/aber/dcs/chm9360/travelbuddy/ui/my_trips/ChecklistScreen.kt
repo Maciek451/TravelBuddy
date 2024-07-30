@@ -9,26 +9,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
@@ -46,6 +53,7 @@ fun ChecklistScreen(
     val trip = Utils.trip
     val appBarTitle = stringResource(id = R.string.checklist)
     var checklist by remember { mutableStateOf(trip?.checklist ?: emptyList()) }
+    var isCheckedListVisible by rememberSaveable { mutableStateOf(false) }
     val uncheckedItems = checklist.filter { it.checked == "false" }
     val checkedItems = checklist.filter { it.checked == "true" }
 
@@ -111,33 +119,73 @@ fun ChecklistScreen(
                         onClick = { addItem() },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp)
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Start
                         ) {
+                            Icon(
+                                modifier = Modifier.padding(start = 8.dp),
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null
+                            )
                             Text(
+                                modifier = Modifier.padding(start = 20.dp),
+                                fontSize = 18.sp,
                                 text = stringResource(id = R.string.list_item_button),
                             )
                         }
                     }
                 }
-
-                items(checkedItems) { item ->
-                    ChecklistItemView(
-                        item = item,
-                        onItemCheckedChange = { item, isChecked ->
-                            val updatedItem = item.copy(checked = isChecked.toString())
-                            updateItem(updatedItem)
-                            trip?.id?.let { tripId ->
-                                firebaseViewModel.updateChecklistItem(tripId, updatedItem)
+                if (checkedItems.isNotEmpty()) {
+                    item {
+                        val checkedCount = checkedItems.size
+                        TextButton(
+                            onClick = { isCheckedListVisible = !isCheckedListVisible },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                Icon(
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    imageVector = if (isCheckedListVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                    contentDescription = null
+                                )
+                                Text(
+                                    modifier = Modifier.padding(start = 20.dp),
+                                    fontSize = 18.sp,
+                                    text = stringResource(
+                                        id = R.string.checked_items,
+                                        checkedCount,
+                                        if (checkedCount > 1) stringResource(id = R.string.s) else ""
+                                    )
+                                )
                             }
-                        },
-                        onItemTextChange = { item, newText -> updateItem(item.copy(task = newText)) },
-                        onItemDelete = { removeItem(it) }
-                    )
+                        }
+                    }
+                }
+                if (isCheckedListVisible) {
+                    items(checkedItems) { item ->
+                        ChecklistItemView(
+                            item = item,
+                            onItemCheckedChange = { item, isChecked ->
+                                val updatedItem = item.copy(checked = isChecked.toString())
+                                updateItem(updatedItem)
+                                trip?.id?.let { tripId ->
+                                    firebaseViewModel.updateChecklistItem(tripId, updatedItem)
+                                }
+                            },
+                            onItemTextChange = { item, newText -> updateItem(item.copy(task = newText)) },
+                            onItemDelete = { removeItem(it) }
+                        )
+                    }
                 }
             }
         }
@@ -169,11 +217,16 @@ fun ChecklistItemView(
                 uncheckedColor = MaterialTheme.colorScheme.error
             )
         )
-        OutlinedTextField(
+        TextField(
             value = item.task,
             onValueChange = { newText ->
                 onItemTextChange(item, newText)
             },
+            textStyle = TextStyle(
+                fontSize = 20.sp,
+                textDecoration = if (item.checked == "true") TextDecoration.LineThrough else TextDecoration.None,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp)
