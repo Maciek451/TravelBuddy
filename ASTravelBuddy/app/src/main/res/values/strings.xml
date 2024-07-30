@@ -151,4 +151,11 @@
     <string name="list_item_button">List item</string>
     <string name="checked_items">%1$d checked item%2$s</string>
     <string name="s">s</string>
+    <string name="no_image">No image available</string>
+    <string name="trip_plan">Trip plan</string>
+    <string name="list_empty">List empty</string>
+    <string name="no_plans">No plans added</string>
+    <string name="checklist_colon">Checklist:</string>
+    <string name="trip_plan_colon">Trip plan:</string>
+    <string name="destination_detail">Destination: %1$s</string>
 </resources>
