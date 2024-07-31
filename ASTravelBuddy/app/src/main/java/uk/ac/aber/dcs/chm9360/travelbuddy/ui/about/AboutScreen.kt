@@ -29,7 +29,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
 fun AboutScreen(
     navController: NavHostController,
 ) {
-    val title = R.string.about
+    val title = stringResource(id = R.string.about)
 
     Column(
         modifier = Modifier
@@ -37,7 +37,7 @@ fun AboutScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AppBarWithArrowBack(navController, title.toString(), false)
+        AppBarWithArrowBack(navController, title, false)
         Column(
             modifier = Modifier
                 .fillMaxSize()
