@@ -159,4 +159,11 @@
     <string name="trip_plan_colon">Trip plan:</string>
     <string name="destination_detail">Destination: %1$s</string>
     <string name="trip_updated">Trip updated</string>
+    <string name="my_location">My location</string>
+    <string name="search_button">Search button</string>
+    <string name="search">Search</string>
+    <string name="empty_query_title">Empty Query</string>
+    <string name="search_query_empty">Search query cannot be empty.</string>
+    <string name="no_results_title">No Results</string>
+    <string name="search_no_results">No locations found for the given query.</string>
 </resources>

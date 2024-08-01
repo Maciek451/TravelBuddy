@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,6 +35,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.CustomDatePicker
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -70,6 +72,7 @@ fun EditTripScreen(
     val showCountryList by retrofitViewModel.showCountryList.collectAsState()
     var searchType by rememberSaveable { mutableStateOf("city") }
     var isDropdownVisible by rememberSaveable { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val isSaveButtonEnabled by rememberSaveable(tripTitle, destination, startDate, endDate) {
         mutableStateOf(
@@ -209,6 +212,7 @@ fun EditTripScreen(
                             .clickable {
                                 destination = "${city.name}, ${city.country}"
                                 retrofitViewModel.hideCityList()
+                                keyboardController?.hide()
                             }
                             .padding(16.dp)
                     )
@@ -224,7 +228,7 @@ fun EditTripScreen(
                             .clickable {
                                 destination = country.name
                                 retrofitViewModel.hideCountryList()
-                                isDropdownVisible = false
+                                keyboardController?.hide()
                             }
                             .padding(16.dp)
                     )

@@ -11,6 +11,7 @@ fun TopLevelScaffold(
     appBarTitle: String,
     showLocationButton: Boolean = false,
     onLocationButtonClick: (() -> Unit)? = null,
+    onSearchButtonClick: (() -> Unit)? = null,
     pageContent: @Composable (innerPadding: PaddingValues) -> Unit = {}
 ) {
     Scaffold(
@@ -19,7 +20,8 @@ fun TopLevelScaffold(
                 navController = navController,
                 appBarTitle = appBarTitle,
                 showLocationButton = showLocationButton,
-                onLocationButtonClick = onLocationButtonClick
+                onLocationButtonClick = onLocationButtonClick,
+                onSearchButtonClick = onSearchButtonClick
             )
         },
         bottomBar = {

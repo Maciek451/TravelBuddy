@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,7 +22,8 @@ fun MainTopAppBar(
     navController: NavHostController,
     appBarTitle: String,
     showLocationButton: Boolean = false,
-    onLocationButtonClick: (() -> Unit)? = null
+    onLocationButtonClick: (() -> Unit)? = null,
+    onSearchButtonClick: (() -> Unit)? = null
 ) {
     TopAppBar(
         title = {
@@ -30,7 +32,16 @@ fun MainTopAppBar(
         actions = {
             if (showLocationButton) {
                 IconButton(onClick = { onLocationButtonClick?.invoke() }) {
-                    Icon(Icons.Default.MyLocation, contentDescription = "My Location")
+                    Icon(
+                        Icons.Default.MyLocation,
+                        contentDescription = stringResource(id = R.string.my_location)
+                    )
+                }
+                IconButton(onClick = { onSearchButtonClick?.invoke() }) {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = stringResource(id = R.string.search_button)
+                    )
                 }
             }
             IconButton(onClick = { navController.navigate(Screens.Notification.route) }) {
