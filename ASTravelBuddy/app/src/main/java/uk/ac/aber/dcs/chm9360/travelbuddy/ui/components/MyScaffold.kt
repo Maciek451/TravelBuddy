@@ -9,9 +9,6 @@ import androidx.navigation.NavHostController
 fun TopLevelScaffold(
     navController: NavHostController,
     appBarTitle: String,
-    showLocationButton: Boolean = false,
-    onLocationButtonClick: (() -> Unit)? = null,
-    onSearchButtonClick: (() -> Unit)? = null,
     pageContent: @Composable (innerPadding: PaddingValues) -> Unit = {}
 ) {
     Scaffold(
@@ -19,9 +16,6 @@ fun TopLevelScaffold(
             MainTopAppBar(
                 navController = navController,
                 appBarTitle = appBarTitle,
-                showLocationButton = showLocationButton,
-                onLocationButtonClick = onLocationButtonClick,
-                onSearchButtonClick = onSearchButtonClick
             )
         },
         bottomBar = {

@@ -17,16 +17,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -98,35 +101,28 @@ fun MapScreen(
     }
 
     fun performSearch(query: String) {
-        val cityZoomLevel = 15.0
-        val countryZoomLevel = 7.0
-
-        when {
-            query.isEmpty() -> {
-                dialogTitle.value = context.getString(R.string.empty_query_title)
-                dialogMessage.value = context.getString(R.string.search_query_empty)
-                showDialog.value = true
-            }
-
-            else -> {
-                val geocoder = Geocoder(context, Locale.getDefault())
-                val address = geocoder.getFromLocationName(query, 1)?.firstOrNull()
-
-                if (address != null) {
-                    val location = GeoPoint(address.latitude, address.longitude)
-                    val zoomLevel =
-                        if (searchType.value == "city") cityZoomLevel else countryZoomLevel
-
-                    mapViewModel.updateMapCenter(location)
-                    mapViewModel.updateMapZoom(zoomLevel)
-                } else {
-                    dialogTitle.value = context.getString(R.string.no_results_title)
-                    dialogMessage.value = context.getString(R.string.search_no_results)
-                    showDialog.value = true
-                }
-                searchBarVisible.value = false
-            }
+        if (query.isEmpty()) {
+            dialogTitle.value = context.getString(R.string.empty_query_title)
+            dialogMessage.value = context.getString(R.string.search_query_empty)
+            showDialog.value = true
+            return
         }
+
+        val geocoder = Geocoder(context, Locale.getDefault())
+        val address = geocoder.getFromLocationName(query, 1)?.firstOrNull()
+
+        if (address != null) {
+            val location = GeoPoint(address.latitude, address.longitude)
+            val zoomLevel = if (searchType.value == "city") 15.0 else 7.0
+
+            mapViewModel.updateMapCenter(location)
+            mapViewModel.updateMapZoom(zoomLevel)
+        } else {
+            dialogTitle.value = context.getString(R.string.no_results_title)
+            dialogMessage.value = context.getString(R.string.search_no_results)
+            showDialog.value = true
+        }
+        searchBarVisible.value = false
     }
 
     if (showDialog.value) {
@@ -144,10 +140,7 @@ fun MapScreen(
 
     TopLevelScaffold(
         navController = navController,
-        appBarTitle = stringResource(R.string.map),
-        showLocationButton = true,
-        onLocationButtonClick = ::moveToCurrentLocation,
-        onSearchButtonClick = { searchBarVisible.value = !searchBarVisible.value }
+        appBarTitle = stringResource(R.string.map)
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -160,13 +153,13 @@ fun MapScreen(
                 Column {
                     SearchBar(
                         searchQuery = searchQuery.value,
-                        onSearchQueryChange = {
-                            searchQuery.value = it
-                            if (it.length > 2) {
+                        onSearchQueryChange = { newQuery ->
+                            searchQuery.value = newQuery
+                            if (newQuery.length > 2) {
                                 if (searchType.value == "city") {
-                                    retrofitViewModel.searchCities(it)
+                                    retrofitViewModel.searchCities(newQuery)
                                 } else {
-                                    retrofitViewModel.searchCountries(it)
+                                    retrofitViewModel.searchCountries(newQuery)
                                 }
                             } else {
                                 retrofitViewModel.hideCityList()
@@ -178,16 +171,36 @@ fun MapScreen(
                         countries = countries,
                         showCityList = showCityList && searchType.value == "city",
                         showCountryList = showCountryList && searchType.value == "country",
-                        onSelectSuggestion = {
-                            searchQuery.value = it
+                        onSelectSuggestion = { suggestion ->
+                            searchQuery.value = suggestion
                         },
                         searchType = searchType.value,
-                        onSearchTypeChange = { searchType.value = it }
+                        onSearchTypeChange = { newType -> searchType.value = newType }
                     )
                 }
             }
+
             if (loading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+
+            FloatingActionButton(
+                onClick = { moveToCurrentLocation() },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(Icons.Default.MyLocation, contentDescription = stringResource(R.string.my_location))
+            }
+
+            FloatingActionButton(
+                onClick = { searchBarVisible.value = !searchBarVisible.value },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+                    .offset(y = (-72).dp)
+            ) {
+                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
             }
         }
     }
@@ -324,12 +337,15 @@ fun MapViewComposable(context: Context, mapViewModel: MapViewModel) {
     val mapCenter by mapViewModel.mapCenter.collectAsState()
     val mapZoom by mapViewModel.mapZoom.collectAsState()
     val currentLocation by mapViewModel.currentLocation.collectAsState()
-    val myLocationText = stringResource(id = R.string.my_location)
+    val markers by mapViewModel.markers.collectAsState()
+    val myLocation = stringResource(id = R.string.my_location)
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
+        ActivityResultContracts.RequestPermission(),
         onResult = { locationPermissionGranted.value = it }
     )
+
+    val minZoomLevel = 4.0
 
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(
@@ -369,15 +385,20 @@ fun MapViewComposable(context: Context, mapViewModel: MapViewModel) {
                 setMultiTouchControls(true)
                 controller.setZoom(mapZoom)
                 controller.setCenter(mapCenter)
+                controller.setZoom(minZoomLevel)
                 overlays.add(MapEventsOverlay(object : MapEventsReceiver {
-                    override fun singleTapConfirmedHelper(p: GeoPoint?) = true
+                    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                        p?.let { mapViewModel.addMarker(it) }
+                        return true
+                    }
+
                     override fun longPressHelper(p: GeoPoint?) = true
                 }))
 
                 val currentLocationMarker = Marker(this).apply {
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     icon = ContextCompat.getDrawable(context, R.drawable.ic_location_marker)
-                    title = myLocationText
+                    title = myLocation
                 }
                 overlays.add(currentLocationMarker)
 
@@ -393,7 +414,13 @@ fun MapViewComposable(context: Context, mapViewModel: MapViewModel) {
                     }
 
                     override fun onZoom(event: ZoomEvent?): Boolean {
-                        event?.let { mapViewModel.updateMapZoom(it.zoomLevel) }
+                        event?.let {
+                            if (event.zoomLevel < minZoomLevel) {
+                                controller.setZoom(minZoomLevel)
+                            } else {
+                                mapViewModel.updateMapZoom(event.zoomLevel)
+                            }
+                        }
                         return super.onZoom(event)
                     }
                 })
@@ -403,14 +430,30 @@ fun MapViewComposable(context: Context, mapViewModel: MapViewModel) {
             mapView.controller.setCenter(mapCenter)
             mapView.controller.setZoom(mapZoom)
 
-            val marker = mapView.overlays.find { it is Marker } as? Marker
-            marker?.apply {
+            mapView.overlays.removeIf { it -> it is Marker && it != mapView.overlays.find { it is Marker && (it).title == myLocation } }
+
+            val currentLocationMarker = Marker(mapView).apply {
                 currentLocation?.let { location ->
                     position = location
-                    title = myLocationText
-                    mapView.invalidate()
+                    title = myLocation
                 }
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                icon = ContextCompat.getDrawable(context, R.drawable.ic_location_marker)
             }
+            mapView.overlays.add(currentLocationMarker)
+
+            markers.forEach { geoPoint ->
+                val marker = Marker(mapView).apply {
+                    position = geoPoint
+                    icon = ContextCompat.getDrawable(context, R.drawable.ic_marker)
+                    setOnMarkerClickListener { _, _ ->
+                        mapViewModel.removeMarker(geoPoint)
+                        true
+                    }
+                }
+                mapView.overlays.add(marker)
+            }
+            mapView.invalidate()
         }
     )
 }
@@ -435,6 +478,9 @@ class MapViewModel : ViewModel() {
     private val _currentLocation = MutableStateFlow<GeoPoint?>(null)
     val currentLocation: StateFlow<GeoPoint?> = _currentLocation
 
+    private val _markers = MutableStateFlow<List<GeoPoint>>(emptyList())
+    val markers: StateFlow<List<GeoPoint>> = _markers
+
     fun updateMapCenter(newCenter: GeoPoint) {
         _mapCenter.value = newCenter
     }
@@ -445,5 +491,13 @@ class MapViewModel : ViewModel() {
 
     fun updateCurrentLocation(location: GeoPoint) {
         _currentLocation.value = location
+    }
+
+    fun addMarker(geoPoint: GeoPoint) {
+        _markers.value += geoPoint
+    }
+
+    fun removeMarker(geoPoint: GeoPoint) {
+        _markers.value -= geoPoint
     }
 }

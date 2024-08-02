@@ -21,29 +21,12 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 fun MainTopAppBar(
     navController: NavHostController,
     appBarTitle: String,
-    showLocationButton: Boolean = false,
-    onLocationButtonClick: (() -> Unit)? = null,
-    onSearchButtonClick: (() -> Unit)? = null
 ) {
     TopAppBar(
         title = {
             Text(appBarTitle)
         },
         actions = {
-            if (showLocationButton) {
-                IconButton(onClick = { onLocationButtonClick?.invoke() }) {
-                    Icon(
-                        Icons.Default.MyLocation,
-                        contentDescription = stringResource(id = R.string.my_location)
-                    )
-                }
-                IconButton(onClick = { onSearchButtonClick?.invoke() }) {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = stringResource(id = R.string.search_button)
-                    )
-                }
-            }
             IconButton(onClick = { navController.navigate(Screens.Notification.route) }) {
                 Icon(
                     imageVector = Icons.Filled.Notifications,
