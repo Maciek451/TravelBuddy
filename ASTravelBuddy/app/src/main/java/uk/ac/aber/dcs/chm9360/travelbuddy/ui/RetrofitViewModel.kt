@@ -1,4 +1,4 @@
-package uk.ac.aber.dcs.chm9360.travelbuddy
+package uk.ac.aber.dcs.chm9360.travelbuddy.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -7,13 +7,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Destination
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.Feature
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.GeoDbApi
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.GeoapifyApi
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.PixabayApi
 
 class RetrofitViewModel : ViewModel() {
 
     private val geoDbApi = GeoDbApi.create()
     private val pixabayApi = PixabayApi.create()
+    private val geoapifyApi = GeoapifyApi.create()
 
     private val _cities = MutableStateFlow<List<Destination>>(emptyList())
     val cities: StateFlow<List<Destination>> = _cities
@@ -35,6 +38,9 @@ class RetrofitViewModel : ViewModel() {
 
     private val _imageLoadingStates = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     val imageLoadingStates: StateFlow<Map<String, Boolean>> = _imageLoadingStates
+
+    private val _places = MutableStateFlow<List<Feature>>(emptyList())
+    val places: StateFlow<List<Feature>> = _places
 
     fun searchCities(query: String) {
         if (query.length <= 2) {
@@ -119,6 +125,57 @@ class RetrofitViewModel : ViewModel() {
                 Log.e("RetrofitViewModel", "Image fetching failed: ${e.message}")
             }
             _imageLoadingStates.value += (destination to false)
+        }
+    }
+
+    fun searchPlaces(city: String, categories: String? = null) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val boundingBox = getBoundingBoxForCity(city)
+                val filter = if (boundingBox != null) {
+                    "rect:${boundingBox.joinToString(",")}"
+                } else {
+                    null
+                }
+
+                val response = geoapifyApi.searchPlaces(
+                    apiKey = GeoapifyApi.GEOAPIFY_API_KEY,
+                    query = city,
+                    categories = categories,
+                    filter = filter
+                )
+                if (response.isSuccessful) {
+                    val responseData = response.body()?.features
+                    _places.value = responseData ?: emptyList()
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("RetrofitViewModel", "Geoapify response not successful: ${response.code()}: $errorBody")
+                }
+            } catch (e: Exception) {
+                Log.e("RetrofitViewModel", "Geoapify call failed: ${e.message}")
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    private suspend fun getBoundingBoxForCity(city: String): List<Double>? {
+        return try {
+            val response = geoapifyApi.geocodeCity(
+                apiKey = GeoapifyApi.GEOAPIFY_API_KEY,
+                city = city
+            )
+            if (response.isSuccessful) {
+                response.body()?.features?.firstOrNull()?.bbox
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("RetrofitViewModel", "Geoapify response not successful: ${response.code()}: $errorBody")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("RetrofitViewModel", "Geoapify call failed: ${e.message}")
+            null
         }
     }
 }

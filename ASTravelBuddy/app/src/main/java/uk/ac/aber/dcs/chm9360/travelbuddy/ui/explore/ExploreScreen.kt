@@ -1,5 +1,9 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,141 +12,239 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.automirrored.filled.ManageSearch
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    retrofitViewModel: RetrofitViewModel = viewModel()
 ) {
     val appBarTitle = stringResource(R.string.explore)
 
-    var searchText by remember { mutableStateOf("") }
-    var isSearching by remember { mutableStateOf(false) }
-    val chipState = remember { mutableStateOf(listOf(false, false)) }
+    var cityText by remember { mutableStateOf("") }
+    var categoryText by remember { mutableStateOf("") }
+    val places by retrofitViewModel.places.collectAsState()
+    val isLoading by retrofitViewModel.loading.collectAsState()
 
-    TopLevelScaffold(navController = navController, appBarTitle = appBarTitle) {
-        Box(
+    val scrollState = rememberLazyListState()
+    val showButton by remember {
+        derivedStateOf {
+            scrollState.firstVisibleItemIndex > 0
+        }
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    TopLevelScaffold(
+        navController = navController,
+        appBarTitle = appBarTitle
+    ) { innerPadding ->
+        Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 56.dp)
+                .padding(innerPadding)
         ) {
-            Column {
-                SearchBar(
-                    query = searchText,
-                    onQueryChange = { searchText = it },
-                    onSearch = {  },
-                    active = isSearching,
-                    onActiveChange = {
-                        isSearching = !isSearching
-                        if (!isSearching) {
-                            searchText = ""
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LazyColumn(
+                    state = scrollState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 8.dp)
+                ) {
+                    item {
+                        TextField(
+                            value = cityText,
+                            onValueChange = { cityText = it },
+                            label = { Text(stringResource(id = R.string.city)) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TextField(
+                            value = categoryText,
+                            onValueChange = { categoryText = it },
+                            label = { Text(stringResource(id = R.string.category)) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                if (cityText.isNotEmpty()) {
+                                    retrofitViewModel.searchPlaces(
+                                        cityText,
+                                        categories = categoryText
+                                    )
+                                    keyboardController?.hide()
+                                } else {
+                                    Log.e("ExploreScreen", "City name is required")
+                                }
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Search,
+                                contentDescription = stringResource(R.string.search_icon)
+                            )
+                            Text(stringResource(id = R.string.search))
                         }
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = if (isSearching) Icons.Filled.ArrowBack else Icons.Default.Search,
-                            contentDescription = stringResource(
-                                if (isSearching) R.string.arrow_back else R.string.search_icon
-                            ),
-                            modifier = Modifier.clickable {
-                                if (isSearching) {
-                                    isSearching = false
-                                    searchText = ""
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    if (isLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(vertical = 32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(text = stringResource(id = R.string.loading))
                                 }
                             }
-                        )
-                    },
-                    trailingIcon = {
-                        if (searchText.isNotEmpty()) {
-                            Icon(
-                                imageVector = Icons.Filled.Clear,
-                                contentDescription = stringResource(R.string.clear_icon),
-                                modifier = Modifier.clickable {
-                                    searchText = ""
-                                }
+                        }
+                    } else if (places.isNotEmpty()) {
+                        items(places) { place ->
+                            PlaceItem(
+                                title = place.properties.name,
+                                subtext = place.properties.address,
+                                onClick = {  }
                             )
                         }
-                    },
-                    placeholder = {
-                        Text(text = "Search:")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    content = {  }
-                )
-
-                Divider(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.filters),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    FilterChip(
-                        selected = chipState.value[0],
-                        onClick = { chipState.value = chipState.value.toMutableList().apply { set(0, !this[0]) } },
-                        label = { Text(stringResource(R.string.recommended)) },
-                        leadingIcon = {
-                            if (chipState.value[0]) {
-                                Icon(
-                                    imageVector = Icons.Filled.Done,
-                                    contentDescription = null
-                                )
+                    } else {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(vertical = 32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ManageSearch,
+                                        contentDescription = stringResource(R.string.search_icon),
+                                        modifier = Modifier.size(64.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(text = stringResource(id = R.string.search_to_get_information))
+                                }
                             }
                         }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    FilterChip(
-                        selected = chipState.value[1],
-                        onClick = { chipState.value = chipState.value.toMutableList().apply { set(1, !this[1]) } },
-                        label = { Text(stringResource(R.string.popular)) },
-                        leadingIcon = {
-                            if (chipState.value[1]) {
-                                Icon(
-                                    imageVector = Icons.Filled.Done,
-                                    contentDescription = null
-                                )
-                            }
-                        }
-                    )
+                    }
                 }
+
+                AnimatedVisibility(
+                    visible = showButton,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    FloatingActionButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                scrollState.animateScrollToItem(0)
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowUp,
+                            contentDescription = stringResource(id = R.string.scroll_to_top),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PlaceItem(
+    title: String,
+    subtext: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = subtext,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }

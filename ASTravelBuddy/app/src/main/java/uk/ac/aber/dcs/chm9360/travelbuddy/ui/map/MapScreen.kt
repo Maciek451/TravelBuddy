@@ -68,7 +68,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
-import uk.ac.aber.dcs.chm9360.travelbuddy.RetrofitViewModel
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Destination
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
 import java.util.Locale

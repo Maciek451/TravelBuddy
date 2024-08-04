@@ -166,4 +166,8 @@
     <string name="search_query_empty">Search query cannot be empty.</string>
     <string name="no_results_title">No Results</string>
     <string name="search_no_results">No locations found for the given query.</string>
+    <string name="category">Category</string>
+    <string name="loading">Fetching information...</string>
+    <string name="search_to_get_information">Search to get information</string>
+    <string name="scroll_to_top">Go to Top</string>
 </resources>
