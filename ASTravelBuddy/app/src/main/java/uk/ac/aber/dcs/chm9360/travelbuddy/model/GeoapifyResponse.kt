@@ -10,7 +10,7 @@ data class Feature(
 
 data class PlaceProperties(
     val name: String,
-    val address: String,
+    val formatted: String,
 )
 
 data class GeocodeResponse(

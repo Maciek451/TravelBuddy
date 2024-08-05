@@ -157,7 +157,7 @@ fun ExploreScreen(
                         items(places) { place ->
                             PlaceItem(
                                 title = place.properties.name,
-                                subtext = place.properties.address,
+                                subtext = place.properties.formatted,
                                 onClick = {  }
                             )
                         }
