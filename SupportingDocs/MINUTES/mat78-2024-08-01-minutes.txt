@@ -1,0 +1,84 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: MS Teams, Thursday, 1st August 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Thursday, 1st August 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. For map, think and implement use case(s), e.g., adding a marker when a user press a location and then provide a route to the selected location from current location. 
+ACTION: mat78
+Status: Ongoing
+Marker for current location is done. 
+
+2. Continue working on firestore functionality for trips features.
+ACTION: mat78
+Status: Ongoing
+
+3. Implement friend approval process for adding friend. 
+ACTION: mat78
+Status: Ongoing
+
+4. Continue implementing "Explore" feature.
+ACTION: mat78
+Status: Ongoing
+
+Other Tasks
+===========
+5. Implement auto-complete names of cities and countries using an API
+ACTION: mat78
+Status: Done
+Used Geodb cities API of Rapidapi for auto-complete names of cities and countries. 
+Currently limited getting suggestions after entering 3 characters and limited to get 3 suggestions because free version allows 1000 calls/day (1 call means one city/country suggestion).
+
+6. Implement loading a photo of place using an API. 
+ACTION: mat78
+Status: Done
+Used pixabay API for this fetching images based on the destination. 
+
+7. Implement Checklist functionality of adding items. 
+ACTION: mat78
+Status: Done
+Try whether reordering of list items is possible. 
+
+8. Implement edit trip functionality.
+ACTION: mat78
+Status: Done
+
+9. Search city/country in the map by typing a place in searbox. 
+ACTION: mat78
+Status: Done
+
+New business 
+============
+1. For map, think and implement use case(s), e.g., adding a marker when a user press a location and then provide a route to the selected location from current location. 
+ACTION: mat78
+
+2. In map, search a specific location provided by OpenStreetMap. 
+ACTION: mat78 
+
+3. Continue working on firestore functionality for trips features.
+ACTION: mat78
+
+4. Implement friend approval process for adding friend. 
+ACTION: mat78
+
+5. Continue implementing "Explore" feature.
+ACTION: mat78
+
+6. Implement showing weather details feature.
+ACTION: mat78
+
+7. Implement showing currency details feature.
+ACTION: mat78
+
+8. Check if Geodb cities API of Rapidapi supports searching in Polish language. 
+If not, then think about how you are going to offer search city/country feature when app is in Polish language. 
+ACTION: mat78
+
+AOB
+=== 
+None
