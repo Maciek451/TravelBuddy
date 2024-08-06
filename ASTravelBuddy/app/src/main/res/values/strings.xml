@@ -170,4 +170,11 @@
     <string name="loading">Fetching information...</string>
     <string name="search_to_get_information">Search to get information</string>
     <string name="scroll_to_top">Go to Top</string>
+    <string name="no_subtext_available">No subtext available</string>
+    <string name="arrow_down_icon">Arrow down icon</string>
+    <string name="empty_destination_title">No Destination</string>
+    <string name="empty_destination_message">Please enter a destination to search.</string>
+    <string name="empty_category_title">No Category</string>
+    <string name="empty_category_message">Please select a category to filter the search.</string>
+    <string name="no_results_found">No places found. Try a different search.</string>
 </resources>
