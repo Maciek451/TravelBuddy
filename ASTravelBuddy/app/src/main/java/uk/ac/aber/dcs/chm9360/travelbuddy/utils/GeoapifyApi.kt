@@ -5,8 +5,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
-import uk.ac.aber.dcs.chm9360.travelbuddy.model.GeoapifyResponse
-import uk.ac.aber.dcs.chm9360.travelbuddy.model.GeocodeResponse
 
 interface GeoapifyApi {
     @GET("v2/places")
@@ -38,3 +36,29 @@ interface GeoapifyApi {
         }
     }
 }
+
+data class GeoapifyResponse(
+    val features: List<Feature>
+)
+
+data class GeocodeResponse(
+    val features: List<GeocodeFeature>
+)
+
+data class GeocodeFeature(
+    val properties: GeocodeFeatureProperties,
+    val bbox: List<Double>? = null
+)
+
+data class PlaceProperties(
+    val name: String,
+    val formatted: String,
+)
+
+data class GeocodeFeatureProperties(
+    val formatted: String
+)
+
+data class Feature(
+    val properties: PlaceProperties
+)

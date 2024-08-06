@@ -6,32 +6,17 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import uk.ac.aber.dcs.chm9360.travelbuddy.model.Destination
-import uk.ac.aber.dcs.chm9360.travelbuddy.model.Feature
-import uk.ac.aber.dcs.chm9360.travelbuddy.utils.GeoDbApi
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Feature
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.GeoapifyApi
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.PixabayApi
 
 class RetrofitViewModel : ViewModel() {
 
-    private val geoDbApi = GeoDbApi.create()
     private val pixabayApi = PixabayApi.create()
     private val geoapifyApi = GeoapifyApi.create()
 
-    private val _cities = MutableStateFlow<List<Destination>>(emptyList())
-    val cities: StateFlow<List<Destination>> = _cities
-
-    private val _countries = MutableStateFlow<List<Destination>>(emptyList())
-    val countries: StateFlow<List<Destination>> = _countries
-
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
-
-    private val _showCityList = MutableStateFlow(false)
-    val showCityList: StateFlow<Boolean> = _showCityList
-
-    private val _showCountryList = MutableStateFlow(false)
-    val showCountryList: StateFlow<Boolean> = _showCountryList
 
     private val _imageUrls = MutableStateFlow<Map<String, String?>>(emptyMap())
     val imageUrls: StateFlow<Map<String, String?>> = _imageUrls
@@ -42,65 +27,8 @@ class RetrofitViewModel : ViewModel() {
     private val _places = MutableStateFlow<List<Feature>>(emptyList())
     val places: StateFlow<List<Feature>> = _places
 
-    fun searchCities(query: String) {
-        if (query.length <= 2) {
-            _cities.value = emptyList()
-            _showCityList.value = false
-            return
-        }
-
-        viewModelScope.launch {
-            _loading.value = true
-            try {
-                val response = geoDbApi.getCities(namePrefix = query)
-                if (response.isSuccessful) {
-                    val responseData = response.body()?.data
-                    _cities.value = responseData ?: emptyList()
-                    _showCityList.value = _cities.value.isNotEmpty()
-                } else {
-                    Log.e("RetrofitViewModel", "API response not successful: ${response.code()}")
-                }
-            } catch (e: Exception) {
-                Log.e("RetrofitViewModel", "API call failed: ${e.message}")
-            }
-            _loading.value = false
-        }
-    }
-
-    fun searchCountries(query: String) {
-        if (query.length <= 2) {
-            _countries.value = emptyList()
-            _showCountryList.value = false
-            return
-        }
-
-        viewModelScope.launch {
-            _loading.value = true
-            try {
-                val response = geoDbApi.getCountries(namePrefix = query)
-                if (response.isSuccessful) {
-                    val responseData = response.body()?.data
-                    _countries.value = responseData ?: emptyList()
-                    _showCountryList.value = _countries.value.isNotEmpty()
-                } else {
-                    Log.e("RetrofitViewModel", "API response not successful: ${response.code()}")
-                }
-            } catch (e: Exception) {
-                Log.e("RetrofitViewModel", "API call failed: ${e.message}")
-            }
-            _loading.value = false
-        }
-    }
-
-    fun hideCityList() {
-        _showCityList.value = false
-        _cities.value = emptyList()
-    }
-
-    fun hideCountryList() {
-        _showCountryList.value = false
-        _countries.value = emptyList()
-    }
+    private val _autocompleteSuggestions = MutableStateFlow<List<String>>(emptyList())
+    val autocompleteSuggestions: StateFlow<List<String>> = _autocompleteSuggestions
 
     fun fetchImage(destination: String) {
         viewModelScope.launch {
@@ -176,6 +104,32 @@ class RetrofitViewModel : ViewModel() {
         } catch (e: Exception) {
             Log.e("RetrofitViewModel", "Geoapify call failed: ${e.message}")
             null
+        }
+    }
+
+    fun fetchAutocompleteSuggestions(query: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val response = geoapifyApi.geocodeCity(
+                    apiKey = GeoapifyApi.GEOAPIFY_API_KEY,
+                    city = query,
+                    limit = 5
+                )
+                if (response.isSuccessful) {
+                    val suggestions = response.body()?.features?.map { it.properties.formatted } ?: emptyList()
+                    _autocompleteSuggestions.value = suggestions
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("RetrofitViewModel", "Geoapify response not successful: ${response.code()}: $errorBody")
+                    _autocompleteSuggestions.value = emptyList()
+                }
+            } catch (e: Exception) {
+                Log.e("RetrofitViewModel", "Geoapify call failed: ${e.message}")
+                _autocompleteSuggestions.value = emptyList()
+            } finally {
+                _loading.value = false
+            }
         }
     }
 }

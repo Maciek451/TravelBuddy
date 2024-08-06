@@ -10,16 +10,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -33,7 +30,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -42,6 +38,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -69,7 +67,6 @@ import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
-import uk.ac.aber.dcs.chm9360.travelbuddy.model.Destination
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
 import java.util.Locale
 
@@ -85,13 +82,10 @@ fun MapScreen(
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
     val dialogTitle = remember { mutableStateOf("") }
-
-    val cities by retrofitViewModel.cities.collectAsState()
-    val countries by retrofitViewModel.countries.collectAsState()
     val loading by retrofitViewModel.loading.collectAsState()
-    val showCityList by retrofitViewModel.showCityList.collectAsState()
-    val showCountryList by retrofitViewModel.showCountryList.collectAsState()
-    val searchType = remember { mutableStateOf("city") }
+    var isDropdownVisible by rememberSaveable { mutableStateOf(false) }
+    val autocompleteSuggestions by retrofitViewModel.autocompleteSuggestions.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     fun moveToCurrentLocation() {
         mapViewModel.currentLocation.value?.let {
@@ -113,10 +107,7 @@ fun MapScreen(
 
         if (address != null) {
             val location = GeoPoint(address.latitude, address.longitude)
-            val zoomLevel = if (searchType.value == "city") 15.0 else 7.0
-
             mapViewModel.updateMapCenter(location)
-            mapViewModel.updateMapZoom(zoomLevel)
         } else {
             dialogTitle.value = context.getString(R.string.no_results_title)
             dialogMessage.value = context.getString(R.string.search_no_results)
@@ -156,26 +147,20 @@ fun MapScreen(
                         onSearchQueryChange = { newQuery ->
                             searchQuery.value = newQuery
                             if (newQuery.length > 2) {
-                                if (searchType.value == "city") {
-                                    retrofitViewModel.searchCities(newQuery)
-                                } else {
-                                    retrofitViewModel.searchCountries(newQuery)
-                                }
+                                retrofitViewModel.fetchAutocompleteSuggestions(newQuery)
+                                isDropdownVisible = true
                             } else {
-                                retrofitViewModel.hideCityList()
-                                retrofitViewModel.hideCountryList()
+                                isDropdownVisible = false
                             }
                         },
                         onSearch = { performSearch(searchQuery.value) },
-                        cities = cities,
-                        countries = countries,
-                        showCityList = showCityList && searchType.value == "city",
-                        showCountryList = showCountryList && searchType.value == "country",
                         onSelectSuggestion = { suggestion ->
                             searchQuery.value = suggestion
+                            isDropdownVisible = false
+                            keyboardController?.hide()
                         },
-                        searchType = searchType.value,
-                        onSearchTypeChange = { newType -> searchType.value = newType }
+                        isDropdownVisible = isDropdownVisible,
+                        autocompleteSuggestions = autocompleteSuggestions
                     )
                 }
             }
@@ -211,16 +196,11 @@ fun SearchBar(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
-    cities: List<Destination> = emptyList(),
-    countries: List<Destination> = emptyList(),
-    showCityList: Boolean = false,
-    showCountryList: Boolean = false,
     onSelectSuggestion: (String) -> Unit,
-    searchType: String,
-    onSearchTypeChange: (String) -> Unit
+    isDropdownVisible: Boolean,
+    autocompleteSuggestions: List<String>
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val radioButtonsVisible = searchQuery.isEmpty()
 
     Column(
         modifier = Modifier
@@ -255,75 +235,22 @@ fun SearchBar(
             }
         )
 
-        if (radioButtonsVisible) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.secondaryContainer),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    modifier = Modifier
-                        .clickable { onSearchTypeChange("city") }
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = searchType == "city",
-                        onClick = { onSearchTypeChange("city") }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = stringResource(id = R.string.city))
-                }
-                Row(
-                    modifier = Modifier
-                        .clickable { onSearchTypeChange("country") }
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = searchType == "country",
-                        onClick = { onSearchTypeChange("country") }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = stringResource(id = R.string.country))
-                }
-            }
-        }
-
-        if (showCityList || showCountryList) {
+        if (isDropdownVisible && autocompleteSuggestions.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.secondaryContainer),
             ) {
-                if (showCityList) {
-                    items(cities) { city ->
-                        Text(
-                            text = "${city.name}, ${city.country}",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onSelectSuggestion("${city.name}, ${city.country}")
-                                }
-                                .padding(16.dp)
-                        )
-                    }
-                }
-
-                if (showCountryList) {
-                    items(countries) { country ->
-                        Text(
-                            text = country.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onSelectSuggestion(country.name)
-                                }
-                                .padding(16.dp)
-                        )
-                    }
+                items(autocompleteSuggestions) { suggestion ->
+                    Text(
+                        text = suggestion,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onSelectSuggestion(suggestion)
+                            }
+                            .padding(16.dp)
+                    )
                 }
             }
         }

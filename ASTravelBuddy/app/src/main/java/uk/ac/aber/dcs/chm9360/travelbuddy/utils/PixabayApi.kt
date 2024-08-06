@@ -5,7 +5,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
-import uk.ac.aber.dcs.chm9360.travelbuddy.model.PixabayResponse
 
 interface PixabayApi {
     @GET("api/")
@@ -28,3 +27,11 @@ interface PixabayApi {
         }
     }
 }
+
+data class PixabayResponse(
+    val hits: List<Hit>
+)
+
+data class Hit(
+    val largeImageURL: String
+)

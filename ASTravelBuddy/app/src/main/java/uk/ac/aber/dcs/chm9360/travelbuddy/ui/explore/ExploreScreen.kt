@@ -95,7 +95,7 @@ fun ExploreScreen(
                         TextField(
                             value = cityText,
                             onValueChange = { cityText = it },
-                            label = { Text(stringResource(id = R.string.city)) },
+                            label = { Text(stringResource(id = R.string.destination)) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
@@ -199,7 +199,8 @@ fun ExploreScreen(
                         },
                         modifier = Modifier
                             .padding(top = 16.dp)
-                            .size(36.dp)
+                            .size(36.dp),
+
                     ) {
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowUp,

@@ -13,18 +13,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -41,6 +49,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.utils.CustomDatePicker
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddTripScreen(
     navController: NavHostController,
@@ -54,15 +63,15 @@ fun AddTripScreen(
     var destination by rememberSaveable { mutableStateOf("") }
     var startDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
     var endDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
-    val cities by retrofitViewModel.cities.collectAsState()
-    val countries by retrofitViewModel.countries.collectAsState()
     val loading by retrofitViewModel.loading.collectAsState()
-    val showCityList by retrofitViewModel.showCityList.collectAsState()
-    val showCountryList by retrofitViewModel.showCountryList.collectAsState()
-    var searchType by rememberSaveable { mutableStateOf("city") }
     var isDropdownVisible by rememberSaveable { mutableStateOf(false) }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val autocompleteSuggestions by retrofitViewModel.autocompleteSuggestions.collectAsState()
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val (tripTitleFocusRequester, destinationFocusRequester) = remember { FocusRequester.createRefs() }
+    var tripTitleHasFocus by rememberSaveable { mutableStateOf(false) }
+    var destinationHasFocus by rememberSaveable { mutableStateOf(false) }
 
     val isSaveButtonEnabled by rememberSaveable(tripTitle, destination, startDate, endDate) {
         mutableStateOf(
@@ -73,8 +82,7 @@ fun AddTripScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         AppBarWithArrowBack(
             navController = navController,
@@ -100,7 +108,7 @@ fun AddTripScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp),
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             CustomDatePicker(
@@ -126,99 +134,85 @@ fun AddTripScreen(
             value = tripTitle,
             onValueChange = { tripTitle = it },
             label = { Text(stringResource(R.string.trip_title)) },
+            trailingIcon = {
+                if (tripTitle.isNotEmpty() && tripTitleHasFocus) {
+                    IconButton(
+                        onClick = {
+                            tripTitle = ""
+                            keyboardController?.hide()
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.delete_icon))
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp)
+                .padding(horizontal = 16.dp)
+                .focusRequester(tripTitleFocusRequester)
+                .onFocusChanged { focusState ->
+                    tripTitleHasFocus = focusState.isFocused
+                }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = searchType == "city",
-                    onClick = { searchType = "city" }
-                )
-                Text(text = stringResource(id = R.string.city))
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = searchType == "country",
-                    onClick = { searchType = "country" }
-                )
-                Text(text = stringResource(id = R.string.country))
-            }
-        }
 
         OutlinedTextField(
             value = destination,
             onValueChange = {
                 destination = it
                 if (it.length > 2) {
-                    if (searchType == "city") {
-                        retrofitViewModel.searchCities(it)
-                    } else {
-                        retrofitViewModel.searchCountries(it)
-                    }
+                    retrofitViewModel.fetchAutocompleteSuggestions(it)
+                    isDropdownVisible = true
                 } else {
-                    retrofitViewModel.hideCityList()
-                    retrofitViewModel.hideCountryList()
+                    isDropdownVisible = false
                 }
             },
             label = { Text(stringResource(R.string.destination)) },
+            trailingIcon = {
+                if (destination.isNotEmpty() && destinationHasFocus) {
+                    IconButton(
+                        onClick = {
+                            destination = ""
+                            isDropdownVisible = false
+                            keyboardController?.hide()
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.delete_icon))
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp)
-                .clickable { isDropdownVisible = !isDropdownVisible }
+                .padding(horizontal = 16.dp)
+                .focusRequester(destinationFocusRequester)
+                .onFocusChanged { focusState ->
+                    destinationHasFocus = focusState.isFocused
+                }
         )
 
         if (loading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            if (showCityList) {
-                items(cities) { city ->
+        if (isDropdownVisible && autocompleteSuggestions.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .align(Alignment.Start)
+            ) {
+                items(autocompleteSuggestions) { suggestion ->
                     Text(
-                        text = "${city.name}, ${city.country}",
+                        text = suggestion,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                destination = "${city.name}, ${city.country}"
-                                retrofitViewModel.hideCityList()
+                                destination = suggestion
+                                isDropdownVisible = false
                                 keyboardController?.hide()
                             }
-                            .padding(16.dp)
-                    )
-                }
-            }
-
-            if (showCountryList) {
-                items(countries) { country ->
-                    Text(
-                        text = country.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                destination = country.name
-                                retrofitViewModel.hideCountryList()
-                                keyboardController?.hide()
-                            }
-                            .padding(16.dp)
+                            .padding(8.dp)
                     )
                 }
             }
