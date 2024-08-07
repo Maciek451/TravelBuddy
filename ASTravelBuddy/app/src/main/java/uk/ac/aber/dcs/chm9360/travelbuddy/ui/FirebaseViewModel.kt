@@ -8,6 +8,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,7 @@ import kotlinx.coroutines.tasks.await
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.ChecklistItem
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.TripPlanItem
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.User
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.AuthenticationState
 import java.text.SimpleDateFormat
@@ -498,6 +500,44 @@ class FirebaseViewModel : ViewModel() {
                 }.addOnFailureListener {
                     Log.e("FirebaseViewModel", "Error updating checklist item", it)
                 }
+            }
+        }
+    }
+
+    fun fetchTripPlans(tripId: String, onComplete: (List<TripPlanItem>) -> Unit) {
+        auth.currentUser?.let { user ->
+            viewModelScope.launch {
+                val tripRef = db.collection("users").document(user.uid)
+                    .collection("trips").document(tripId)
+                tripRef.get().addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val trip = document.toObject(Trip::class.java)
+                        onComplete(trip?.tripPlans ?: emptyList())
+                    } else {
+                        onComplete(emptyList())
+                    }
+                }.addOnFailureListener {
+                    Log.e("FirebaseViewModel", "Error fetching trip plans", it)
+                    onComplete(emptyList())
+                }
+            }
+        }
+    }
+
+    fun removeTripPlan(tripId: String, tripPlan: TripPlanItem, onComplete: (Boolean) -> Unit) {
+        auth.currentUser?.let { user ->
+            val tripRef = db.collection("users").document(user.uid)
+                .collection("trips").document(tripId)
+
+            viewModelScope.launch {
+                tripRef.update("tripPlans", FieldValue.arrayRemove(tripPlan))
+                    .addOnSuccessListener {
+                        onComplete(true)
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FirebaseViewModel", "Error removing trip plan", e)
+                        onComplete(false)
+                    }
             }
         }
     }

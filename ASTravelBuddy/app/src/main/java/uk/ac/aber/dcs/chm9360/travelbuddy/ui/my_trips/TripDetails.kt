@@ -42,22 +42,6 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 
-//    var tripPlans by remember { mutableStateOf(trip?.tripPlans ?: emptyList()) }
-//            firebaseViewModel.fetchTripPlans(tripId) { fetchedTripPlans ->
-//                tripPlans = fetchedTripPlans
-//                Utils.trip = trip.copy(tripPlans = fetchedTripPlans)
-//            }
-//    val tripPlansPreview = tripPlans.take(5)
-//                        if (tripPlansPreview.isNotEmpty()) {
-//                            tripPlansPreview.forEachIndexed { index, plan ->
-//                                Text(
-//                                    text = "${index + 1}. ${plan.details}",
-//                                    style = MaterialTheme.typography.bodyMedium,
-//                                    modifier = Modifier.padding(vertical = 2.dp)
-//                                )
-//                            }
-//                        } else {
-
 @Composable
 fun TripDetailsScreen(
     navController: NavHostController,
@@ -67,17 +51,24 @@ fun TripDetailsScreen(
     val appBarTitle = trip?.title
     var showConfirmDialog by remember { mutableStateOf(false) }
     var checklist by remember { mutableStateOf(trip?.checklist ?: emptyList()) }
+    var tripPlans by remember { mutableStateOf(trip?.tripPlans ?: emptyList()) }
 
     LaunchedEffect(trip?.id) {
         trip?.id?.let { tripId ->
             firebaseViewModel.fetchChecklist(tripId) { fetchedChecklist ->
                 checklist = fetchedChecklist
                 Utils.trip = trip.copy(checklist = fetchedChecklist)
+
+            }
+            firebaseViewModel.fetchTripPlans(tripId) { fetchedTripPlans ->
+                tripPlans = fetchedTripPlans
+                Utils.trip = trip.copy(tripPlans = fetchedTripPlans)
             }
         }
     }
 
     val uncheckedItemsPreview = checklist.filter { it.checked == "false" }.take(5)
+    val tripPlansPreview = tripPlans.take(5)
 
     fun getWeatherLink(destination: String?): String {
         val location = destination?.substringBefore(",")?.trim() ?: ""
@@ -268,11 +259,21 @@ fun TripDetailsScreen(
                             style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
-                        Text(
-                            text = stringResource(id = R.string.no_plans),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
-                        )
+                        if (tripPlansPreview.isNotEmpty()) {
+                            tripPlansPreview.forEachIndexed { index, plan ->
+                                Text(
+                                    text = "${index + 1}. ${plan.place}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(vertical = 2.dp)
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = stringResource(id = R.string.no_plans),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray
+                            )
+                        }
                     }
                 }
             }

@@ -68,7 +68,11 @@ fun ChecklistScreen(
     }
 
     fun addItem() {
-        val newItem = ChecklistItem(id = UUID.randomUUID().toString(), task = "", checked = false.toString())
+        val newItem = ChecklistItem(
+            id = UUID.randomUUID().toString(),
+            task = "",
+            checked = false.toString()
+        )
         checklist = uncheckedItems + newItem + checkedItems
     }
 

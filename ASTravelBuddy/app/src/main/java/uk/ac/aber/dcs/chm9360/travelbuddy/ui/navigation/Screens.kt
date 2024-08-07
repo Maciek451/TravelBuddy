@@ -8,6 +8,7 @@ sealed class Screens(
     object EditTrip : Screens("edit_trip")
     object Checklist : Screens("checklist")
     object TripPlan : Screens("trip_plan")
+    object AddTripPlan : Screens("add_trip_plan")
     object TripMap : Screens("trip_map")
     object Map : Screens("map")
     object AddSheet : Screens("add")

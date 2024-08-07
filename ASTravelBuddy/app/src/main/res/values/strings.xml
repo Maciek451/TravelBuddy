@@ -182,4 +182,13 @@
     <string name="show_on_map">Show on map</string>
     <string name="weather_icon">Weather icon</string>
     <string name="check_weather">Check weather</string>
+    <string name="place_label">Label</string>
+    <string name="date_of_visit">Date of visit</string>
+    <string name="trip_plan_saved">Trip plan added</string>
+    <string name="add_trip_plan">Add trip plan</string>
+    <string name="edit_item">Edit item</string>
+    <string name="remove_item">Remove item</string>
+    <string name="edit_trip_plan">Edit trip plan</string>
+    <string name="confirm_remove_trip_plan">Confirm trip plan removal</string>
+    <string name="trip_plan_delete_confirmation">Click confirm to remove this item from the list</string>
 </resources>
