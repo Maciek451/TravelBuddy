@@ -322,13 +322,6 @@ fun MapViewComposable(context: Context, mapViewModel: MapViewModel) {
                     override fun longPressHelper(p: GeoPoint?) = true
                 }))
 
-                val currentLocationMarker = Marker(this).apply {
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    icon = ContextCompat.getDrawable(context, R.drawable.ic_location_marker)
-                    title = myLocation
-                }
-                overlays.add(currentLocationMarker)
-
                 addOnFirstLayoutListener { _, _, _, _, _ ->
                     controller.setCenter(mapCenter)
                     controller.setZoom(mapZoom)

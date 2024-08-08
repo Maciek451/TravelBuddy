@@ -80,7 +80,7 @@ fun TripPlanScreen(
             isSaveButtonEnabled = false
         )
 
-        LazyColumn {
+        LazyColumn(modifier = Modifier.padding(8.dp)) {
             items(tripPlans) { tripPlan ->
                 TripPlanItem(
                     tripPlan = tripPlan,

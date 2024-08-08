@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -37,22 +38,23 @@ import java.util.Locale
 
 @Composable
 fun TripMapScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    mapViewModel: MapViewModel = viewModel()
 ) {
     val trip = Utils.trip
     val appBarTitle = trip?.title
     val context = LocalContext.current
-    val mapViewModel: MapViewModel = viewModel()
     val locationPermissionGranted = remember { mutableStateOf(false) }
     val mapCenter by mapViewModel.mapCenter.collectAsState()
     val mapZoom by mapViewModel.mapZoom.collectAsState()
+    var tripPlanMarkers by remember { mutableStateOf(emptyList<Pair<String, GeoPoint>>()) }
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
         onResult = { locationPermissionGranted.value = it }
     )
 
-    LaunchedEffect(trip?.destination) {
+    LaunchedEffect(trip?.destination, trip?.tripPlans) {
         if (trip?.destination != null) {
             if (ContextCompat.checkSelfPermission(
                     context,
@@ -65,13 +67,21 @@ fun TripMapScreen(
             }
 
             val geocoder = Geocoder(context, Locale.getDefault())
-            val address = geocoder.getFromLocationName(trip.destination, 1)?.firstOrNull()
 
+            val address = geocoder.getFromLocationName(trip.destination, 1)?.firstOrNull()
             if (address != null) {
                 val location = GeoPoint(address.latitude, address.longitude)
                 mapViewModel.updateMapCenter(location)
             } else {
                 Log.e("TripMapScreen", "Error geocoding destination: ${trip.destination}")
+            }
+
+            tripPlanMarkers = trip.tripPlans.mapNotNull { tripPlan ->
+                val tripPlanAddress = geocoder.getFromLocationName(tripPlan.place, 1)?.firstOrNull()
+                tripPlanAddress?.let {
+                    val location = GeoPoint(it.latitude, it.longitude)
+                    Pair(tripPlan.place, location)
+                }
             }
         }
     }
@@ -118,12 +128,23 @@ fun TripMapScreen(
 
                 mapView.overlays.removeIf { it is Marker }
 
-                val marker = Marker(mapView).apply {
+                val destinationMarker = Marker(mapView).apply {
                     position = mapCenter
                     icon = ContextCompat.getDrawable(context, R.drawable.ic_location_marker)
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    title = trip?.destination ?: "Destination"
                 }
-                mapView.overlays.add(marker)
+                mapView.overlays.add(destinationMarker)
+
+                tripPlanMarkers.forEach { (place, location) ->
+                    val marker = Marker(mapView).apply {
+                        position = location
+                        icon = ContextCompat.getDrawable(context, R.drawable.ic_marker)
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        title = place
+                    }
+                    mapView.overlays.add(marker)
+                }
                 mapView.invalidate()
             }
         )
