@@ -9,8 +9,9 @@ sealed class Screens(
     object Checklist : Screens("checklist")
     object TripPlan : Screens("trip_plan")
     object AddTripPlan : Screens("add_trip_plan")
+    object EditTripPlan : Screens("edit_trip_plan")
+    object TripPlanDetails : Screens("trip_plan_details")
     object TripMap : Screens("trip_map")
-    object Map : Screens("map")
     object AddSheet : Screens("add")
     object Explore : Screens("explore")
     object Friends : Screens("friends")
@@ -27,9 +28,8 @@ sealed class Screens(
 }
 
 val screens = listOf(
-    Screens.MyTrips,
-    Screens.Map,
     Screens.AddSheet,
+    Screens.MyTrips,
     Screens.Explore,
     Screens.Friends
 )

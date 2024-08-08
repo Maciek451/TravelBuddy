@@ -11,11 +11,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -85,7 +87,13 @@ fun TripPlanScreen(
                 TripPlanItem(
                     tripPlan = tripPlan,
                     onTripPlanDelete = { removeTripPlan(it) },
+                    onEditTripPlan = {
+                        Utils.tripPlanItem = tripPlan
+                        navController.navigate(Screens.EditTripPlan.route)
+                    },
                     onCardClick = {
+                        Utils.tripPlanItem = tripPlan
+                        navController.navigate(Screens.TripPlanDetails.route)
                     }
                 )
             }
@@ -122,10 +130,12 @@ fun TripPlanScreen(
 fun TripPlanItem(
     tripPlan: TripPlanItem,
     onTripPlanDelete: (TripPlanItem) -> Unit,
+    onEditTripPlan: () -> Unit,
     onCardClick: () -> Unit
 ) {
     var isTextFieldFocused by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -169,11 +179,30 @@ fun TripPlanItem(
                         .fillMaxWidth()
                 )
             }
-            IconButton(onClick = { showDialog = true }) {
+            IconButton(onClick = { showMenu = true }) {
                 Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(id = R.string.delete_icon)
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = stringResource(id = R.string.more_icon)
                 )
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(id = R.string.edit)) },
+                        onClick = {
+                            showMenu = false
+                            onEditTripPlan()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(id = R.string.remove)) },
+                        onClick = {
+                            showMenu = false
+                            showDialog = true
+                        }
+                    )
+                }
             }
         }
     }

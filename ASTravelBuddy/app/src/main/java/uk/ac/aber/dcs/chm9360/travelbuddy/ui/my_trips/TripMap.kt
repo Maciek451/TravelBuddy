@@ -32,7 +32,7 @@ import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
-import uk.ac.aber.dcs.chm9360.travelbuddy.ui.map.MapViewModel
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.MapViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 import java.util.Locale
 

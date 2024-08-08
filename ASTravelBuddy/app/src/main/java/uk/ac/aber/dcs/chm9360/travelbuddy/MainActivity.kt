@@ -27,13 +27,14 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.ExploreScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.AddFriendScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.FriendsListScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.FriendsScreen
-import uk.ac.aber.dcs.chm9360.travelbuddy.ui.map.MapScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.AddTripPlanScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.ChecklistScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.EditTripPlanScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.EditTripScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.MyTripsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripDetailsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripMapScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripPlanDetailsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripPlanScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.notifications.NotificationScreen
@@ -82,8 +83,9 @@ class MainActivity : ComponentActivity() {
             composable(Screens.Checklist.route) { ChecklistScreen(navController) }
             composable(Screens.TripPlan.route) { TripPlanScreen(navController) }
             composable(Screens.AddTripPlan.route) { AddTripPlanScreen(navController) }
+            composable(Screens.EditTripPlan.route) { EditTripPlanScreen(navController) }
+            composable(Screens.TripPlanDetails.route) { TripPlanDetailsScreen(navController) }
             composable(Screens.TripMap.route) { TripMapScreen(navController) }
-            composable(Screens.Map.route) { MapScreen(navController) }
             composable(Screens.Explore.route) { ExploreScreen(navController) }
             composable(Screens.Friends.route) { FriendsScreen(navController) }
             composable(Screens.Account.route) { AccountScreen(navController) }

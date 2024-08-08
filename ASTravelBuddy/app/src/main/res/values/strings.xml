@@ -179,9 +179,9 @@
     <string name="no_results_found">No places found. Try a different search.</string>
     <string name="view_on_map">View on map</string>
     <string name="map_icon">Map icon</string>
-    <string name="show_on_map">Show on map</string>
+    <string name="show_on_map">Visualize on map</string>
     <string name="weather_icon">Weather icon</string>
-    <string name="check_weather">Check weather</string>
+    <string name="check_weather">Check weather online</string>
     <string name="place_label">Label</string>
     <string name="date_of_visit">Date of visit</string>
     <string name="trip_plan_saved">Trip plan added</string>
@@ -191,4 +191,7 @@
     <string name="edit_trip_plan">Edit trip plan</string>
     <string name="confirm_remove_trip_plan">Confirm trip plan removal</string>
     <string name="trip_plan_delete_confirmation">Click confirm to remove this item from the list</string>
+    <string name="trip_plan_updated">Trip plan updated</string>
+    <string name="remove_trip_plan">Remove trip plan</string>
+    <string name="edit">Edit</string>
 </resources>

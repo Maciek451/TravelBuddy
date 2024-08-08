@@ -249,6 +249,7 @@ fun TripDetailsScreen(
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
                         .clickable {
+                            Utils.trip = trip
                             navController.navigate(Screens.TripPlan.route)
                         },
                     elevation = CardDefaults.cardElevation(4.dp),

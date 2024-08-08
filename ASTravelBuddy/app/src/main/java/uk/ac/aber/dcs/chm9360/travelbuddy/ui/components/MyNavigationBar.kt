@@ -1,17 +1,13 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CardTravel
 import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.TravelExplore
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.CardTravel
 import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.TravelExplore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -22,10 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -39,20 +32,15 @@ fun MyNavigationBar(
     navController: NavHostController
 ) {
     val icons = mapOf(
+        Screens.AddSheet to IconGroup(
+            filledIcon = Icons.Filled.AddCircle,
+            outlineIcon = Icons.Outlined.AddCircle,
+            label = stringResource(id = R.string.add)
+        ),
         Screens.MyTrips to IconGroup(
             filledIcon = Icons.Filled.CardTravel,
             outlineIcon = Icons.Outlined.CardTravel,
             label = stringResource(id = R.string.my_trips)
-        ),
-        Screens.Map to IconGroup(
-            filledIcon = Icons.Filled.Map,
-            outlineIcon = Icons.Outlined.Map,
-            label = stringResource(id = R.string.map)
-        ),
-        Screens.AddSheet to IconGroup(
-            filledIcon = Icons.Filled.AddCircle,
-            outlineIcon = Icons.Outlined.AddCircle,
-            label = ""
         ),
         Screens.Explore to IconGroup(
             filledIcon = Icons.Filled.TravelExplore,
@@ -83,22 +71,12 @@ fun MyNavigationBar(
             val labelText = iconGroup.label
             NavigationBarItem(
                 icon = {
-                    if (screen == Screens.AddSheet) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = if (isSelected) Icons.Filled.AddCircle else Icons.Outlined.AddCircle,
-                                contentDescription = labelText,
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
-                    } else {
-                        Icon(
-                            imageVector = if (isSelected) iconGroup.filledIcon else iconGroup.outlineIcon,
-                            contentDescription = labelText
-                        )
-                    }
+                    Icon(
+                        imageVector = if (isSelected) iconGroup.filledIcon else iconGroup.outlineIcon,
+                        contentDescription = labelText
+                    )
                 },
-                label = { if (screen != Screens.AddSheet) Text(labelText) },
+                label = { Text(labelText) },
                 selected = isSelected,
                 onClick = {
                     if (screen == Screens.AddSheet) {

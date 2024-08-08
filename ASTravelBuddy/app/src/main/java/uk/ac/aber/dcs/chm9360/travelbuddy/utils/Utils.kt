@@ -23,11 +23,13 @@ import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.TripPlanItem
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 object Utils {
     var trip: Trip? = null
+    var tripPlanItem: TripPlanItem? = null
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
