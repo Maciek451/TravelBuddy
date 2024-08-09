@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter
 object Utils {
     var trip: Trip? = null
     var tripPlanItem: TripPlanItem? = null
+    var placeDetails: Feature? = null
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

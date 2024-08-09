@@ -194,4 +194,6 @@
     <string name="trip_plan_updated">Trip plan updated</string>
     <string name="remove_trip_plan">Remove trip plan</string>
     <string name="edit">Edit</string>
+    <string name="choose_trip">Choose trip</string>
+    <string name="add_to_trip">Add to trip</string>
 </resources>

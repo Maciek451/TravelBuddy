@@ -89,6 +89,8 @@ import org.osmdroid.views.overlay.Marker
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.categoryList
 import java.util.Locale
 
@@ -179,7 +181,9 @@ fun ExploreScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             Column(
-                                modifier = Modifier.fillMaxSize().padding(top = 16.dp),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = 16.dp),
                             ) {
                                 if (isComponentEnabled) {
                                     TextField(
@@ -408,7 +412,10 @@ fun ExploreScreen(
                                                 PlaceItem(
                                                     title = place.properties.name,
                                                     subtext = place.properties.formatted,
-                                                    onClick = { }
+                                                    onClick = {
+                                                        Utils.placeDetails = place
+                                                        navController.navigate(Screens.PlaceDetails.route)
+                                                    }
                                                 )
                                             }
                                         } else if (isSearchClicked) {
@@ -445,7 +452,7 @@ fun ExploreScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             MapScreen(
-                                retrofitViewModel = retrofitViewModel
+                                retrofitViewModel = retrofitViewModel,
                             )
                         }
                     }
@@ -494,7 +501,7 @@ fun PlaceItem(
 
 @Composable
 fun MapScreen(
-    retrofitViewModel: RetrofitViewModel = viewModel()
+    retrofitViewModel: RetrofitViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val mapViewModel: MapViewModel = viewModel()
