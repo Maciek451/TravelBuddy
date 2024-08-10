@@ -14,6 +14,7 @@ sealed class Screens(
     object TripMap : Screens("trip_map")
     object AddSheet : Screens("add")
     object Explore : Screens("explore")
+    object Map : Screens("map")
     object PlaceDetails : Screens("place_details")
     object AddTripPlanFromExplore : Screens("add_trip_plan_from_explore")
     object Friends : Screens("friends")

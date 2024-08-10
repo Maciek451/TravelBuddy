@@ -172,9 +172,9 @@
     <string name="scroll_to_top">Go to Top</string>
     <string name="no_subtext_available">No subtext available</string>
     <string name="arrow_down_icon">Arrow down icon</string>
-    <string name="empty_destination_title">No Destination</string>
+    <string name="empty_destination_title">No destination specified</string>
     <string name="empty_destination_message">Please enter a destination to search.</string>
-    <string name="empty_category_title">No Category</string>
+    <string name="empty_category_title">No category specified</string>
     <string name="empty_category_message">Please select a category to filter the search.</string>
     <string name="no_results_found">No places found. Try a different search.</string>
     <string name="view_on_map">View on map</string>
@@ -196,4 +196,7 @@
     <string name="edit">Edit</string>
     <string name="choose_trip">Choose trip</string>
     <string name="add_to_trip">Add to trip</string>
+    <string name="map_view">Map view</string>
+    <string name="map_search">Map search</string>
+    <string name="new_search">New search</string>
 </resources>
