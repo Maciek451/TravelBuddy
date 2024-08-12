@@ -1,9 +1,7 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -27,20 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.ChooseTripDialog
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
-import java.util.Locale
 
 @Composable
 fun PlaceDetailsScreen(
@@ -69,14 +59,8 @@ fun PlaceDetailsScreen(
         }
     }
 
-    val placeLocation = remember(placeDetails) {
-        placeDetails?.properties?.formatted?.let { address ->
-            val geocoder = Geocoder(context, Locale.getDefault())
-            geocoder.getFromLocationName(address, 1)?.firstOrNull()?.let {
-                GeoPoint(it.latitude, it.longitude)
-            }
-        }
-    }
+    val placeMarker =
+        placeDetails?.properties?.let { createMapMarkerFromDestination(it.formatted, context) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         if (appBarTitle != null) {
@@ -115,44 +99,30 @@ fun PlaceDetailsScreen(
                 )
             }
 
-            placeLocation?.let { location ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .height(300.dp),
-                    shape = MaterialTheme.shapes.medium,
-                    elevation = CardDefaults.cardElevation(4.dp)
-                ) {
-                    AndroidView(
-                        modifier = Modifier.fillMaxSize(),
-                        factory = {
-                            MapView(context).apply {
-                                Configuration.getInstance()
-                                    .load(
-                                        context,
-                                        context.getSharedPreferences("osm_prefs", Context.MODE_PRIVATE)
-                                    )
-                                setTileSource(TileSourceFactory.MAPNIK)
-                                setMultiTouchControls(true)
-                                controller.setZoom(15.0)
-                                controller.setCenter(location)
-
-                                overlays.add(Marker(this).apply {
-                                    position = location
-                                    icon = ContextCompat.getDrawable(context, R.drawable.ic_marker)
-                                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                                    title = placeDetails.properties.name
-                                })
-                            }
-                        },
-                        update = { mapView ->
-                            mapView.controller.setCenter(location)
-                            mapView.invalidate()
-                        }
-                    )
-                }
+            if (placeMarker != null) {
+                MapCard(
+                    placeMarker = placeMarker
+                )
             }
         }
+    }
+}
+
+
+@Composable
+fun MapCard(
+    placeMarker: MapMarker
+) {
+    val context = LocalContext.current
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .height(300.dp),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        MapComposable(context = context, centerMarker = placeMarker)
     }
 }

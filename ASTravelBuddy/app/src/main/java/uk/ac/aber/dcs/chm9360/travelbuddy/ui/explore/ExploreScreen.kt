@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore
 
+import android.location.Geocoder
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,12 +55,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import org.osmdroid.util.GeoPoint
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.categoryList
+import java.util.Locale
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -69,6 +72,7 @@ fun ExploreScreen(
 ) {
     val appBarTitle = stringResource(R.string.explore)
 
+    val placeDetails = Utils.placeDetails
     var cityText by rememberSaveable { mutableStateOf("") }
     var categoryText by rememberSaveable { mutableStateOf("") }
     var selectedCategoryKey by rememberSaveable { mutableStateOf("") }
@@ -93,6 +97,15 @@ fun ExploreScreen(
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
     val dialogTitle = remember { mutableStateOf("") }
+
+    val placeLocation = remember(placeDetails) {
+        placeDetails?.properties?.formatted?.let { address ->
+            val geocoder = Geocoder(context, Locale.getDefault())
+            geocoder.getFromLocationName(address, 1)?.firstOrNull()?.let {
+                GeoPoint(it.latitude, it.longitude)
+            }
+        }
+    }
 
     LaunchedEffect(places) {
         if (places.isNotEmpty()) {
@@ -281,6 +294,7 @@ fun ExploreScreen(
                                             }
 
                                             else -> {
+                                                Utils.destinationName = cityText
                                                 retrofitViewModel.searchPlaces(
                                                     cityText,
                                                     categories = selectedCategoryKey
@@ -339,8 +353,8 @@ fun ExploreScreen(
                                 }
                                 Button(
                                     onClick = {
-                                        Utils.placeDetails
-                                        navController.navigate(Screens.Map.route)
+                                        Utils.featureList = places
+                                        navController.navigate(Screens.MapView.route)
                                     },
                                     modifier = Modifier
                                         .weight(1f)

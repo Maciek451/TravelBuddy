@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -59,13 +58,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapAdapter
-import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
@@ -264,14 +261,17 @@ fun SearchBar(
 }
 
 @Composable
-fun MapViewComposable(context: Context, mapViewModel: MapViewModel) {
+fun MapViewComposable(
+    context: Context,
+    mapViewModel: MapViewModel
+) {
     val mapView = remember { MapView(context) }
     val locationPermissionGranted = remember { mutableStateOf(false) }
     val mapCenter by mapViewModel.mapCenter.collectAsState()
     val mapZoom by mapViewModel.mapZoom.collectAsState()
     val currentLocation by mapViewModel.currentLocation.collectAsState()
     val markers by mapViewModel.markers.collectAsState()
-    val myLocation = stringResource(id = R.string.my_location)
+    val myLocationString = stringResource(id = R.string.my_location)
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -308,8 +308,7 @@ fun MapViewComposable(context: Context, mapViewModel: MapViewModel) {
 
     AndroidView(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 8.dp),
+            .fillMaxSize(),
         factory = {
             mapView.apply {
                 Configuration.getInstance()
@@ -322,19 +321,6 @@ fun MapViewComposable(context: Context, mapViewModel: MapViewModel) {
                 controller.setZoom(mapZoom)
                 controller.setCenter(mapCenter)
                 controller.setZoom(minZoomLevel)
-                overlays.add(MapEventsOverlay(object : MapEventsReceiver {
-                    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-                        p?.let { mapViewModel.addMarker(it) }
-                        return true
-                    }
-
-                    override fun longPressHelper(p: GeoPoint?) = true
-                }))
-
-                addOnFirstLayoutListener { _, _, _, _, _ ->
-                    controller.setCenter(mapCenter)
-                    controller.setZoom(mapZoom)
-                }
 
                 setMapListener(object : MapAdapter() {
                     override fun onScroll(event: ScrollEvent?): Boolean {
@@ -355,34 +341,28 @@ fun MapViewComposable(context: Context, mapViewModel: MapViewModel) {
                 })
             }
         },
-        update = { mapView ->
-            mapView.controller.setCenter(mapCenter)
-            mapView.controller.setZoom(mapZoom)
+        update = { currentMapView ->
+            currentMapView.controller.setCenter(mapCenter)
+            currentMapView.controller.setZoom(mapZoom)
 
-            mapView.overlays.removeIf { it -> it is Marker && it != mapView.overlays.find { it is Marker && (it).title == myLocation } }
-
-            val currentLocationMarker = Marker(mapView).apply {
+            val currentLocationMarker = Marker(currentMapView).apply {
                 currentLocation?.let { location ->
                     position = location
-                    title = myLocation
+                    title = myLocationString
                 }
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 icon = ContextCompat.getDrawable(context, R.drawable.ic_location_marker)
             }
-            mapView.overlays.add(currentLocationMarker)
+            currentMapView.overlays.add(currentLocationMarker)
 
             markers.forEach { geoPoint ->
-                val marker = Marker(mapView).apply {
+                val marker = Marker(currentMapView).apply {
                     position = geoPoint
                     icon = ContextCompat.getDrawable(context, R.drawable.ic_marker)
-                    setOnMarkerClickListener { _, _ ->
-                        mapViewModel.removeMarker(geoPoint)
-                        true
-                    }
                 }
-                mapView.overlays.add(marker)
+                currentMapView.overlays.add(marker)
             }
-            mapView.invalidate()
+            currentMapView.invalidate()
         }
     )
 }
@@ -420,13 +400,5 @@ class MapViewModel : ViewModel() {
 
     fun updateCurrentLocation(location: GeoPoint) {
         _currentLocation.value = location
-    }
-
-    fun addMarker(geoPoint: GeoPoint) {
-        _markers.value += geoPoint
-    }
-
-    fun removeMarker(geoPoint: GeoPoint) {
-        _markers.value -= geoPoint
     }
 }

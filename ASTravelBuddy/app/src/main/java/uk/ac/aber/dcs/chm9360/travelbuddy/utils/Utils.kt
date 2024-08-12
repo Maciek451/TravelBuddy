@@ -31,6 +31,8 @@ object Utils {
     var trip: Trip? = null
     var tripPlanItem: TripPlanItem? = null
     var placeDetails: Feature? = null
+    var featureList: List<Feature>? = null
+    var destinationName: String = ""
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
