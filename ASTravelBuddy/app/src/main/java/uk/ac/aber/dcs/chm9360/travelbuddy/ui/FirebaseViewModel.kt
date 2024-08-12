@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.ChecklistItem
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.FriendRequest
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.TripPlanItem
@@ -51,12 +52,16 @@ class FirebaseViewModel : ViewModel() {
     private val _creationDate = MutableStateFlow<String?>(null)
     val creationDate: StateFlow<String?> get() = _creationDate
 
+    private val _friendRequests = MutableStateFlow<List<FriendRequest>>(emptyList())
+    val friendRequests: StateFlow<List<FriendRequest>> get() = _friendRequests
+
     init {
         observeAuthState()
         fetchPhrases()
         fetchTrips()
         fetchFriends()
         fetchCreationDate()
+        fetchFriendRequests()
     }
 
     private fun observeAuthState() {
@@ -326,6 +331,117 @@ class FirebaseViewModel : ViewModel() {
             .get()
             .addOnSuccessListener { document -> callback(document.exists()) }
             .addOnFailureListener { callback(false) }
+    }
+
+    fun sendFriendRequest(receiverId: String, onResult: (Boolean) -> Unit) {
+        auth.currentUser?.let { user ->
+            db.collection("users").document(user.uid).get()
+                .addOnSuccessListener { userDoc ->
+                    val senderEmail = userDoc.getString("email") ?: ""
+                    val senderUsername = userDoc.getString("username") ?: ""
+
+                    val friendRequest = FriendRequest(
+                        senderId = user.uid,
+                        receiverId = receiverId,
+                        senderEmail = senderEmail,
+                        senderUsername = senderUsername
+                    )
+
+                    db.collection("friendRequests").add(friendRequest)
+                        .addOnSuccessListener { onResult(true) }
+                        .addOnFailureListener { onResult(false) }
+                }
+                .addOnFailureListener { onResult(false) }
+        } ?: onResult(false)
+    }
+
+    fun fetchFriendRequests() {
+        auth.currentUser?.let { user ->
+            db.collection("friendRequests")
+                .whereEqualTo("receiverId", user.uid)
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Log.e("FirebaseViewModel", "Error fetching friend requests", e)
+                        return@addSnapshotListener
+                    }
+                    val requests = snapshot?.toObjects(FriendRequest::class.java) ?: emptyList()
+                    _friendRequests.value = requests
+                }
+        }
+    }
+
+    fun acceptFriendRequest(friendRequest: FriendRequest, onResult: (Boolean) -> Unit) {
+        auth.currentUser?.let { user ->
+            val batch = db.batch()
+
+            val senderFriendsRef = db.collection("users").document(friendRequest.senderId)
+                .collection("friends").document(user.uid)
+            val senderData = mapOf("userId" to user.uid)
+            batch.set(senderFriendsRef, senderData)
+
+            val receiverFriendsRef = db.collection("users").document(user.uid)
+                .collection("friends").document(friendRequest.senderId)
+            val receiverData = mapOf("userId" to friendRequest.senderId)
+            batch.set(receiverFriendsRef, receiverData)
+
+            db.collection("friendRequests")
+                .whereEqualTo("senderId", friendRequest.senderId)
+                .whereEqualTo("receiverId", friendRequest.receiverId)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot != null && !snapshot.isEmpty) {
+                        for (doc in snapshot.documents) {
+                            batch.delete(doc.reference)
+                        }
+                        batch.commit()
+                            .addOnSuccessListener { onResult(true) }
+                            .addOnFailureListener { onResult(false) }
+                    } else {
+                        onResult(false)
+                    }
+                }
+                .addOnFailureListener { onResult(false) }
+        }
+    }
+
+    fun declineFriendRequest(friendRequest: FriendRequest, onResult: (Boolean) -> Unit) {
+        auth.currentUser?.let {
+            db.collection("friendRequests")
+                .whereEqualTo("senderId", friendRequest.senderId)
+                .whereEqualTo("receiverId", friendRequest.receiverId)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot != null && !snapshot.isEmpty) {
+                        for (doc in snapshot.documents) {
+                            doc.reference.delete()
+                                .addOnSuccessListener { onResult(true) }
+                                .addOnFailureListener { onResult(false) }
+                        }
+                    } else {
+                        onResult(false)
+                    }
+                }
+                .addOnFailureListener { onResult(false) }
+        }
+    }
+
+    fun fetchUsers(onResult: (List<User>) -> Unit) {
+        db.collection("users")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val users = snapshot.documents.mapNotNull { doc ->
+                    User(
+                        userId = doc.id,
+                        username = doc.getString("username") ?: "",
+                        email = doc.getString("email") ?: ""
+                    )
+                }
+                onResult(users)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirebaseViewModel", "Error fetching users", exception)
+                onResult(emptyList())
+            }
     }
 
     fun fetchPhrases() {

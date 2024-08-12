@@ -199,4 +199,6 @@
     <string name="map_view">Map view</string>
     <string name="map_search">Map search</string>
     <string name="new_search">New search</string>
+    <string name="friend_request_sent">Freind request sent</string>
+    <string name="failed_to_send_request">Failed to send request</string>
 </resources>

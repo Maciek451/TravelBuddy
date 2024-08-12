@@ -1,0 +1,74 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: MS Teams, Thursday, 8th August 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Thursday, 8th August 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. For map, think and implement use case(s), e.g., adding a marker when a user press a location and then provide a route to the selected location from current location. 
+ACTION: mat78
+Status: Ongoing
+Move Map to Explore as a tab.
+
+2. In map, search a specific location provided by OpenStreetMap. 
+ACTION: mat78
+Status: Done 
+
+3. Continue working on firestore functionality for trips features.
+ACTION: mat78
+Status: Ongoing
+
+4. Implement friend approval process for adding friend. 
+ACTION: mat78
+Status: Ongoing
+
+5. Continue implementing "Explore" feature.
+ACTION: mat78
+Status: Ongiong
+
+6. Implement showing weather details feature.
+ACTION: mat78
+Status: Done
+Directs to web browser
+
+7. Implement showing currency details feature.
+ACTION: mat78
+Status: Decided to leave it
+
+8. Check if Geodb cities API of Rapidapi supports searching in Polish language. 
+If not, then think about how you are going to offer search city/country feature when app is in Polish language. 
+ACTION: mat78
+Status: 
+
+New business 
+============
+1. Continue implementing "Explore" feature.
+On clicking a places, show the details of the place.
+Adding a place to existing trip(s).
+ACTION: mat78
+
+2. In explore screen, arrange categories in alphabetical order. 
+ACTION: mat78
+
+3. Move Map to Explore as a tab.
+ACTION: mat78
+
+4. Continue working on firestore functionality for trips features.
+ACTION: mat78
+
+5. Implement friend approval process for adding friend. 
+ACTION: mat78
+
+6. System notification of trip reminder before the trip.
+ACTION: mat78
+
+7. Share the trip with friends.
+ACTION: mat78
+
+AOB
+=== 
+1. Searching of places using API will be performed in English language even if the app is in Polish language. 
