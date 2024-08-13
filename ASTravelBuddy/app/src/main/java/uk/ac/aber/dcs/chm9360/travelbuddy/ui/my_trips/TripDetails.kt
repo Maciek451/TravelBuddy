@@ -2,6 +2,7 @@ package uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -32,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,8 +52,10 @@ fun TripDetailsScreen(
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
     val trip = Utils.trip
+    val context = LocalContext.current
     val appBarTitle = trip?.title
     var showConfirmDialog by remember { mutableStateOf(false) }
+    var showConfirmStateDialog by remember { mutableStateOf(false) }
     var checklist by remember { mutableStateOf(trip?.checklist ?: emptyList()) }
     var tripPlans by remember { mutableStateOf(trip?.tripPlans ?: emptyList()) }
 
@@ -58,7 +64,6 @@ fun TripDetailsScreen(
             firebaseViewModel.fetchChecklist(tripId) { fetchedChecklist ->
                 checklist = fetchedChecklist
                 Utils.trip = trip.copy(checklist = fetchedChecklist)
-
             }
             firebaseViewModel.fetchTripPlans(tripId) { fetchedTripPlans ->
                 tripPlans = fetchedTripPlans
@@ -277,6 +282,30 @@ fun TripDetailsScreen(
                         }
                     }
                 }
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = if (trip.shared) stringResource(R.string.status_public) else stringResource(R.string.status_private),
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 16.dp)
+                )
+
+                Button(
+                    onClick = { showConfirmStateDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    enabled = trip.shared,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                    )
+                ) {
+                    Text(text = stringResource(R.string.set_not_shared))
+                }
             }
         }
     }
@@ -294,6 +323,24 @@ fun TripDetailsScreen(
                     }
                 }
                 showConfirmDialog = false
+            }
+        )
+    }
+
+    if (showConfirmStateDialog) {
+        ConfirmTripStateDialog(
+            showDialog = showConfirmStateDialog,
+            onDismiss = { showConfirmStateDialog = false },
+            onPostConfirmed = {
+                Utils.trip = trip
+                if (trip != null) {
+                    firebaseViewModel.tripToPrivate(trip) {
+                        Toast.makeText(context, R.string.trip_not_shared, Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    }
+                }
+                showConfirmStateDialog = false
+                navController.navigate(Screens.MyTrips.route)
             }
         )
     }

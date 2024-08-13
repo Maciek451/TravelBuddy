@@ -201,4 +201,14 @@
     <string name="new_search">New search</string>
     <string name="friend_request_sent">Freind request sent</string>
     <string name="failed_to_send_request">Failed to send request</string>
+    <string name="share_icon">Share icon</string>
+    <string name="unshare">Unshare</string>
+    <string name="share">Share</string>
+    <string name="trip_not_shared">Trip set to private</string>
+    <string name="set_not_shared">Set to private</string>
+    <string name="click_to_confirm">Click to confirm</string>
+    <string name="confirm_text">Click if you want to proceed with this action</string>
+    <string name="status_public">Status: Public</string>
+    <string name="status_private">Status: Private</string>
+    <string name="trip_shared">Trip set to public</string>
 </resources>

@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,15 +13,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NoLuggage
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,10 +33,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +56,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils.trip
 
 @Composable
 fun MyTripsScreen(
@@ -58,6 +68,9 @@ fun MyTripsScreen(
     val trips by firebaseViewModel.trips.collectAsState()
     val imageUrls by retrofitViewModel.imageUrls.collectAsState()
     val imageLoadingStates by retrofitViewModel.imageLoadingStates.collectAsState()
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    var selectedTrip by remember { mutableStateOf<Trip?>(null) }
+    val context = LocalContext.current
 
     LaunchedEffect(trips) {
         trips.forEach { trip ->
@@ -91,6 +104,10 @@ fun MyTripsScreen(
                             onItemClick = {
                                 Utils.trip = trip
                                 navController.navigate(Screens.TripDetails.route)
+                            },
+                            onShareClick = {
+                                selectedTrip = trip
+                                showConfirmDialog = true
                             }
                         )
                     }
@@ -103,6 +120,21 @@ fun MyTripsScreen(
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchTrips()
     }
+    if (showConfirmDialog) {
+        ConfirmTripStateDialog(
+            showDialog = showConfirmDialog,
+            onDismiss = { showConfirmDialog = false },
+            onPostConfirmed = {
+                selectedTrip?.let {
+                    firebaseViewModel.postTrip(it) {
+                        Toast.makeText(context, R.string.trip_shared, Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    }
+                }
+                showConfirmDialog = false
+            }
+        )
+    }
 }
 
 @Composable
@@ -110,7 +142,8 @@ fun TripCard(
     trip: Trip,
     imageUrl: String?,
     isLoading: Boolean,
-    onItemClick: () -> Unit
+    onItemClick: () -> Unit,
+    onShareClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -173,13 +206,29 @@ fun TripCard(
                 }
             }
 
-            Button(
-                onClick = onItemClick,
+            Row(
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
             ) {
-                Text(text = stringResource(id = R.string.details))
+                Button(
+                    onClick = onItemClick,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = stringResource(id = R.string.details))
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                IconButton(
+                    onClick = onShareClick,
+                    enabled = !trip.shared
+                ) {
+                    Icon(
+                        imageVector = if (trip.shared) Icons.Filled.Share else Icons.Outlined.Share,
+                        contentDescription = stringResource(id = if (trip.shared) R.string.unshare else R.string.share)
+                    )
+                }
             }
         }
     }

@@ -38,13 +38,12 @@ fun AddTripPlanFromExploreScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-
     val title = stringResource(id = R.string.add_trip_plan)
     val trip = Utils.trip
     val placeDetails = Utils.placeDetails
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var place by rememberSaveable { placeDetails?.properties?.let { mutableStateOf(it.formatted) }!! }
+    var place by rememberSaveable { mutableStateOf(placeDetails?.properties?.let { it.formatted } ?: "") }
     var dateOfVisit by rememberSaveable { mutableStateOf(LocalDate.now()) }
 
     val isSaveButtonEnabled by rememberSaveable(place) {
@@ -67,10 +66,12 @@ fun AddTripPlanFromExploreScreen(
                     dateOfVisit = dateOfVisit.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
                 )
                 trip?.let {
-                    val updatedTrip = it.copy(tripPlans = it.tripPlans + newTripPlan)
-                    firebaseViewModel.updateTrip(updatedTrip)
+                    firebaseViewModel.addTripPlan(it.id, newTripPlan) { success ->
+                        if (success) {
+                            navController.navigate(Screens.Explore.route)
+                        }
+                    }
                 }
-                navController.navigate(Screens.Explore.route)
             }
         )
 
@@ -90,6 +91,7 @@ fun AddTripPlanFromExploreScreen(
         OutlinedTextField(
             value = place,
             onValueChange = {
+                place = it
             },
             label = { Text(stringResource(R.string.place_label)) },
             trailingIcon = {
@@ -100,11 +102,7 @@ fun AddTripPlanFromExploreScreen(
                             keyboardController?.hide()
                         }
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(R.string.delete_icon
-                            )
-                        )
+                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.delete_icon))
                     }
                 }
             },

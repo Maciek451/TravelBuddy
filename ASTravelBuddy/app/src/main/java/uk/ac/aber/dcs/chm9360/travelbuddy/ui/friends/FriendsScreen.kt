@@ -55,6 +55,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripCard
 
 @Composable
 fun FriendsScreen(
@@ -64,6 +65,7 @@ fun FriendsScreen(
     val appBarTitle = stringResource(id = R.string.friends)
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val phrases by firebaseViewModel.phrases.collectAsState()
+    val trips by firebaseViewModel.trips.collectAsState()
     val isRefreshing by firebaseViewModel.isRefreshing.collectAsState()
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
     val coroutineScope = rememberCoroutineScope()
@@ -99,8 +101,26 @@ fun FriendsScreen(
                 }
                 when (selectedTabIndex) {
                     0 -> {
-                        EmptyTripsScreen(firebaseViewModel = firebaseViewModel)
+                        SwipeRefresh(
+                            state = swipeRefreshState,
+                            onRefresh = {
+                                coroutineScope.launch {
+                                    firebaseViewModel.fetchTrips()
+                                }
+                            }
+                        ) {
+                            if (trips.isNotEmpty()) {
+                                LazyColumn {
+                                    items(trips) { trip ->
+
+                                    }
+                                }
+                            } else {
+                                EmptyTripsScreen(firebaseViewModel = firebaseViewModel)
+                            }
+                        }
                     }
+
                     1 -> {
                         SwipeRefresh(
                             state = swipeRefreshState,

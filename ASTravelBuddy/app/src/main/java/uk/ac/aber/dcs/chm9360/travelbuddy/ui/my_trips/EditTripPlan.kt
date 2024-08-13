@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -84,12 +85,16 @@ fun EditTripPlanScreen(
                     place = place,
                     dateOfVisit = dateOfVisit.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
                 )
-                val updatedTripPlans = trip.tripPlans.map { if (it.id == tripPlanItem.id) updatedTripPlan else it }
-                val updatedTrip = trip.copy(tripPlans = updatedTripPlans)
-                firebaseViewModel.updateTrip(updatedTrip) {
-                    Utils.trip = updatedTrip
-                    Toast.makeText(context, R.string.trip_plan_updated, Toast.LENGTH_SHORT).show()
-                    navController.popBackStack()
+                trip.let {
+                    firebaseViewModel.updateTripPlan(it.id, updatedTripPlan) { success ->
+                        if (success) {
+                            Utils.trip = it.copy(tripPlans = it.tripPlans.map { plan ->
+                                if (plan.id == tripPlanItem.id) updatedTripPlan else plan
+                            })
+                            Toast.makeText(context, R.string.trip_plan_updated, Toast.LENGTH_SHORT).show()
+                            navController.popBackStack()
+                        }
+                    }
                 }
             }
         )

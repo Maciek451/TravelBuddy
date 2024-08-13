@@ -54,12 +54,16 @@ fun TripPlanScreen(
     val appBarTitle = stringResource(id = R.string.trip_plan)
     var tripPlans by remember { mutableStateOf(trip?.tripPlans ?: emptyList()) }
 
+    fun fetchTripPlans(tripId: String) {
+        firebaseViewModel.fetchTripPlans(tripId) { fetchedTripPlans ->
+            tripPlans = fetchedTripPlans
+            Utils.trip = trip?.copy(tripPlans = fetchedTripPlans)
+        }
+    }
+
     LaunchedEffect(trip?.id) {
         trip?.id?.let { tripId ->
-            firebaseViewModel.fetchTripPlans(tripId) { fetchedTripPlans ->
-                tripPlans = fetchedTripPlans
-                Utils.trip = trip.copy(tripPlans = fetchedTripPlans)
-            }
+            fetchTripPlans(tripId)
         }
     }
 
@@ -67,7 +71,7 @@ fun TripPlanScreen(
         trip?.id?.let { tripId ->
             firebaseViewModel.removeTripPlan(tripId, tripPlan) { success ->
                 if (success) {
-                    tripPlans = tripPlans.filter { it.id != tripPlan.id }
+                    fetchTripPlans(tripId)
                 }
             }
         }
@@ -209,7 +213,10 @@ fun TripPlanItem(
 
     if (showDialog) {
         DeleteTripPlanDialog(
-            onConfirmDelete = { onTripPlanDelete(tripPlan) },
+            onConfirmDelete = {
+                showDialog = false
+                onTripPlanDelete(tripPlan)
+            },
             onDismiss = { showDialog = false }
         )
     }

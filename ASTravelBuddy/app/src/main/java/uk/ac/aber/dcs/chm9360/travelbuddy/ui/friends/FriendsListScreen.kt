@@ -105,15 +105,6 @@ fun FriendsListScreen(
             showDialog = showConfirmDialog,
             onDismiss = { showConfirmDialog = false },
             onRemoveConfirmed = {
-                firebaseViewModel.removeFriend(friendToRemove!!.userId) { success ->
-                    if (success) {
-                        messageText.value = context.getString(R.string.friend_removed_successfully)
-                    } else {
-                        messageText.value = context.getString(R.string.failed_to_remove_friend)
-                    }
-                    showMessage.value = true
-                }
-                showConfirmDialog = false
             }
         )
     }
