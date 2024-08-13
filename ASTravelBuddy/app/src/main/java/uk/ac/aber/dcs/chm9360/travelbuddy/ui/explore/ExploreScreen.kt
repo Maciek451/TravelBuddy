@@ -89,21 +89,19 @@ fun ExploreScreen(
     var cityHasFocus by rememberSaveable { mutableStateOf(false) }
     var categoryHasFocus by rememberSaveable { mutableStateOf(false) }
 
-    val filteredCategories = categoryList.filter {
-        it.second.contains(categoryText, ignoreCase = true)
-    }
+    val filteredCategories = categoryList
+        .filter { it.second.contains(categoryText, ignoreCase = true) }
+        .sortedBy { it.second }
 
     val context = LocalContext.current
     val showDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
     val dialogTitle = remember { mutableStateOf("") }
 
-    val placeLocation = remember(placeDetails) {
-        placeDetails?.properties?.formatted?.let { address ->
-            val geocoder = Geocoder(context, Locale.getDefault())
-            geocoder.getFromLocationName(address, 1)?.firstOrNull()?.let {
-                GeoPoint(it.latitude, it.longitude)
-            }
+    placeDetails?.properties?.formatted?.let { address ->
+        val geocoder = Geocoder(context, Locale.getDefault())
+        geocoder.getFromLocationName(address, 1)?.firstOrNull()?.let {
+            GeoPoint(it.latitude, it.longitude)
         }
     }
 
