@@ -10,14 +10,11 @@ import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.ChecklistItem
-import uk.ac.aber.dcs.chm9360.travelbuddy.model.Friend
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.FriendRequest
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
@@ -179,72 +176,81 @@ class FirebaseViewModel : ViewModel() {
 
     fun isUserLoggedIn(): Boolean = auth.currentUser != null
 
-    fun deleteUserAccount(onResult: (Boolean) -> Unit) {
-        val user = auth.currentUser
-        user?.let {
-            viewModelScope.launch {
+    fun removeAllUserData(onComplete: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val user = auth.currentUser
+            if (user != null) {
                 try {
-                    val dataRemoved = removeAllUserDataSync()
-                    if (dataRemoved) {
-                        db.collection("users").document(user.uid).delete().await()
-                        user.delete().await()
-                        auth.signOut()
-                        _authState.value = null
-                        onResult(true)
-                    } else {
-                        onResult(false)
+                    val db = FirebaseFirestore.getInstance()
+
+                    val phrasesRef = db.collection("users").document(user.uid).collection("phrases")
+                    val phrasesSnapshot = phrasesRef.get().await()
+                    for (doc in phrasesSnapshot.documents) {
+                        doc.reference.delete().await()
+                    }
+
+                    val tripsRef = db.collection("users").document(user.uid).collection("trips")
+                    val tripsSnapshot = tripsRef.get().await()
+                    for (doc in tripsSnapshot.documents) {
+                        doc.reference.delete().await()
+                    }
+
+                    val friendRequestsRef = db.collection("friendRequests")
+                    val friendRequestsSnapshot = friendRequestsRef.whereEqualTo("receiverId", user.uid).get().await()
+                    for (doc in friendRequestsSnapshot.documents) {
+                        doc.reference.delete().await()
+                    }
+
+                    val friendsListRef = db.collection("friends").document(user.uid)
+                    friendsListRef.delete().await()
+
+                    onComplete(true)
+                } catch (e: Exception) {
+                    Log.e("FirebaseViewModel", "Error removing user data", e)
+                    onComplete(false)
+                }
+            } else {
+                onComplete(false)
+            }
+        }
+    }
+
+    fun deleteUserAccount(onComplete: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val user = auth.currentUser
+            if (user != null) {
+                try {
+                    removeAllUserData { success ->
+                        if (success) {
+                            val userDocRef = db.collection("users").document(user.uid)
+                            userDocRef.delete()
+                                .addOnCompleteListener { deleteUserDocTask ->
+                                    if (deleteUserDocTask.isSuccessful) {
+                                        user.delete()
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    onComplete(true)
+                                                } else {
+                                                    Log.e("FirebaseViewModel", "Error deleting user account", task.exception)
+                                                    onComplete(false)
+                                                }
+                                            }
+                                    } else {
+                                        Log.e("FirebaseViewModel", "Error deleting user document", deleteUserDocTask.exception)
+                                        onComplete(false)
+                                    }
+                                }
+                        } else {
+                            onComplete(false)
+                        }
                     }
                 } catch (e: Exception) {
                     Log.e("FirebaseViewModel", "Error deleting user account", e)
-                    onResult(false)
+                    onComplete(false)
                 }
+            } else {
+                onComplete(false)
             }
-        } ?: onResult(false)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun removeAllUserDataSync(): Boolean =
-        suspendCancellableCoroutine { continuation ->
-            removeAllUserData { success ->
-                continuation.resume(success) {
-                    continuation.cancel()
-                }
-            }
-        }
-
-    fun removeAllUserData(onResult: (Boolean) -> Unit) {
-        val user = auth.currentUser
-        if (user != null) {
-            val batch = db.batch()
-            val userDocRef = db.collection("users").document(user.uid)
-
-            viewModelScope.launch {
-                try {
-                    val phrasesSnapshot = userDocRef.collection("phrases").get().await()
-                    for (document in phrasesSnapshot.documents) {
-                        batch.delete(document.reference)
-                    }
-                    val tripsSnapshot = userDocRef.collection("trips").get().await()
-                    for (document in tripsSnapshot.documents) {
-                        batch.delete(document.reference)
-                    }
-                    val friendsSnapshot = userDocRef.collection("friends").get().await()
-                    for (document in friendsSnapshot.documents) {
-                        batch.delete(document.reference)
-                    }
-                    batch.commit()
-                        .addOnSuccessListener { onResult(true) }
-                        .addOnFailureListener {
-                            Log.e("FirebaseViewModel", "Error committing batch", it)
-                            onResult(false)
-                        }
-                } catch (e: Exception) {
-                    Log.e("FirebaseViewModel", "Error removing user data", e)
-                    onResult(false)
-                }
-            }
-        } else {
-            onResult(false)
         }
     }
 
@@ -627,7 +633,8 @@ class FirebaseViewModel : ViewModel() {
                         "title" to updatedTrip.title,
                         "destination" to updatedTrip.destination,
                         "startDate" to updatedTrip.startDate,
-                        "endDate" to updatedTrip.endDate
+                        "endDate" to updatedTrip.endDate,
+                        "checklist" to updatedTrip.checklist
                     )
 
                     tripRef.update(updates)
