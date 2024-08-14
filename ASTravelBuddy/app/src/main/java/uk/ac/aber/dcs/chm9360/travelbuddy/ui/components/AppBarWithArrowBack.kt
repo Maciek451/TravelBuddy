@@ -36,7 +36,6 @@ fun AppBarWithArrowBack(
     navController: NavHostController,
     appBarTitle: String,
     showMoreIcon: Boolean = true,
-    showRemoveIcon: Boolean = false,
     tripMenu: Boolean = false,
     showSaveButton: Boolean = false,
     showSignOut: Boolean = false,
@@ -74,14 +73,6 @@ fun AppBarWithArrowBack(
                     Icon(
                         Icons.Outlined.Done,
                         contentDescription = stringResource(R.string.done_icon)
-                    )
-                }
-            }
-            if (showRemoveIcon) {
-                IconButton(onClick = { }) {
-                    Icon(
-                        Icons.Outlined.DeleteSweep,
-                        contentDescription = stringResource(R.string.delete_sweep_icon)
                     )
                 }
             }

@@ -47,8 +47,7 @@ fun NotificationScreen(
         AppBarWithArrowBack(
             navController = navController,
             appBarTitle = appBarTitle,
-            showMoreIcon = false,
-            showRemoveIcon = true
+            showMoreIcon = false
         )
 
         if (friendRequests.isEmpty()) {

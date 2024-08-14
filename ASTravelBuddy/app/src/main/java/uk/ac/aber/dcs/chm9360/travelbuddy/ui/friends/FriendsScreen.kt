@@ -109,15 +109,7 @@ fun FriendsScreen(
                                 }
                             }
                         ) {
-                            if (trips.isNotEmpty()) {
-                                LazyColumn {
-                                    items(trips) { trip ->
-
-                                    }
-                                }
-                            } else {
-                                EmptyTripsScreen(firebaseViewModel = firebaseViewModel)
-                            }
+                            EmptyTripsScreen(firebaseViewModel = firebaseViewModel)
                         }
                     }
 

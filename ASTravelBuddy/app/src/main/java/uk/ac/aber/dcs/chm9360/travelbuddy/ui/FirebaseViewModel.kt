@@ -288,77 +288,77 @@ class FirebaseViewModel : ViewModel() {
 
     fun fetchFriends() {
         auth.currentUser?.let { user ->
-            viewModelScope.launch {
-                db.collection("users").document(user.uid)
-                    .collection("friends")
-                    .get()
-                    .addOnSuccessListener { snapshot ->
-                        val friends = snapshot.documents.mapNotNull { doc ->
-                            User(
-                                userId = doc.id,
-                                username = doc.getString("username") ?: "",
-                                email = doc.getString("email") ?: ""
-                            )
-                        }
-                        _friends.value = friends
-                    }
-                    .addOnFailureListener { Log.e("FirebaseViewModel", "Error fetching friends") }
+            getFriendsOfUser(user.uid) { friends ->
+                _friends.value = friends
             }
         }
     }
 
     fun addFriend(user: User, friend: User, onResult: (Boolean) -> Unit = {}) {
-        auth.currentUser?.let { fbUser ->
-            val db = FirebaseFirestore.getInstance()
+        val auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser
+        val db = FirebaseFirestore.getInstance()
 
-            val friendData = hashMapOf(
+        if (currentUser != null) {
+            // Create entries for both the user and the friend
+            val userEntry = hashMapOf(
                 "user_id" to user.userId,
-                "user_username" to user.username,
-                "user_email" to user.email,
-                "friend_id" to friend.userId,
-                "friend_username" to friend.username,
-                "friend_email" to friend.email,
+                "username" to user.username,
+                "email" to user.email
             )
 
-            val friendsListRef = db.collection("friends").document(fbUser.uid)
+            val friendEntry = hashMapOf(
+                "user_id" to friend.userId,
+                "username" to friend.username,
+                "email" to friend.email
+            )
 
-            friendsListRef.update("list_of_friends", FieldValue.arrayUnion(friendData))
+            // Reference to the document where the friends list is stored
+            val friendsListRef = db.collection("friends").document(user.userId)
+
+            // Update the friends list document to include both entries
+            friendsListRef.update("list_of_friends", FieldValue.arrayUnion(userEntry, friendEntry))
                 .addOnSuccessListener { onResult(true) }
                 .addOnFailureListener {
-                    friendsListRef.set(hashMapOf("list_of_friends" to arrayListOf(friendData)))
+                    // If the document doesn't exist, create it and add the entries
+                    friendsListRef.set(hashMapOf("list_of_friends" to arrayListOf(userEntry, friendEntry)))
                         .addOnSuccessListener { onResult(true) }
                         .addOnFailureListener { onResult(false) }
                 }
-        } ?: onResult(false)
+        } else {
+            // Handle the case where the current user is not authenticated
+            onResult(false)
+        }
     }
 
-    fun getFriendsOfUser(user: String, callback: (List<Friend>) -> Unit) {
-        val db = FirebaseFirestore.getInstance()
+    fun getFriendsOfUser(userId: String, callback: (List<User>) -> Unit) {
+        auth.currentUser?.let {
+            val db = FirebaseFirestore.getInstance()
 
-        val friendsListRef = db.collection("friends").document("friends_list")
+            // Reference to the user's friends collection
+            val friendsCollectionRef = db.collection("friends")
+                .whereEqualTo("user_id", userId)  // Ensure this matches your document structure
 
-        friendsListRef.get()
-            .addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot.exists()) {
-                    val friendsList = documentSnapshot
-                        .get("list_of_friends") as? List<Map<String, String>>
+            friendsCollectionRef.get()
+                .addOnSuccessListener { querySnapshot ->
+                    Log.d("FirebaseViewModel", "QuerySnapshot documents: ${querySnapshot.documents}")
 
-                    val filteredFriends = friendsList?.mapNotNull { friendMap ->
-                        val friend =
-                            Friend(friendMap["user_id"] ?: "", friendMap["friend_id"] ?: "")
-                        if (friend.userId == user) friend else null
-                    } ?: emptyList()
-
-                    callback(filteredFriends)
-                } else {
+                    val friendsList = querySnapshot.documents.mapNotNull { document ->
+                        // Convert document to User object
+                        val user = document.toObject(User::class.java)
+                        user?.apply {
+                            this.userId = document.id
+                        }
+                    }
+                    Log.d("FirebaseViewModel", "Parsed friends list: $friendsList")
+                    callback(friendsList)
+                }
+                .addOnFailureListener {
+                    Log.e("FirebaseViewModel", "Error fetching friends", it)
                     callback(emptyList())
                 }
-            }
-            .addOnFailureListener {
-                callback(emptyList())
-            }
+        } ?: callback(emptyList())
     }
-
 
     fun sendFriendRequest(receiverId: String, onResult: (Boolean) -> Unit) {
         auth.currentUser?.let { user ->
@@ -399,8 +399,6 @@ class FirebaseViewModel : ViewModel() {
 
     fun acceptFriendRequest(friendRequest: FriendRequest, onResult: (Boolean) -> Unit) {
         auth.currentUser?.let {
-            val batch = db.batch()
-
             db.collection("friendRequests")
                 .whereEqualTo("senderId", friendRequest.senderId)
                 .whereEqualTo("receiverId", friendRequest.receiverId)
@@ -410,22 +408,27 @@ class FirebaseViewModel : ViewModel() {
                         for (doc in snapshot.documents) {
                             doc.reference.delete()
                         }
-                        batch.commit()
-                            .addOnSuccessListener {
-                                val friend = User(
-                                    friendRequest.senderId,
-                                    friendRequest.senderUsername,
-                                    friendRequest.senderEmail
-                                )
-                                val user = User(
-                                    friendRequest.receiverId,
-                                    username.toString(),
-                                    email.toString()
-                                )
-                                addFriend(user, friend)
-                                addFriend(friend, user)
+
+                        val friend = User(
+                            friendRequest.senderId,
+                            friendRequest.senderUsername,
+                            friendRequest.senderEmail
+                        )
+                        val user = User(
+                            friendRequest.receiverId,
+                            _username.value ?: "",
+                            _email.value ?: ""
+                        )
+
+                        addFriend(user, friend) { success1 ->
+                            if (success1) {
+                                addFriend(friend, user) { success2 ->
+                                    onResult(success2)
+                                }
+                            } else {
+                                onResult(false)
                             }
-                            .addOnFailureListener { onResult(false) }
+                        }
                     } else {
                         onResult(false)
                     }

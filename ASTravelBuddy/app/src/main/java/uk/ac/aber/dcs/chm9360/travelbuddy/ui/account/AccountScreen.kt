@@ -60,7 +60,6 @@ fun AccountScreen(
 
     val showThemeDialog = rememberSaveable { mutableStateOf(false) }
     val showLanguageDialog = rememberSaveable { mutableStateOf(false) }
-    val currentLanguage by rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchUsername()
@@ -76,7 +75,7 @@ fun AccountScreen(
     )
     LanguageSelectionDialog(
         showDialog = showLanguageDialog.value,
-        currentLanguage = currentLanguage,
+        currentLanguage = 0,
         onDismiss = { showLanguageDialog.value = false },
         onLanguageSelected = {
             showLanguageDialog.value = false

@@ -12,10 +12,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.AddTripScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.about.AboutScreen
@@ -44,6 +46,8 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.notifications.NotificationScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.phrase.AddPhraseScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.theme.TravelBuddyTheme
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.LocaleManager
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.getLanguagePreference
 
 class MainActivity : ComponentActivity() {
     private val firebaseViewModel: FirebaseViewModel by viewModels()
@@ -51,6 +55,15 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val context = applicationContext
+        val prefsFlow = getLanguagePreference(context)
+        lifecycleScope.launch {
+            prefsFlow.collect { language ->
+                LocaleManager.setLocale(context, if (language == 0) "en" else "pl")
+            }
+        }
+
         enableEdgeToEdge()
         setContent {
             TravelBuddyTheme {
@@ -59,7 +72,6 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-
                     val startDestination = if (firebaseViewModel.isUserLoggedIn()) {
                         Screens.MyTrips.route
                     } else {

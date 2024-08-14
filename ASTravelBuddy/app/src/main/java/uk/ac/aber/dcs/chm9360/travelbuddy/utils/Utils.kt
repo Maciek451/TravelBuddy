@@ -1,5 +1,7 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.utils
 
+import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,6 +28,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.TripPlanItem
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 object Utils {
     var trip: Trip? = null
@@ -33,6 +36,20 @@ object Utils {
     var placeDetails: Feature? = null
     var featureList: List<Feature>? = null
     var destinationName: String = ""
+}
+
+object LocaleManager {
+    fun setLocale(context: Context, languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+
+        val resources = context.resources
+        val config = Configuration(resources.configuration).apply {
+            setLocale(locale)
+            setLayoutDirection(locale)
+        }
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

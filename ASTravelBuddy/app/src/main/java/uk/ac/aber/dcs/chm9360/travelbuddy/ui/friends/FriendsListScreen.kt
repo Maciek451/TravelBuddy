@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -58,24 +59,11 @@ fun FriendsListScreen(
     val friends by firebaseViewModel.friends.collectAsState()
 
     var showConfirmDialog by rememberSaveable { mutableStateOf(false) }
-
-    //Needs to be 'remember' to avoid recomposition
     var friendToRemove by remember { mutableStateOf<User?>(null) }
 
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchFriends()
-    }
-
-    val context = LocalContext.current
-
-    val showMessage = rememberSaveable { mutableStateOf(false) }
-    val messageText = rememberSaveable { mutableStateOf("") }
-
-    if (showMessage.value) {
-        LaunchedEffect(Unit) {
-            Toast.makeText(context, messageText.value, Toast.LENGTH_SHORT).show()
-            showMessage.value = false
-        }
+        Log.d("FriendsListScreen", "Friends fetched: ${friends.map { "${it.username}, ${it.email}" }}")
     }
 
     Column(
@@ -105,6 +93,7 @@ fun FriendsListScreen(
             showDialog = showConfirmDialog,
             onDismiss = { showConfirmDialog = false },
             onRemoveConfirmed = {
+                // Handle removal here
             }
         )
     }
@@ -112,6 +101,8 @@ fun FriendsListScreen(
 
 @Composable
 fun FriendItem(user: User, onDeleteClick: () -> Unit) {
+    Log.d("FriendItem", "User details: Username: ${user.username}, Email: ${user.email}")
+
     val monogram = user.username.firstOrNull()?.uppercase() ?: ""
 
     Card(
