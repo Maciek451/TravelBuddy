@@ -31,6 +31,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -54,13 +55,17 @@ import kotlinx.coroutines.launch
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripCard
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 
 @Composable
 fun FriendsScreen(
     navController: NavHostController,
-    firebaseViewModel: FirebaseViewModel = viewModel()
+    firebaseViewModel: FirebaseViewModel = viewModel(),
+    retrofitViewModel: RetrofitViewModel = viewModel()
 ) {
     val appBarTitle = stringResource(id = R.string.friends)
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -69,10 +74,24 @@ fun FriendsScreen(
     val isRefreshing by firebaseViewModel.isRefreshing.collectAsState()
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
     val coroutineScope = rememberCoroutineScope()
+    val imageUrls by retrofitViewModel.imageUrls.collectAsState()
+    val imageLoadingStates by retrofitViewModel.imageLoadingStates.collectAsState()
+    val friendRequests by firebaseViewModel.friendRequests.collectAsState()
+
+    LaunchedEffect(phrases) {
+        firebaseViewModel.fetchPhrases()
+    }
+
+    LaunchedEffect(trips) {
+        trips.forEach { trip ->
+            retrofitViewModel.fetchImage(trip.destination)
+        }
+    }
 
     TopLevelScaffold(
         navController = navController,
         appBarTitle = appBarTitle,
+        friendRequestCount = friendRequests.size
     ) { innerPadding ->
         Surface(
             modifier = Modifier
@@ -109,7 +128,27 @@ fun FriendsScreen(
                                 }
                             }
                         ) {
-                            EmptyTripsScreen(firebaseViewModel = firebaseViewModel)
+                            val sharedTrips = trips.filter { it.shared }
+
+                            if (sharedTrips.isNotEmpty()) {
+                                LazyColumn {
+                                    items(sharedTrips) { trip ->
+                                        TripCard(
+                                            trip = trip,
+                                            imageUrl = imageUrls[trip.destination],
+                                            isLoading = imageLoadingStates[trip.destination] ?: false,
+                                            onItemClick = {
+                                                Utils.trip = trip
+                                                navController.navigate(Screens.TripDetails.route)
+                                            },
+                                            onShareClick = {},
+                                            isShareButtonEnabled = false
+                                        )
+                                    }
+                                }
+                            } else {
+                                EmptyTripsScreen(firebaseViewModel = firebaseViewModel)
+                            }
                         }
                     }
 
@@ -118,7 +157,7 @@ fun FriendsScreen(
                             state = swipeRefreshState,
                             onRefresh = {
                                 coroutineScope.launch {
-                                    firebaseViewModel.refreshPhrases()
+                                    firebaseViewModel.fetchPhrases()
                                 }
                             }
                         ) {
@@ -246,7 +285,7 @@ fun EmptyPhrasesScreen(firebaseViewModel: FirebaseViewModel = viewModel()) {
         state = swipeRefreshState,
         onRefresh = {
             coroutineScope.launch {
-                firebaseViewModel.refreshPhrases()
+                firebaseViewModel.fetchPhrases()
             }
         }
     ) {

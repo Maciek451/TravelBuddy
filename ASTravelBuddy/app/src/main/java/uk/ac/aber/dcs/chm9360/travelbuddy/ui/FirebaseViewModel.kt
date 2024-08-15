@@ -60,7 +60,6 @@ class FirebaseViewModel : ViewModel() {
         observeAuthState()
         fetchPhrases()
         fetchTrips()
-        fetchFriends()
         fetchCreationDate()
         fetchFriendRequests()
         fetchUsername()
@@ -196,7 +195,8 @@ class FirebaseViewModel : ViewModel() {
                     }
 
                     val friendRequestsRef = db.collection("friendRequests")
-                    val friendRequestsSnapshot = friendRequestsRef.whereEqualTo("receiverId", user.uid).get().await()
+                    val friendRequestsSnapshot =
+                        friendRequestsRef.whereEqualTo("receiverId", user.uid).get().await()
                     for (doc in friendRequestsSnapshot.documents) {
                         doc.reference.delete().await()
                     }
@@ -231,12 +231,20 @@ class FirebaseViewModel : ViewModel() {
                                                 if (task.isSuccessful) {
                                                     onComplete(true)
                                                 } else {
-                                                    Log.e("FirebaseViewModel", "Error deleting user account", task.exception)
+                                                    Log.e(
+                                                        "FirebaseViewModel",
+                                                        "Error deleting user account",
+                                                        task.exception
+                                                    )
                                                     onComplete(false)
                                                 }
                                             }
                                     } else {
-                                        Log.e("FirebaseViewModel", "Error deleting user document", deleteUserDocTask.exception)
+                                        Log.e(
+                                            "FirebaseViewModel",
+                                            "Error deleting user document",
+                                            deleteUserDocTask.exception
+                                        )
                                         onComplete(false)
                                     }
                                 }
@@ -292,13 +300,10 @@ class FirebaseViewModel : ViewModel() {
         } ?: callback(false)
     }
 
-    fun fetchFriends() {
-        auth.currentUser?.let { user ->
-            getFriendsOfUser(user.uid) { friends ->
-                _friends.value = friends
-            }
-        }
-    }
+    data class FriendRelation(
+        val user: User = User(),
+        val friend: User = User()
+    )
 
     fun addFriend(user: User, friend: User, onResult: (Boolean) -> Unit = {}) {
         val auth = FirebaseAuth.getInstance()
@@ -306,64 +311,80 @@ class FirebaseViewModel : ViewModel() {
         val db = FirebaseFirestore.getInstance()
 
         if (currentUser != null) {
-            // Create entries for both the user and the friend
-            val userEntry = hashMapOf(
-                "user_id" to user.userId,
-                "username" to user.username,
-                "email" to user.email
-            )
 
-            val friendEntry = hashMapOf(
-                "user_id" to friend.userId,
-                "username" to friend.username,
-                "email" to friend.email
-            )
+            val friendRelation = FriendRelation(user, friend)
+            val friendsListRef = db.collection("friends").document("friends_list")
 
-            // Reference to the document where the friends list is stored
-            val friendsListRef = db.collection("friends").document(user.userId)
-
-            // Update the friends list document to include both entries
-            friendsListRef.update("list_of_friends", FieldValue.arrayUnion(userEntry, friendEntry))
+            friendsListRef.update("list_of_friends", FieldValue.arrayUnion(friendRelation))
                 .addOnSuccessListener { onResult(true) }
                 .addOnFailureListener {
-                    // If the document doesn't exist, create it and add the entries
-                    friendsListRef.set(hashMapOf("list_of_friends" to arrayListOf(userEntry, friendEntry)))
+                    friendsListRef.set(
+                        hashMapOf(
+                            "list_of_friends" to arrayListOf(friendRelation)
+                        )
+                    )
                         .addOnSuccessListener { onResult(true) }
                         .addOnFailureListener { onResult(false) }
                 }
         } else {
-            // Handle the case where the current user is not authenticated
             onResult(false)
         }
     }
 
-    fun getFriendsOfUser(userId: String, callback: (List<User>) -> Unit) {
-        auth.currentUser?.let {
-            val db = FirebaseFirestore.getInstance()
+    fun getFriendsOfUser(userId: String) {
+        val db = FirebaseFirestore.getInstance()
 
-            // Reference to the user's friends collection
-            val friendsCollectionRef = db.collection("friends")
-                .whereEqualTo("user_id", userId)  // Ensure this matches your document structure
+        val friendsListRef = db.collection("friends").document("friends_list")
 
-            friendsCollectionRef.get()
-                .addOnSuccessListener { querySnapshot ->
-                    Log.d("FirebaseViewModel", "QuerySnapshot documents: ${querySnapshot.documents}")
+        friendsListRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val friendRelations = documentSnapshot.get("list_of_friends") as? List<Map<String, Any>>
 
-                    val friendsList = querySnapshot.documents.mapNotNull { document ->
-                        // Convert document to User object
-                        val user = document.toObject(User::class.java)
-                        user?.apply {
-                            this.userId = document.id
+                    val friendsList = friendRelations?.mapNotNull { map ->
+                        val userMap = map["user"] as? Map<String, Any>
+                        val friendMap = map["friend"] as? Map<String, Any>
+
+                        val user = userMap?.let {
+                            User(
+                                userId = it["userId"] as? String ?: "",
+                                username = it["username"] as? String ?: "",
+                                email = it["email"] as? String ?: ""
+                            )
                         }
-                    }
+
+                        val friend = friendMap?.let {
+                            User(
+                                userId = it["userId"] as? String ?: "",
+                                username = it["username"] as? String ?: "",
+                                email = it["email"] as? String ?: ""
+                            )
+                        }
+
+                        if (user != null && friend != null && user.userId == userId) {
+                            FriendRelation(user, friend)
+                        } else {
+                            null
+                        }
+                    }?.flatMap { relation ->
+                        when {
+                            relation.user.userId == userId -> listOf(relation.friend)
+                            relation.friend.userId == userId -> listOf(relation.user)
+                            else -> emptyList()
+                        }
+                    } ?: emptyList()
+
                     Log.d("FirebaseViewModel", "Parsed friends list: $friendsList")
-                    callback(friendsList)
+                    _friends.value = friendsList
+                } else {
+                    Log.d("FirebaseViewModel", "No friends list found")
+                    _friends.value = emptyList()
                 }
-                .addOnFailureListener {
-                    Log.e("FirebaseViewModel", "Error fetching friends", it)
-                    callback(emptyList())
-                }
-        } ?: callback(emptyList())
+            }
+            .addOnFailureListener {
+                Log.e("FirebaseViewModel", "Error fetching friends", it)
+                _friends.value = emptyList()
+            }
     }
 
     fun sendFriendRequest(receiverId: String, onResult: (Boolean) -> Unit) {
@@ -386,6 +407,47 @@ class FirebaseViewModel : ViewModel() {
                 }
                 .addOnFailureListener { onResult(false) }
         } ?: onResult(false)
+    }
+
+    fun removeFriend(friend: User, onComplete: (Boolean) -> Unit) {
+        auth.currentUser?.let { currentUser ->
+            viewModelScope.launch {
+                try {
+                    val friendsListRef = db.collection("friends").document("friends_list")
+                    val friendRelationToRemove = FriendRelation(
+                        user = User(
+                            userId = currentUser.uid,
+                            username = _username.value ?: "",
+                            email = _email.value ?: ""
+                        ),
+                        friend = friend
+                    )
+
+                    friendsListRef.update("list_of_friends", FieldValue.arrayRemove(friendRelationToRemove))
+                        .addOnSuccessListener {
+                            val reverseFriendRelation = FriendRelation(
+                                user = friend,
+                                friend = User(
+                                    userId = currentUser.uid,
+                                    username = _username.value ?: "",
+                                    email = _email.value ?: ""
+                                )
+                            )
+
+                            friendsListRef.update("list_of_friends", FieldValue.arrayRemove(reverseFriendRelation))
+                                .addOnSuccessListener {
+                                    getFriendsOfUser(currentUser.uid)
+                                    onComplete(true)
+                                }
+                                .addOnFailureListener { onComplete(false) }
+                        }
+                        .addOnFailureListener { onComplete(false) }
+                } catch (e: Exception) {
+                    Log.e("FirebaseViewModel", "Error removing friend", e)
+                    onComplete(false)
+                }
+            }
+        } ?: onComplete(false)
     }
 
     fun fetchFriendRequests() {
@@ -498,8 +560,8 @@ class FirebaseViewModel : ViewModel() {
                                 ?.copy(username = doc.getString("username") ?: "")
                         }
 
-                    val friends = fetchFriendsList(user.uid)
-                    val friendPhrases = friends.flatMap { friend ->
+                    getFriendsOfUser(user.uid)
+                    val friendPhrases = friends.value.flatMap { friend ->
                         db.collection("users").document(friend.userId)
                             .collection("phrases")
                             .get()
@@ -516,22 +578,6 @@ class FirebaseViewModel : ViewModel() {
                     _isRefreshing.value = false
                 }
             }
-        }
-    }
-
-    private suspend fun fetchFriendsList(userId: String): List<User> {
-        return try {
-            val friendsSnapshot = db.collection("users").document(userId)
-                .collection("friends")
-                .get()
-                .await()
-
-            friendsSnapshot.documents.mapNotNull { doc ->
-                doc.toObject(User::class.java)
-            }
-        } catch (e: Exception) {
-            Log.e("FirebaseViewModel", "Error fetching friends", e)
-            emptyList()
         }
     }
 
@@ -554,14 +600,9 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
-    fun refreshPhrases() {
-        fetchPhrases()
-    }
-
     fun fetchTrips() {
         auth.currentUser?.let { user ->
             viewModelScope.launch {
-                // Fetch the user's own trips
                 db.collection("users").document(user.uid)
                     .collection("trips")
                     .addSnapshotListener { snapshot, e ->
@@ -573,16 +614,21 @@ class FirebaseViewModel : ViewModel() {
                         _trips.value = tripsList
                     }
 
-                // Fetch trips shared by friends
-                val friends = fetchFriendsList(user.uid)
+                getFriendsOfUser(user.uid)
                 val sharedTrips = mutableListOf<Trip>()
-                friends.forEach { friend ->
+                friends.value.forEach { friend ->
                     db.collection("users").document(friend.userId)
-                        .collection("sharedTrips")
+                        .collection("trips")
                         .get()
                         .addOnSuccessListener { snapshot ->
-                            sharedTrips.addAll(snapshot.toObjects(Trip::class.java))
+                            val trips = snapshot?.toObjects(Trip::class.java) ?: emptyList()
+                            trips.forEach { trip ->
+                                if (trip.shared) {
+                                    sharedTrips.add(trip)
+                                }
+                            }
                             _trips.value += sharedTrips
+                            Log.d("FirebaseViewModel", "All trips: $trips")
                         }
                         .addOnFailureListener { e ->
                             Log.e("FirebaseViewModel", "Error fetching shared trips", e)
@@ -734,7 +780,11 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
-    fun updateTripPlan(tripId: String, updatedTripPlan: TripPlanItem, onComplete: (Boolean) -> Unit) {
+    fun updateTripPlan(
+        tripId: String,
+        updatedTripPlan: TripPlanItem,
+        onComplete: (Boolean) -> Unit
+    ) {
         auth.currentUser?.let { user ->
             val tripRef = db.collection("users").document(user.uid)
                 .collection("trips").document(tripId)

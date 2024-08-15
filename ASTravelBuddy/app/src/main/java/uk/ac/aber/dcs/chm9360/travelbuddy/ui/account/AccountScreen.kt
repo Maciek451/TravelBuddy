@@ -49,8 +49,7 @@ fun AccountScreen(
 ) {
     val appBarTitle = stringResource(id = R.string.account)
     val navigateToFriendsList: () -> Unit = { navController.navigate(Screens.FriendsList.route) }
-    val navigateToPreferences: () -> Unit = { }
-    val navigateToTermsOfService: () -> Unit = { }
+    val navigateToTermsOfService: () -> Unit = { navController.navigate(Screens.TermsOfService.route) }
     val navigateToAbout: () -> Unit = { navController.navigate(Screens.About.route) }
 
     val authState by firebaseViewModel.authState.collectAsState()
@@ -98,7 +97,6 @@ fun AccountScreen(
         SettingsList(
             items = listOf(
                 R.string.your_friends to navigateToFriendsList,
-                R.string.preferences to navigateToPreferences,
             )
         )
         Spacer(modifier = Modifier.height(16.dp))

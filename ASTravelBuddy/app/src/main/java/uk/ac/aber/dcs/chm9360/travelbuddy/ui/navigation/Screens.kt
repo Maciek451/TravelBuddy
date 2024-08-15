@@ -20,6 +20,7 @@ sealed class Screens(
     object AddTripPlanFromExplore : Screens("add_trip_plan_from_explore")
     object Friends : Screens("friends")
     object Account : Screens("account")
+    object TermsOfService : Screens("terms_of_service")
     object About : Screens("about")
     object Notification: Screens("notification")
     object SignIn: Screens("sign_in")

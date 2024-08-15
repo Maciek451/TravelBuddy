@@ -1,7 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -62,7 +60,7 @@ fun FriendsListScreen(
     var friendToRemove by remember { mutableStateOf<User?>(null) }
 
     LaunchedEffect(Unit) {
-        firebaseViewModel.fetchFriends()
+        firebaseViewModel.getFriendsOfUser(firebaseViewModel.authState.value?.uid ?: "")
         Log.d("FriendsListScreen", "Friends fetched: ${friends.map { "${it.username}, ${it.email}" }}")
     }
 
@@ -93,7 +91,9 @@ fun FriendsListScreen(
             showDialog = showConfirmDialog,
             onDismiss = { showConfirmDialog = false },
             onRemoveConfirmed = {
-                // Handle removal here
+                firebaseViewModel.removeFriend(friendToRemove!!) {
+                    showConfirmDialog = false
+                }
             }
         )
     }

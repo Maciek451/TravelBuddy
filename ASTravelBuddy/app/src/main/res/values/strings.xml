@@ -211,4 +211,6 @@
     <string name="status_public">Status: Public</string>
     <string name="status_private">Status: Private</string>
     <string name="trip_shared">Trip set to public</string>
+    <string name="author">Author: %1$s</string>
+    <string name="terms_of_service_text">Coming soon</string>
 </resources>

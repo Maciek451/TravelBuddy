@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 fun TopLevelScaffold(
     navController: NavHostController,
     appBarTitle: String,
+    friendRequestCount: Int = 0,
     pageContent: @Composable (innerPadding: PaddingValues) -> Unit = {}
 ) {
     Scaffold(
@@ -16,6 +17,7 @@ fun TopLevelScaffold(
             MainTopAppBar(
                 navController = navController,
                 appBarTitle = appBarTitle,
+                notificationCount = friendRequestCount
             )
         },
         bottomBar = {

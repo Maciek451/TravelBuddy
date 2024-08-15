@@ -23,6 +23,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.AddTripScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.about.AboutScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.AccountScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.ProfileScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.TermsOfServiceScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SignInScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SignUpScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.ExploreScreen
@@ -109,6 +110,7 @@ class MainActivity : ComponentActivity() {
             composable(Screens.AddTripPlanFromExplore.route) { AddTripPlanFromExploreScreen(navController) }
             composable(Screens.Friends.route) { FriendsScreen(navController) }
             composable(Screens.Account.route) { AccountScreen(navController) }
+            composable(Screens.TermsOfService.route) { TermsOfServiceScreen(navController) }
             composable(Screens.About.route) { AboutScreen(navController) }
             composable(Screens.Notification.route) { NotificationScreen(navController) }
             composable(Screens.SignIn.route) { SignInScreen(navController, firebaseViewModel) }

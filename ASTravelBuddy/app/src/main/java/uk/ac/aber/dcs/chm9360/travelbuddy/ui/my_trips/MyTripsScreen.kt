@@ -56,7 +56,6 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
-import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils.trip
 
 @Composable
 fun MyTripsScreen(
@@ -65,6 +64,7 @@ fun MyTripsScreen(
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
     val appBarTitle = stringResource(id = R.string.my_trips)
+    val friendRequests by firebaseViewModel.friendRequests.collectAsState()
     val trips by firebaseViewModel.trips.collectAsState()
     val imageUrls by retrofitViewModel.imageUrls.collectAsState()
     val imageLoadingStates by retrofitViewModel.imageLoadingStates.collectAsState()
@@ -80,7 +80,8 @@ fun MyTripsScreen(
 
     TopLevelScaffold(
         navController = navController,
-        appBarTitle = appBarTitle
+        appBarTitle = appBarTitle,
+        friendRequestCount = friendRequests.size
     ) { innerPadding ->
         Surface(
             modifier = Modifier
@@ -108,7 +109,8 @@ fun MyTripsScreen(
                             onShareClick = {
                                 selectedTrip = trip
                                 showConfirmDialog = true
-                            }
+                            },
+                            isShareButtonEnabled = true
                         )
                     }
                 }
@@ -143,7 +145,8 @@ fun TripCard(
     imageUrl: String?,
     isLoading: Boolean,
     onItemClick: () -> Unit,
-    onShareClick: () -> Unit
+    onShareClick: () -> Unit,
+    isShareButtonEnabled: Boolean
 ) {
     Card(
         modifier = Modifier
@@ -220,13 +223,22 @@ fun TripCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                IconButton(
-                    onClick = onShareClick,
-                    enabled = !trip.shared
-                ) {
-                    Icon(
-                        imageVector = if (trip.shared) Icons.Filled.Share else Icons.Outlined.Share,
-                        contentDescription = stringResource(id = if (trip.shared) R.string.unshare else R.string.share)
+                if (isShareButtonEnabled) {
+                    IconButton(
+                        onClick = onShareClick,
+                    ) {
+                        Icon(
+                            imageVector = if (trip.shared) Icons.Filled.Share else Icons.Outlined.Share,
+                            contentDescription = stringResource(id = if (trip.shared) R.string.unshare else R.string.share)
+                        )
+                    }
+                } else {
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.author, trip.author),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.align(Alignment.CenterVertically)
                     )
                 }
             }

@@ -57,6 +57,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import org.osmdroid.util.GeoPoint
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
@@ -68,6 +69,7 @@ import java.util.Locale
 @Composable
 fun ExploreScreen(
     navController: NavHostController,
+    firebaseViewModel: FirebaseViewModel = viewModel(),
     retrofitViewModel: RetrofitViewModel = viewModel()
 ) {
     val appBarTitle = stringResource(R.string.explore)
@@ -88,6 +90,7 @@ fun ExploreScreen(
     val (cityFocusRequester, categoryFocusRequester) = remember { FocusRequester.createRefs() }
     var cityHasFocus by rememberSaveable { mutableStateOf(false) }
     var categoryHasFocus by rememberSaveable { mutableStateOf(false) }
+    val friendRequests by firebaseViewModel.friendRequests.collectAsState()
 
     val filteredCategories = categoryList
         .filter { it.second.contains(categoryText, ignoreCase = true) }
@@ -126,7 +129,8 @@ fun ExploreScreen(
 
     TopLevelScaffold(
         navController = navController,
-        appBarTitle = appBarTitle
+        appBarTitle = appBarTitle,
+        friendRequestCount = friendRequests.size
     ) { innerPadding ->
         Surface(
             modifier = Modifier
