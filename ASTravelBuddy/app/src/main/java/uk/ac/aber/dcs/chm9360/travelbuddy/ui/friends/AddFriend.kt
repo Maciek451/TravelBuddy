@@ -93,12 +93,21 @@ fun AddFriendScreen(
             isSaveButtonEnabled = isSaveButtonEnabled,
             onSave = {
                 selectedUser?.let { user ->
-                    firebaseViewModel.sendFriendRequest(user.userId) { success ->
-                        if (success) {
-                            Toast.makeText(context, R.string.friend_request_sent, Toast.LENGTH_SHORT).show()
-                            navController.navigate(Screens.Friends.route) { popUpTo(0) }
-                        } else {
-                            Toast.makeText(context, R.string.failed_to_send_request, Toast.LENGTH_SHORT).show()
+                    firebaseViewModel.sendFriendRequest(user.userId) { success, reason ->
+                        when {
+                            success -> {
+                                Toast.makeText(context, R.string.friend_request_sent, Toast.LENGTH_SHORT).show()
+                                navController.navigate(Screens.Friends.route) { popUpTo(0) }
+                            }
+                            reason == "already_friends" -> {
+                                Toast.makeText(context, R.string.already_friends, Toast.LENGTH_SHORT).show()
+                            }
+                            reason == "already_sent" -> {
+                                Toast.makeText(context, R.string.already_sent_request, Toast.LENGTH_SHORT).show()
+                            }
+                            else -> {
+                                Toast.makeText(context, R.string.failed_to_send_request, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }

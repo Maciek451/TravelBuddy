@@ -213,4 +213,6 @@
     <string name="trip_shared">Trip set to public</string>
     <string name="author">Author: %1$s</string>
     <string name="terms_of_service_text">Coming soon</string>
+    <string name="already_friends">This user is already your friend</string>
+    <string name="already_sent_request">Friend request already sent</string>
 </resources>

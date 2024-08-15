@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.User
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
@@ -58,6 +60,18 @@ fun TripDetailsScreen(
     var showConfirmStateDialog by remember { mutableStateOf(false) }
     var checklist by remember { mutableStateOf(trip?.checklist ?: emptyList()) }
     var tripPlans by remember { mutableStateOf(trip?.tripPlans ?: emptyList()) }
+    val authState = firebaseViewModel.authState.collectAsState().value
+    var currentUser by remember { mutableStateOf<User?>(null) }
+    var isUserAuthor by remember { mutableStateOf(false) }
+
+    LaunchedEffect(authState?.uid) {
+        authState?.uid?.let { userId ->
+            firebaseViewModel.getUserData(userId) { user ->
+                currentUser = user
+                isUserAuthor = (user?.username == trip?.author)
+            }
+        }
+    }
 
     LaunchedEffect(trip?.id) {
         trip?.id?.let { tripId ->
@@ -85,7 +99,8 @@ fun TripDetailsScreen(
             AppBarWithArrowBack(
                 navController = navController,
                 appBarTitle = appBarTitle,
-                tripMenu = true,
+                tripMenu = isUserAuthor,
+                showMoreIcon = isUserAuthor,
                 onRemoveTrip = { showConfirmDialog = true }
             )
 
@@ -284,27 +299,29 @@ fun TripDetailsScreen(
                 }
                 Spacer(modifier = Modifier.weight(1f))
 
-                Text(
-                    text = if (trip.shared) stringResource(R.string.status_public) else stringResource(R.string.status_private),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp)
-                )
-
-                Button(
-                    onClick = { showConfirmStateDialog = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    enabled = trip.shared,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                if ((currentUser?.username == trip.author)) {
+                    Text(
+                        text = if (trip.shared) stringResource(R.string.status_public) else stringResource(R.string.status_private),
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 16.dp)
                     )
-                ) {
-                    Text(text = stringResource(R.string.set_not_shared))
+
+                    Button(
+                        onClick = { showConfirmStateDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        enabled = trip.shared,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                        )
+                    ) {
+                        Text(text = stringResource(R.string.set_not_shared))
+                    }
                 }
             }
         }

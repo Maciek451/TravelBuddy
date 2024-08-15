@@ -110,6 +110,17 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
+    fun getUserData(userId: String, onSuccess: (User?) -> Unit) {
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                val user = document.toObject(User::class.java)
+                onSuccess(user)
+            }
+            .addOnFailureListener {
+                onSuccess(null)
+            }
+    }
+
     fun signUpWithEmailAndPassword(
         email: String,
         password: String,
@@ -387,10 +398,38 @@ class FirebaseViewModel : ViewModel() {
             }
     }
 
-    fun sendFriendRequest(receiverId: String, onResult: (Boolean) -> Unit) {
+    fun sendFriendRequest(receiverId: String, onResult: (Boolean, String?) -> Unit) {
         auth.currentUser?.let { user ->
-            db.collection("users").document(user.uid).get()
-                .addOnSuccessListener { userDoc ->
+            viewModelScope.launch {
+                try {
+                    val friendsListRef = db.collection("friends").document("friends_list").get().await()
+                    val friendRelations = friendsListRef.get("list_of_friends") as? List<Map<String, Any>>
+
+                    val alreadyFriends = friendRelations?.any { map ->
+                        val userMap = map["user"] as? Map<String, Any>
+                        val friendMap = map["friend"] as? Map<String, Any>
+
+                        (userMap?.get("userId") == user.uid && friendMap?.get("userId") == receiverId) ||
+                                (userMap?.get("userId") == receiverId && friendMap?.get("userId") == user.uid)
+                    } ?: false
+
+                    if (alreadyFriends) {
+                        onResult(false, "already_friends")
+                        return@launch
+                    }
+
+                    val existingRequest = db.collection("friendRequests")
+                        .whereEqualTo("senderId", user.uid)
+                        .whereEqualTo("receiverId", receiverId)
+                        .get()
+                        .await()
+
+                    if (!existingRequest.isEmpty) {
+                        onResult(false, "already_sent")
+                        return@launch
+                    }
+
+                    val userDoc = db.collection("users").document(user.uid).get().await()
                     val senderEmail = userDoc.getString("email") ?: ""
                     val senderUsername = userDoc.getString("username") ?: ""
 
@@ -402,11 +441,14 @@ class FirebaseViewModel : ViewModel() {
                     )
 
                     db.collection("friendRequests").add(friendRequest)
-                        .addOnSuccessListener { onResult(true) }
-                        .addOnFailureListener { onResult(false) }
+                        .addOnSuccessListener { onResult(true, null) }
+                        .addOnFailureListener { onResult(false, "error_sending_request") }
+                } catch (e: Exception) {
+                    Log.e("FirebaseViewModel", "Error sending friend request", e)
+                    onResult(false, "exception_occurred")
                 }
-                .addOnFailureListener { onResult(false) }
-        } ?: onResult(false)
+            }
+        } ?: onResult(false, "not_logged_in")
     }
 
     fun removeFriend(friend: User, onComplete: (Boolean) -> Unit) {

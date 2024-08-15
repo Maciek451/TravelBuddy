@@ -1,10 +1,12 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.account
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -25,10 +27,16 @@ fun TermsOfServiceScreen(
             showMoreIcon = false,
             )
 
-        Text(
-            textAlign = TextAlign.Center,
-            text = stringResource(id = R.string.terms_of_service_text),
-            style = MaterialTheme.typography.headlineMedium,
-        )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                textAlign = TextAlign.Center,
+                text = stringResource(id = R.string.terms_of_service_text),
+                style = MaterialTheme.typography.headlineMedium,
+            )
+        }
     }
 }
