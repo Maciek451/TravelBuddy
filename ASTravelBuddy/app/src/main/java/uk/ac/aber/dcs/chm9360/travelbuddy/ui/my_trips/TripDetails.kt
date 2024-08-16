@@ -230,36 +230,38 @@ fun TripDetailsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                        .clickable {
-                            Utils.trip = trip
-                            navController.navigate(Screens.Checklist.route)
-                        },
-                    elevation = CardDefaults.cardElevation(4.dp),
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = stringResource(id = R.string.checklist_colon),
-                            style = MaterialTheme.typography.headlineSmall,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        if (uncheckedItemsPreview.isNotEmpty()) {
-                            uncheckedItemsPreview.forEachIndexed { index, item ->
+                if ((currentUser?.username == trip.author)) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                            .clickable {
+                                Utils.trip = trip
+                                navController.navigate(Screens.Checklist.route)
+                            },
+                        elevation = CardDefaults.cardElevation(4.dp),
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = stringResource(id = R.string.checklist_colon),
+                                style = MaterialTheme.typography.headlineSmall,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            if (uncheckedItemsPreview.isNotEmpty()) {
+                                uncheckedItemsPreview.forEachIndexed { index, item ->
+                                    Text(
+                                        text = "${index + 1}. ${item.task}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(vertical = 2.dp)
+                                    )
+                                }
+                            } else {
                                 Text(
-                                    text = "${index + 1}. ${item.task}",
+                                    text = stringResource(id = R.string.list_empty),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(vertical = 2.dp)
+                                    color = Color.Gray
                                 )
                             }
-                        } else {
-                            Text(
-                                text = stringResource(id = R.string.list_empty),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.Gray
-                            )
                         }
                     }
                 }

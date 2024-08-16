@@ -629,17 +629,57 @@ class FirebaseViewModel : ViewModel() {
                 try {
                     val username = db.collection("users").document(user.uid).get().await()
                         .getString("username") ?: "Unknown User"
-                    val phraseWithUsername = phrase.copy(username = username)
-                    db.collection("users").document(user.uid)
-                        .collection("phrases")
-                        .add(phraseWithUsername)
-                        .await()
+                    val phraseRef = db.collection("users").document(user.uid)
+                        .collection("phrases").document()
+                    val phraseWithIdAndUsername = phrase.copy(id = phraseRef.id, username = username)
+                    phraseRef.set(phraseWithIdAndUsername).await()
                     fetchPhrases()
                 } catch (e: Exception) {
                     Log.e("FirebaseViewModel", "Error adding phrase", e)
                 }
             }
         }
+    }
+
+    fun updatePhrase(updatedPhrase: Phrase, onSuccess: () -> Unit = {}) {
+        auth.currentUser?.let { user ->
+            viewModelScope.launch {
+                try {
+                    val phraseRef = db.collection("users").document(user.uid)
+                        .collection("phrases").document(updatedPhrase.id) // Make sure `updatedPhrase` has an `id` property
+
+                    val updates = mapOf(
+                        "language" to updatedPhrase.language,
+                        "phrase" to updatedPhrase.phrase,
+                        "translation" to updatedPhrase.translation,
+                        "username" to updatedPhrase.username
+                    )
+
+                    phraseRef.update(updates)
+                        .addOnSuccessListener {
+                            fetchPhrases()
+                            onSuccess()
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("FirebaseViewModel", "Error updating phrase", exception)
+                        }
+                } catch (e: Exception) {
+                    Log.e("FirebaseViewModel", "Error updating phrase", e)
+                }
+            }
+        }
+    }
+
+    fun removePhrase(phrase: Phrase, onComplete: (Boolean) -> Unit) {
+        auth.currentUser?.let { user ->
+            viewModelScope.launch {
+                db.collection("users").document(user.uid)
+                    .collection("phrases").document(phrase.id) // Make sure `phrase` has an `id` property
+                    .delete()
+                    .addOnSuccessListener { onComplete(true) }
+                    .addOnFailureListener { onComplete(false) }
+            }
+        } ?: onComplete(false)
     }
 
     fun fetchTrips() {

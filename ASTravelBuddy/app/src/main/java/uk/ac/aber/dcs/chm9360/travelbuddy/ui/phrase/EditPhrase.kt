@@ -21,29 +21,33 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
-import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
-import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 
 @Composable
-fun AddPhraseScreen(
+fun EditPhraseScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel()
 ) {
-    val title = stringResource(id = R.string.add_a_phrase)
-    val nextDestination = Screens.Friends.route
-
-    var language by rememberSaveable { mutableStateOf("") }
-    var phrase by rememberSaveable { mutableStateOf("") }
-    var translation by rememberSaveable { mutableStateOf("") }
-
+    val phrase = Utils.phrase
     val context = LocalContext.current
 
-    val isSaveButtonEnabled by rememberSaveable(language, phrase, translation) {
+    if (phrase == null) {
+        Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT).show()
+        navController.popBackStack()
+        return
+    }
+
+    val title = stringResource(id = R.string.edit_phrase)
+    var language by rememberSaveable { mutableStateOf(phrase.language) }
+    var phraseText by rememberSaveable { mutableStateOf(phrase.phrase) }
+    var translation by rememberSaveable { mutableStateOf(phrase.translation) }
+
+    val isSaveButtonEnabled by rememberSaveable(language, phraseText, translation) {
         mutableStateOf(
             language.isNotBlank() &&
-                    phrase.isNotBlank() &&
+                    phraseText.isNotBlank() &&
                     translation.isNotBlank()
         )
     }
@@ -52,20 +56,21 @@ fun AddPhraseScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         AppBarWithArrowBack(
-            navController,
+            navController = navController,
             appBarTitle = title,
             showSaveButton = true,
             showMoreIcon = false,
             isSaveButtonEnabled = isSaveButtonEnabled,
             onSave = {
-                val newPhrase = Phrase(
+                val updatedPhrase = phrase.copy(
                     language = language,
-                    phrase = phrase,
+                    phrase = phraseText,
                     translation = translation
                 )
-                firebaseViewModel.addPhrase(newPhrase)
-                Toast.makeText(context, R.string.phrase_saved, Toast.LENGTH_SHORT).show()
-                navController.navigate(nextDestination) { popUpTo(0) }
+                firebaseViewModel.updatePhrase(updatedPhrase) {
+                    Toast.makeText(context, R.string.phrase_updated, Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
+                }
             }
         )
 
@@ -83,8 +88,8 @@ fun AddPhraseScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = phrase,
-            onValueChange = { phrase = it },
+            value = phraseText,
+            onValueChange = { phraseText = it },
             label = { Text(stringResource(R.string.phrase)) },
             modifier = Modifier
                 .fillMaxWidth()

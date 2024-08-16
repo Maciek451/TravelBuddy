@@ -46,6 +46,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripPlanScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.notifications.NotificationScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.phrase.AddPhraseScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.phrase.EditPhraseScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.theme.TravelBuddyTheme
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.LocaleManager
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.getLanguagePreference
@@ -117,6 +118,7 @@ class MainActivity : ComponentActivity() {
             composable(Screens.SignUp.route) { SignUpScreen(navController, firebaseViewModel) }
             composable(Screens.AddTrip.route) { AddTripScreen(navController) }
             composable(Screens.AddPhrase.route) { AddPhraseScreen(navController) }
+            composable(Screens.EditPhrase.route) { EditPhraseScreen(navController) }
             composable(Screens.AddFriend.route) { AddFriendScreen(navController) }
             composable(Screens.FriendsList.route) { FriendsListScreen(navController) }
             composable(Screens.Profile.route) { ProfileScreen(navController) }

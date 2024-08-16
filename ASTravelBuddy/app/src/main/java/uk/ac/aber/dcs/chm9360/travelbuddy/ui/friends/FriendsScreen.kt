@@ -19,10 +19,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NoLuggage
 import androidx.compose.material.icons.filled.SpeakerNotesOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +38,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -54,12 +59,16 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.User
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.ConfirmTripRemovalDialog
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripCard
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.phrase.ConfirmPhraseRemovalDialog
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
+import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils.phrase
 
 @Composable
 fun FriendsScreen(
@@ -77,6 +86,17 @@ fun FriendsScreen(
     val imageUrls by retrofitViewModel.imageUrls.collectAsState()
     val imageLoadingStates by retrofitViewModel.imageLoadingStates.collectAsState()
     val friendRequests by firebaseViewModel.friendRequests.collectAsState()
+    var showConfirmRemovalDialog by remember { mutableStateOf(false) }
+    val authState = firebaseViewModel.authState.collectAsState().value
+    var currentUser by remember { mutableStateOf<User?>(null) }
+
+    LaunchedEffect(authState?.uid) {
+        authState?.uid?.let { userId ->
+            firebaseViewModel.getUserData(userId) { user ->
+                currentUser = user
+            }
+        }
+    }
 
     LaunchedEffect(phrases) {
         firebaseViewModel.fetchPhrases()
@@ -164,7 +184,19 @@ fun FriendsScreen(
                             if (phrases.isNotEmpty()) {
                                 LazyColumn {
                                     items(phrases) { phrase ->
-                                        PhraseCard(phrase)
+                                        val isUserAuthor = currentUser?.username == phrase.username
+                                        PhraseCard(
+                                            phrase = phrase,
+                                            onEditClick = {
+                                                Utils.phrase = phrase
+                                                navController.navigate(Screens.EditPhrase.route)
+                                            },
+                                            onRemoveClick = {
+                                                Utils.phrase = phrase
+                                                showConfirmRemovalDialog = true
+                                            },
+                                            isMoreIconEnabled = isUserAuthor
+                                        )
                                     }
                                 }
                             } else {
@@ -176,10 +208,33 @@ fun FriendsScreen(
             }
         }
     }
+    if (showConfirmRemovalDialog) {
+        ConfirmPhraseRemovalDialog(
+            showDialog = showConfirmRemovalDialog,
+            onDismiss = { showConfirmRemovalDialog = false },
+            onRemoveConfirmed = {
+                phrase?.let { phraseToRemove ->
+                    firebaseViewModel.removePhrase(phraseToRemove) { isSuccess ->
+                        if (isSuccess) {
+                            showConfirmRemovalDialog = false
+                        }
+                    }
+                }
+                firebaseViewModel.fetchPhrases()
+            }
+        )
+    }
 }
 
 @Composable
-fun PhraseCard(phrase: Phrase) {
+fun PhraseCard(
+    phrase: Phrase,
+    onEditClick: () -> Unit,
+    onRemoveClick: () -> Unit,
+    isMoreIconEnabled: Boolean
+) {
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -190,7 +245,8 @@ fun PhraseCard(phrase: Phrase) {
             modifier = Modifier.padding(16.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Box(
                     modifier = Modifier
@@ -210,32 +266,62 @@ fun PhraseCard(phrase: Phrase) {
                     text = phrase.username,
                     style = MaterialTheme.typography.bodyLarge
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                if (isMoreIconEnabled) {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = stringResource(id = R.string.more_icon)
+                        )
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(id = R.string.edit_phrase)) },
+                                onClick = {
+                                    expanded = false
+                                    onEditClick()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(id = R.string.remove_phrase)) },
+                                onClick = {
+                                    expanded = false
+                                    onRemoveClick()
+                                }
+                            )
+                        }
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(20.dp))
             Text(
                 text = phrase.language,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.titleMedium
             )
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             Text(
                 text = "\"${phrase.phrase}\"",
                 fontSize = 20.sp,
             )
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             Text(
+                modifier = Modifier.padding(bottom = 15.dp),
                 text = "(${phrase.translation})",
                 fontSize = 20.sp,
             )
-            Spacer(modifier = Modifier.height(20.dp))
-            IconButton(onClick = { }) {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = stringResource(R.string.like)
-                )
-            }
         }
     }
 }
+
+//            Spacer(modifier = Modifier.height(20.dp))
+//            IconButton(onClick = { }) {
+//                Icon(
+//                    imageVector = Icons.Default.FavoriteBorder,
+//                    contentDescription = stringResource(R.string.like)
+//                )
+//            }
 
 @Composable
 fun EmptyTripsScreen(firebaseViewModel: FirebaseViewModel = viewModel()) {

@@ -27,6 +27,7 @@ sealed class Screens(
     object SignUp: Screens("sign_up")
     object AddTrip: Screens("add_trip")
     object AddPhrase: Screens("add_phrase")
+    object EditPhrase: Screens("edit_phrase")
     object AddFriend: Screens("add_friend")
     object FriendsList: Screens("list_of_friends")
     object Profile: Screens("profile")

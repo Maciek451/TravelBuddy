@@ -211,4 +211,12 @@
     <string name="status_public">Status: Publiczny</string>
     <string name="status_private">Status: Prywatny</string>
     <string name="trip_shared">Wycieczka ustawiona na publiczną</string>
+    <string name="author">Autor: %1$s</string>
+    <string name="terms_of_service_text">Wkrótce dostępne</string>
+    <string name="already_friends">Ten użytkownik jest już Twoim znajomym</string>
+    <string name="already_sent_request">Prośba o dodanie do znajomych została już wysłana</string>
+    <string name="edit_phrase">Edytuj frazę</string>
+    <string name="remove_phrase">Usuń frazę</string>
+    <string name="confirm_remove_phrase">Kliknij potwierdź, aby usunąć frazę</string>
+    <string name="phrase_updated">Zaktualizowano frazę</string>
 </resources>

@@ -52,6 +52,7 @@ import coil.compose.rememberAsyncImagePainter
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.User
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
@@ -72,8 +73,21 @@ fun MyTripsScreen(
     var selectedTrip by remember { mutableStateOf<Trip?>(null) }
     val context = LocalContext.current
 
-    LaunchedEffect(trips) {
-        trips.forEach { trip ->
+    val authState = firebaseViewModel.authState.collectAsState().value
+    var currentUser by remember { mutableStateOf<User?>(null) }
+
+    LaunchedEffect(authState?.uid) {
+        authState?.uid?.let { userId ->
+            firebaseViewModel.getUserData(userId) { user ->
+                currentUser = user
+            }
+        }
+    }
+
+    val userTrips = trips.filter { it.author == currentUser?.username }
+
+    LaunchedEffect(userTrips) {
+        userTrips.forEach { trip ->
             retrofitViewModel.fetchImage(trip.destination)
         }
     }
@@ -88,13 +102,13 @@ fun MyTripsScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            if (trips.isNotEmpty()) {
+            if (userTrips.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier
                         .padding(start = 8.dp, end = 8.dp)
                         .fillMaxSize()
                 ) {
-                    items(trips) { trip ->
+                    items(userTrips) { trip ->
                         val imageUrl = imageUrls[trip.destination]
                         val isLoading = imageLoadingStates[trip.destination] ?: false
 
@@ -119,9 +133,11 @@ fun MyTripsScreen(
             }
         }
     }
+
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchTrips()
     }
+
     if (showConfirmDialog) {
         ConfirmTripStateDialog(
             showDialog = showConfirmDialog,

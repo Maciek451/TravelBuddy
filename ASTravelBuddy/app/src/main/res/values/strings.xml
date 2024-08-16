@@ -215,4 +215,8 @@
     <string name="terms_of_service_text">Coming soon</string>
     <string name="already_friends">This user is already your friend</string>
     <string name="already_sent_request">Friend request already sent</string>
+    <string name="edit_phrase">Edit phrase</string>
+    <string name="remove_phrase">Remove phrase</string>
+    <string name="confirm_remove_phrase">Click confirm to remove phrase</string>
+    <string name="phrase_updated">Phrase updated</string>
 </resources>

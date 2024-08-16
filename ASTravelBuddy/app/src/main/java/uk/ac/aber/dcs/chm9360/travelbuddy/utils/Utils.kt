@@ -24,6 +24,7 @@ import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.Phrase
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.Trip
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.TripPlanItem
 import java.time.LocalDate
@@ -32,6 +33,7 @@ import java.util.Locale
 
 object Utils {
     var trip: Trip? = null
+    var phrase: Phrase? = null
     var tripPlanItem: TripPlanItem? = null
     var placeDetails: Feature? = null
     var featureList: List<Feature>? = null

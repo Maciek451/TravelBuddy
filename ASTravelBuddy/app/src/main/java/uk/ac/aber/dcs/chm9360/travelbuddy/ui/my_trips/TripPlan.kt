@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import uk.ac.aber.dcs.chm9360.travelbuddy.R
 import uk.ac.aber.dcs.chm9360.travelbuddy.model.TripPlanItem
+import uk.ac.aber.dcs.chm9360.travelbuddy.model.User
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.AppBarWithArrowBack
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
@@ -53,11 +56,23 @@ fun TripPlanScreen(
     val trip = Utils.trip
     val appBarTitle = stringResource(id = R.string.trip_plan)
     var tripPlans by remember { mutableStateOf(trip?.tripPlans ?: emptyList()) }
+    val authState = firebaseViewModel.authState.collectAsState().value
+    var currentUser by remember { mutableStateOf<User?>(null) }
+    var isUserAuthor by remember { mutableStateOf(false) }
 
     fun fetchTripPlans(tripId: String) {
         firebaseViewModel.fetchTripPlans(tripId) { fetchedTripPlans ->
             tripPlans = fetchedTripPlans
             Utils.trip = trip?.copy(tripPlans = fetchedTripPlans)
+        }
+    }
+
+    LaunchedEffect(authState?.uid) {
+        authState?.uid?.let { userId ->
+            firebaseViewModel.getUserData(userId) { user ->
+                currentUser = user
+                isUserAuthor = (user?.username == trip?.author)
+            }
         }
     }
 
@@ -81,8 +96,8 @@ fun TripPlanScreen(
         AppBarWithArrowBack(
             navController = navController,
             appBarTitle = appBarTitle,
-            showSaveButton = true,
-            showMoreIcon = false,
+            showSaveButton = isUserAuthor,
+            showMoreIcon = isUserAuthor,
             isSaveButtonEnabled = false
         )
 
@@ -100,29 +115,34 @@ fun TripPlanScreen(
                         navController.navigate(Screens.TripPlanDetails.route)
                     }
                 )
+                Log.d("TripPlanScreen", "Trip plans: $tripPlans")
             }
             item {
-                TextButton(
-                    onClick = {
-                        Utils.trip = trip
-                        navController.navigate(Screens.AddTripPlan.route)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 8.dp),
-                            fontSize = 18.sp,
-                            text = stringResource(id = R.string.list_item_button),
-                        )
+                if (trip != null) {
+                    if ((currentUser?.username == trip.author)) {
+                        TextButton(
+                            onClick = {
+                                Utils.trip = trip
+                                navController.navigate(Screens.AddTripPlan.route)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null
+                                )
+                                Text(
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    fontSize = 18.sp,
+                                    text = stringResource(id = R.string.list_item_button),
+                                )
+                            }
+                        }
                     }
                 }
             }
