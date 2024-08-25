@@ -1,5 +1,8 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,10 +11,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -53,6 +63,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.utils.getLanguagePreference
 
 class MainActivity : ComponentActivity() {
     private val firebaseViewModel: FirebaseViewModel by viewModels()
+    private var showNetworkDialog by mutableStateOf(false)
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +75,10 @@ class MainActivity : ComponentActivity() {
             prefsFlow.collect { language ->
                 LocaleManager.setLocale(context, if (language == 0) "en" else "pl")
             }
+        }
+
+        if (!isNetworkAvailable(context)) {
+            showNetworkDialog = true
         }
 
         enableEdgeToEdge()
@@ -80,6 +95,19 @@ class MainActivity : ComponentActivity() {
                         Screens.SignIn.route
                     }
                     BuildNavigationGraph(navController, startDestination)
+
+                    if (showNetworkDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showNetworkDialog = false },
+                            title = { Text(stringResource(R.string.no_internet_connection)) },
+                            text = { Text(stringResource(R.string.no_internet_connection_message)) },
+                            confirmButton = {
+                                Button(onClick = { showNetworkDialog = false }) {
+                                    Text(stringResource(R.string.ok))
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -124,4 +152,11 @@ class MainActivity : ComponentActivity() {
             composable(Screens.Profile.route) { ProfileScreen(navController) }
         }
     }
+}
+
+fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 }

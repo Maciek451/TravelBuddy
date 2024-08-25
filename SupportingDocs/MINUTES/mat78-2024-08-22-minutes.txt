@@ -1,0 +1,30 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: MS Teams, Thursday, 22nd August 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Thursday, 22nd August 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. System notification of trip reminder before the trip.
+ACTION: mat78
+Status: Ongoing
+
+2. Work on the dissertation. 
+ACTION: mat78
+Status: Ongoing
+
+New business 
+============
+1. System notification of trip reminder before the trip.
+ACTION: mat78
+
+2. Work on the dissertation. 
+ACTION: mat78
+
+AOB
+=== 
+NONE

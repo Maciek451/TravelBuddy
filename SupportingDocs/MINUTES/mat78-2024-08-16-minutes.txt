@@ -1,0 +1,62 @@
+Project: MSc Project
+Meeting: Weekly Project Meeting 
+People present: Maciej Traczyk [mat78] and Yasir Saleem [yss1] 
+Place and date of meeting: MS Teams, Friday, 16th August 2024 
+Circulation list: mat78 and yss1
+Author: Yasir Saleem [yss1] 
+Date of minutes: Friday, 16th August 2024
+Version: 1.0
+
+Matters arising 
+===============
+1. Continue implementing "Explore" feature.
+On clicking a places, show the details of the place.
+Adding a place to existing trip(s).
+ACTION: mat78
+Status: Done
+
+2. In explore screen, arrange categories in alphabetical order. 
+ACTION: mat78
+Status: Done
+
+3. Move Map to Explore as a tab.
+ACTION: mat78
+Status: Done
+Created a new button of "Map Search".
+"Map search" button changes to "Map view" button after search results are shown. 
+
+4. Continue working on firestore functionality for trips features.
+ACTION: mat78
+Status: Done
+
+5. Implement friend approval process for adding friend. 
+ACTION: mat78
+Status: Done
+
+6. System notification of trip reminder before the trip.
+ACTION: mat78
+Status: Ongoing
+Notifications appear when the app is running but not when the app is force closed. 
+
+7. Share the trip with friends.
+ACTION: mat78
+Status: Done
+
+Other work
+==========
+8. Polish version of version.
+ACTION: mat78
+Status: Done
+The app works in Polish language but when the app is forced closed and restarted, then it loads English language. 
+
+New business 
+============
+1. System notification of trip reminder before the trip.
+ACTION: mat78
+
+2. Work on the dissertation. 
+ACTION: mat78
+
+AOB
+=== 
+NONE
