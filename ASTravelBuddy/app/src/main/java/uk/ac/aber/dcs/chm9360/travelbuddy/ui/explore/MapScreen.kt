@@ -103,11 +103,22 @@ fun MapScreen(
         }
 
         val geocoder = Geocoder(context, Locale.getDefault())
-        val address = geocoder.getFromLocationName(query, 1)?.firstOrNull()
+        val addresses = geocoder.getFromLocationName(query, 5)
 
-        if (address != null) {
+        val newMarkers = mutableListOf<GeoPoint>()
+        val newTitles = mutableMapOf<GeoPoint, String>()
+
+        addresses?.forEach { address ->
             val location = GeoPoint(address.latitude, address.longitude)
-            mapViewModel.updateMapCenter(location)
+            newMarkers.add(location)
+            newTitles[location] = query
+        }
+
+        if (newMarkers.isNotEmpty()) {
+            mapViewModel.updateMapCenter(newMarkers.first())
+            mapViewModel.updateMapZoom(16.0)
+            mapViewModel.updateMarkers(newMarkers)
+            mapViewModel.updateMarkerTitles(newTitles)
         } else {
             dialogTitle.value = context.getString(R.string.no_results_title)
             dialogMessage.value = context.getString(R.string.search_no_results)
@@ -271,6 +282,7 @@ fun MapViewComposable(
     val mapZoom by mapViewModel.mapZoom.collectAsState()
     val currentLocation by mapViewModel.currentLocation.collectAsState()
     val markers by mapViewModel.markers.collectAsState()
+    val markerTitles by mapViewModel.markerTitles.collectAsState()
     val myLocationString = stringResource(id = R.string.my_location)
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
@@ -345,20 +357,23 @@ fun MapViewComposable(
             currentMapView.controller.setCenter(mapCenter)
             currentMapView.controller.setZoom(mapZoom)
 
+            currentMapView.overlays.clear()
+
             val currentLocationMarker = Marker(currentMapView).apply {
                 currentLocation?.let { location ->
                     position = location
                     title = myLocationString
                 }
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = ContextCompat.getDrawable(context, R.drawable.ic_location_marker)
+                icon = ContextCompat.getDrawable(context, R.drawable.red_marker)
             }
             currentMapView.overlays.add(currentLocationMarker)
 
             markers.forEach { geoPoint ->
                 val marker = Marker(currentMapView).apply {
                     position = geoPoint
-                    icon = ContextCompat.getDrawable(context, R.drawable.ic_marker)
+                    icon = ContextCompat.getDrawable(context, R.drawable.blue_marker)
+                    title = markerTitles[geoPoint]
                 }
                 currentMapView.overlays.add(marker)
             }
@@ -390,6 +405,9 @@ class MapViewModel : ViewModel() {
     private val _markers = MutableStateFlow<List<GeoPoint>>(emptyList())
     val markers: StateFlow<List<GeoPoint>> = _markers
 
+    private val _markerTitles = MutableStateFlow<Map<GeoPoint, String>>(emptyMap())
+    val markerTitles: StateFlow<Map<GeoPoint, String>> = _markerTitles
+
     fun updateMapCenter(newCenter: GeoPoint) {
         _mapCenter.value = newCenter
     }
@@ -400,5 +418,13 @@ class MapViewModel : ViewModel() {
 
     fun updateCurrentLocation(location: GeoPoint) {
         _currentLocation.value = location
+    }
+
+    fun updateMarkers(newMarkers: List<GeoPoint>) {
+        _markers.value = newMarkers
+    }
+
+    fun updateMarkerTitles(newTitles: Map<GeoPoint, String>) {
+        _markerTitles.value = newTitles
     }
 }

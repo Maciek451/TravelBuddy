@@ -5,12 +5,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -20,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -92,7 +96,7 @@ fun SignInScreen(
                 .padding(top = 25.dp),
             fontSize = 30.sp
         )
-        OutlinedTextField(
+        TextField(
             value = email,
             label = {
                 Text(text = stringResource(id = R.string.email_address))
@@ -107,8 +111,10 @@ fun SignInScreen(
             isError = errorMessage.isNotEmpty()
         )
 
+        Spacer(modifier = Modifier.padding(4.dp))
+
         var passwordVisible by rememberSaveable { mutableStateOf(false) }
-        OutlinedTextField(
+        TextField(
             value = password,
             label = {
                 Text(text = stringResource(id = R.string.password))
@@ -146,7 +152,7 @@ fun SignInScreen(
                     when (errorCode) {
                         AuthenticationState.LOGGED_IN_SUCCESSFULLY -> {
                             Toast.makeText(context, R.string.login_success, Toast.LENGTH_SHORT).show()
-                            navController.navigate(Screens.MyTrips.route)
+                            navController.navigate(Screens.MyTrips.route) { popUpTo(0) }
                         }
                         AuthenticationState.USER_IS_NOT_VERIFIED -> {
                             showVerificationDialog = true
@@ -175,7 +181,17 @@ fun SignInScreen(
                 .padding(top = 10.dp),
             enabled = email.isNotEmpty() && password.isNotEmpty()
         ) {
-            Text(text = stringResource(id = R.string.sign_in_button))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Login,
+                    contentDescription = stringResource(id = R.string.login_icon)
+                )
+                Spacer(modifier = Modifier.padding(4.dp))
+                Text(text = stringResource(id = R.string.sign_in_button))
+            }
         }
 
         Row(

@@ -98,6 +98,10 @@ dependencies {
     //Retrofit
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
+
+    //Coroutines
     implementation (libs.kotlinx.coroutines.android)
+
+    //Coil
     implementation (libs.coil.compose)
 }

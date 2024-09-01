@@ -1,7 +1,10 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,6 +12,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -17,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -71,7 +77,7 @@ fun SignUpScreen(
             modifier = Modifier.padding(bottom = 25.dp, top = 120.dp),
             fontSize = 30.sp
         )
-        OutlinedTextField(
+        TextField(
             value = email,
             label = {
                 Text(stringResource(id = R.string.email_address))
@@ -85,7 +91,10 @@ fun SignUpScreen(
                 .padding(top = 25.dp, start = 8.dp, end = 8.dp),
             isError = errorMessage.isNotEmpty()
         )
-        OutlinedTextField(
+
+        Spacer(modifier = Modifier.padding(4.dp))
+
+        TextField(
             value = username,
             label = {
                 Text(text = stringResource(id = R.string.username))
@@ -101,9 +110,11 @@ fun SignUpScreen(
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
         )
 
+        Spacer(modifier = Modifier.padding(4.dp))
+
         var passwordVisible by rememberSaveable { mutableStateOf(false) }
         var passwordConfirmationVisible by rememberSaveable { mutableStateOf(false) }
-        OutlinedTextField(
+        TextField(
             value = password,
             label = {
                 Text(text = stringResource(id = R.string.password))
@@ -130,7 +141,10 @@ fun SignUpScreen(
                 }
             }
         )
-        OutlinedTextField(
+
+        Spacer(modifier = Modifier.padding(4.dp))
+
+        TextField(
             value = passwordConfirmation,
             label = {
                 Text(text = stringResource(id = R.string.confirm_password))
@@ -168,33 +182,67 @@ fun SignUpScreen(
             onClick = {
                 when {
                     password != passwordConfirmation -> {
-                        Toast.makeText(context, R.string.password_mismatch, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.password_mismatch, Toast.LENGTH_SHORT)
+                            .show()
                     }
+
                     password.length < 6 -> {
-                        Toast.makeText(context, R.string.password_too_short, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.password_too_short, Toast.LENGTH_SHORT)
+                            .show()
                     }
+
                     else -> {
-                        firebaseViewModel.signUpWithEmailAndPassword(email, password, username) { errorCode ->
+                        firebaseViewModel.signUpWithEmailAndPassword(
+                            email,
+                            password,
+                            username
+                        ) { errorCode ->
                             when (errorCode) {
                                 AuthenticationState.SIGNED_UP_SUCCESSFULLY -> {
-                                    Toast.makeText(context, R.string.verification_email_sent, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        R.string.verification_email_sent,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     showVerificationDialog = true
                                 }
+
                                 AuthenticationState.USER_ALREADY_EXISTS -> {
-                                    errorMessage = context.getString(R.string.error_user_already_exists)
-                                    Toast.makeText(context, R.string.error_user_already_exists, Toast.LENGTH_SHORT).show()
+                                    errorMessage =
+                                        context.getString(R.string.error_user_already_exists)
+                                    Toast.makeText(
+                                        context,
+                                        R.string.error_user_already_exists,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
+
                                 AuthenticationState.EMAIL_WRONG_FORMAT -> {
-                                    errorMessage = context.getString(R.string.error_wrong_email_format)
-                                    Toast.makeText(context, R.string.error_wrong_email_format, Toast.LENGTH_SHORT).show()
+                                    errorMessage =
+                                        context.getString(R.string.error_wrong_email_format)
+                                    Toast.makeText(
+                                        context,
+                                        R.string.error_wrong_email_format,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
+
                                 AuthenticationState.PASSWORD_WRONG_FORMAT -> {
                                     errorMessage = context.getString(R.string.password_too_short)
-                                    Toast.makeText(context, R.string.password_too_short, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        R.string.password_too_short,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
+
                                 else -> {
                                     errorMessage = context.getString(R.string.unknown_error)
-                                    Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        R.string.unknown_error,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                         }
@@ -203,9 +251,19 @@ fun SignUpScreen(
             },
             modifier = Modifier
                 .padding(top = 25.dp),
-            enabled = email.isNotEmpty() && password.isNotEmpty() && passwordConfirmation.isNotEmpty()
+            enabled = email.isNotEmpty() && username.isNotEmpty() && password.isNotEmpty() && passwordConfirmation.isNotEmpty()
         ) {
-            Text(text = stringResource(id = R.string.sign_up_button))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PersonAdd,
+                    contentDescription = stringResource(id = R.string.sign_up_icon)
+                )
+                Spacer(modifier = Modifier.padding(4.dp))
+                Text(text = stringResource(id = R.string.sign_up_button))
+            }
         }
     }
 }

@@ -67,7 +67,7 @@ fun MapComposable(
 //                 Add marker for the destination
             val destinationMarker = Marker(mapView).apply {
                 position = centerMarker.location
-                icon = ContextCompat.getDrawable(context, R.drawable.ic_location_marker)
+                icon = ContextCompat.getDrawable(context, R.drawable.red_marker)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 title = centerMarker.title
             }
@@ -77,7 +77,7 @@ fun MapComposable(
             placesMarkers.forEach { currentMarker ->
                 val marker = Marker(mapView).apply {
                     position = currentMarker.location
-                    icon = ContextCompat.getDrawable(context, R.drawable.ic_marker)
+                    icon = ContextCompat.getDrawable(context, R.drawable.blue_marker)
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     title = currentMarker.title
                 }
