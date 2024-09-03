@@ -18,7 +18,10 @@ fun AfterSignUpDialog(
 ) {
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = onDismiss,
+            onDismissRequest = {
+                onDismiss()
+                navController.navigate(Screens.SignIn.route)
+            },
             title = {
                 Text(
                     text = stringResource(id = R.string.verification_needed_title),

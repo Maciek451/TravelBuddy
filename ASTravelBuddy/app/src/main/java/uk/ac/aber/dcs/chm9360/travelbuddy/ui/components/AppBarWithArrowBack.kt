@@ -36,6 +36,7 @@ fun AppBarWithArrowBack(
     navController: NavHostController,
     appBarTitle: String,
     showMoreIcon: Boolean = true,
+    showNavIcon: Boolean = true,
     tripMenu: Boolean = false,
     showSaveButton: Boolean = false,
     showSignOut: Boolean = false,
@@ -57,11 +58,13 @@ fun AppBarWithArrowBack(
     CenterAlignedTopAppBar(
         title = { Text(appBarTitle) },
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.arrow_back)
-                )
+            if (showNavIcon) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.arrow_back)
+                    )
+                }
             }
         },
         actions = {

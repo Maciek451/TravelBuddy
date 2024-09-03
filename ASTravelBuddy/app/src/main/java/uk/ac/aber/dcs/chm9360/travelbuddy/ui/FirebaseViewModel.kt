@@ -124,7 +124,6 @@ class FirebaseViewModel : ViewModel() {
     fun signUpWithEmailAndPassword(
         email: String,
         password: String,
-        username: String,
         callback: (Int) -> Unit
     ) {
         viewModelScope.launch {
@@ -133,7 +132,7 @@ class FirebaseViewModel : ViewModel() {
                 {
                     val user = auth.currentUser
                     user?.uid?.let { userId ->
-                        val userMap = mapOf("username" to username, "email" to email)
+                        val userMap = mapOf("email" to email)
                         db.collection("users").document(userId).set(userMap)
                             .addOnSuccessListener {
                                 sendVerificationEmail { isSuccess ->
@@ -273,6 +272,19 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
+    fun isUsernameTaken(username: String, callback: (Boolean) -> Unit) {
+        db.collection("users")
+            .whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener { documents ->
+                callback(!documents.isEmpty)
+            }
+            .addOnFailureListener {
+                Log.e("FirebaseViewModel", "Error checking if username is taken", it)
+                callback(false)
+            }
+    }
+
     fun fetchUsername() {
         auth.currentUser?.let { user ->
             viewModelScope.launch {
@@ -300,14 +312,46 @@ class FirebaseViewModel : ViewModel() {
     }
 
     fun updateUsername(newUsername: String, callback: (Boolean) -> Unit) {
+        isUsernameTaken(newUsername) { isTaken ->
+            if (isTaken) {
+                callback(false)
+            } else {
+                auth.currentUser?.let { user ->
+                    val userDocRef = db.collection("users").document(user.uid)
+                    val tripsRef = db.collection("users").document(user.uid).collection("trips")
+                    val phrasesRef = db.collection("users").document(user.uid).collection("phrases")
+
+                    viewModelScope.launch {
+                        try {
+                            userDocRef.update("username", newUsername).await()
+                            _username.value = newUsername
+
+                            val tripsSnapshot = tripsRef.get().await()
+                            for (doc in tripsSnapshot.documents) {
+                                doc.reference.update("author", newUsername).await()
+                            }
+                            val phrasesSnapshot = phrasesRef.get().await()
+                            for (doc in phrasesSnapshot.documents) {
+                                doc.reference.update("username", newUsername).await()
+                            }
+                            callback(true)
+                        } catch (e: Exception) {
+                            Log.e("FirebaseViewModel", "Error updating username", e)
+                            callback(false)
+                        }
+                    }
+                } ?: callback(false)
+            }
+        }
+    }
+
+    fun checkUsernameAndNavigate(callback: (Boolean) -> Unit) {
         auth.currentUser?.let { user ->
-            db.collection("users").document(user.uid)
-                .update("username", newUsername)
-                .addOnSuccessListener {
-                    _username.value = newUsername
-                    callback(true)
-                }
-                .addOnFailureListener { callback(false) }
+            val userDocRef = db.collection("users").document(user.uid)
+            userDocRef.get().addOnSuccessListener { document ->
+                val username = document.getString("username")
+                callback(username.isNullOrEmpty())
+            }
         } ?: callback(false)
     }
 

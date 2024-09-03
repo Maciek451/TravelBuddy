@@ -17,10 +17,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
@@ -34,6 +37,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.about.AboutScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.AccountScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.ProfileScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.account.TermsOfServiceScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SetUsernameScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SignInScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.authentication.SignUpScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.ExploreScreen
@@ -64,6 +68,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.utils.getLanguagePreference
 class MainActivity : ComponentActivity() {
     private val firebaseViewModel: FirebaseViewModel by viewModels()
     private var showNetworkDialog by mutableStateOf(false)
+    private var startDestination by mutableStateOf(Screens.SignIn.route)
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,32 +86,62 @@ class MainActivity : ComponentActivity() {
             showNetworkDialog = true
         }
 
-        enableEdgeToEdge()
-        setContent {
-            TravelBuddyTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val navController = rememberNavController()
-                    val startDestination = if (firebaseViewModel.isUserLoggedIn()) {
-                        Screens.MyTrips.route
+        lifecycleScope.launch {
+            if (firebaseViewModel.isUserLoggedIn()) {
+                firebaseViewModel.checkUsernameAndNavigate { isUsernameRequired ->
+                    startDestination = if (isUsernameRequired) {
+                        Screens.SetUsername.route
                     } else {
-                        Screens.SignIn.route
+                        Screens.MyTrips.route
                     }
-                    BuildNavigationGraph(navController, startDestination)
+                    setContent {
+                        TravelBuddyTheme {
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color = MaterialTheme.colorScheme.background
+                            ) {
+                                val navController = rememberNavController()
+                                BuildNavigationGraph(navController, startDestination)
 
-                    if (showNetworkDialog) {
-                        AlertDialog(
-                            onDismissRequest = { showNetworkDialog = false },
-                            title = { Text(stringResource(R.string.no_internet_connection)) },
-                            text = { Text(stringResource(R.string.no_internet_connection_message)) },
-                            confirmButton = {
-                                Button(onClick = { showNetworkDialog = false }) {
-                                    Text(stringResource(R.string.ok))
+                                if (showNetworkDialog) {
+                                    AlertDialog(
+                                        onDismissRequest = { showNetworkDialog = false },
+                                        title = { Text(stringResource(R.string.no_internet_connection)) },
+                                        text = { Text(stringResource(R.string.no_internet_connection_message)) },
+                                        confirmButton = {
+                                            Button(onClick = { showNetworkDialog = false }) {
+                                                Text(stringResource(R.string.ok))
+                                            }
+                                        }
+                                    )
                                 }
                             }
-                        )
+                        }
+                    }
+                }
+            } else {
+                setContent {
+                    TravelBuddyTheme {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            val navController = rememberNavController()
+                            BuildNavigationGraph(navController, Screens.SignIn.route)
+
+                            if (showNetworkDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showNetworkDialog = false },
+                                    title = { Text(stringResource(R.string.no_internet_connection)) },
+                                    text = { Text(stringResource(R.string.no_internet_connection_message)) },
+                                    confirmButton = {
+                                        Button(onClick = { showNetworkDialog = false }) {
+                                            Text(stringResource(R.string.ok))
+                                        }
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -143,6 +178,7 @@ class MainActivity : ComponentActivity() {
             composable(Screens.About.route) { AboutScreen(navController) }
             composable(Screens.Notification.route) { NotificationScreen(navController) }
             composable(Screens.SignIn.route) { SignInScreen(navController, firebaseViewModel) }
+            composable(Screens.SetUsername.route) { SetUsernameScreen(navController, firebaseViewModel) }
             composable(Screens.SignUp.route) { SignUpScreen(navController, firebaseViewModel) }
             composable(Screens.AddTrip.route) { AddTripScreen(navController) }
             composable(Screens.AddPhrase.route) { AddPhraseScreen(navController) }
@@ -152,11 +188,11 @@ class MainActivity : ComponentActivity() {
             composable(Screens.Profile.route) { ProfileScreen(navController) }
         }
     }
-}
 
-fun isNetworkAvailable(context: Context): Boolean {
-    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val network = connectivityManager.activeNetwork ?: return false
-    val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
 }

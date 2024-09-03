@@ -69,9 +69,14 @@ fun SignInScreen(
         onResendEmail = {
             firebaseViewModel.sendVerificationEmail { isSuccess ->
                 if (isSuccess) {
-                    Toast.makeText(context, R.string.verification_email_resent, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.verification_email_resent, Toast.LENGTH_SHORT)
+                        .show()
                 } else {
-                    Toast.makeText(context, R.string.failed_to_resend_verification_email, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        R.string.failed_to_resend_verification_email,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -151,28 +156,57 @@ fun SignInScreen(
                 firebaseViewModel.signInWithEmailAndPassword(email, password) { errorCode ->
                     when (errorCode) {
                         AuthenticationState.LOGGED_IN_SUCCESSFULLY -> {
-                            Toast.makeText(context, R.string.login_success, Toast.LENGTH_SHORT).show()
-                            navController.navigate(Screens.MyTrips.route) { popUpTo(0) }
+                            Toast.makeText(context, R.string.login_success, Toast.LENGTH_SHORT)
+                                .show()
+                            firebaseViewModel.checkUsernameAndNavigate { needsUsername ->
+                                if (needsUsername) {
+                                    navController.navigate(Screens.SetUsername.route) { popUpTo(0) }
+                                } else {
+                                    navController.navigate(Screens.MyTrips.route) { popUpTo(0) }
+                                }
+                            }
                         }
+
                         AuthenticationState.USER_IS_NOT_VERIFIED -> {
                             showVerificationDialog = true
-                            Toast.makeText(context, R.string.error_user_not_verified, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.error_user_not_verified,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         AuthenticationState.PASSWORD_WRONG -> {
                             errorMessage = context.getString(R.string.error_wrong_password_or_email)
-                            Toast.makeText(context, R.string.error_wrong_password_or_email, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.error_wrong_password_or_email,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         AuthenticationState.ACCOUNT_DOES_NOT_EXIST -> {
                             errorMessage = context.getString(R.string.error_account_does_not_exist)
-                            Toast.makeText(context, R.string.error_account_does_not_exist, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.error_account_does_not_exist,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         AuthenticationState.EMAIL_WRONG_FORMAT -> {
                             errorMessage = context.getString(R.string.error_wrong_email_format)
-                            Toast.makeText(context, R.string.error_wrong_email_format, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.error_wrong_email_format,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         else -> {
                             errorMessage = context.getString(R.string.unknown_error)
-                            Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT)
+                                .show()
                         }
                     }
                 }

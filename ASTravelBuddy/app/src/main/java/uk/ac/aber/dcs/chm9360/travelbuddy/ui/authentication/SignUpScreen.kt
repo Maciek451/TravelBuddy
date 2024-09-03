@@ -49,7 +49,6 @@ fun SignUpScreen(
 ) {
     val title = stringResource(id = R.string.app_name)
     var email by rememberSaveable { mutableStateOf("") }
-    var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordConfirmation by rememberSaveable { mutableStateOf("") }
     var showVerificationDialog by rememberSaveable { mutableStateOf(false) }
@@ -90,24 +89,6 @@ fun SignUpScreen(
                 .fillMaxWidth()
                 .padding(top = 25.dp, start = 8.dp, end = 8.dp),
             isError = errorMessage.isNotEmpty()
-        )
-
-        Spacer(modifier = Modifier.padding(4.dp))
-
-        TextField(
-            value = username,
-            label = {
-                Text(text = stringResource(id = R.string.username))
-            },
-            onValueChange = {
-                username = it
-                errorMessage = ""
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 8.dp, end = 8.dp),
-            isError = errorMessage.isNotEmpty(),
-            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
         )
 
         Spacer(modifier = Modifier.padding(4.dp))
@@ -173,6 +154,7 @@ fun SignUpScreen(
                 }
             }
         )
+
         Text(
             text = "",
             color = MaterialTheme.colorScheme.error
@@ -194,8 +176,7 @@ fun SignUpScreen(
                     else -> {
                         firebaseViewModel.signUpWithEmailAndPassword(
                             email,
-                            password,
-                            username
+                            password
                         ) { errorCode ->
                             when (errorCode) {
                                 AuthenticationState.SIGNED_UP_SUCCESSFULLY -> {
@@ -205,16 +186,6 @@ fun SignUpScreen(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     showVerificationDialog = true
-                                }
-
-                                AuthenticationState.USER_ALREADY_EXISTS -> {
-                                    errorMessage =
-                                        context.getString(R.string.error_user_already_exists)
-                                    Toast.makeText(
-                                        context,
-                                        R.string.error_user_already_exists,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
                                 }
 
                                 AuthenticationState.EMAIL_WRONG_FORMAT -> {
@@ -251,7 +222,7 @@ fun SignUpScreen(
             },
             modifier = Modifier
                 .padding(top = 25.dp),
-            enabled = email.isNotEmpty() && username.isNotEmpty() && password.isNotEmpty() && passwordConfirmation.isNotEmpty()
+            enabled = email.isNotEmpty() && password.isNotEmpty() && passwordConfirmation.isNotEmpty()
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,

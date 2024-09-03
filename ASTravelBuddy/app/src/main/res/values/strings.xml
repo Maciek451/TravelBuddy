@@ -86,7 +86,7 @@
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="update_username">Update your display name</string>
     <string name="username_updated">Display name updated</string>
-    <string name="username_update_failed">Display update failed</string>
+    <string name="username_update_failed">Display name is taken</string>
     <string name="dark_theme">Dark</string>
     <string name="light_theme">Light</string>
     <string name="select_theme">Select theme</string>
@@ -199,7 +199,7 @@
     <string name="map_view">Map view</string>
     <string name="map_search">Map search</string>
     <string name="new_search">New search</string>
-    <string name="friend_request_sent">Freind request sent</string>
+    <string name="friend_request_sent">Friend request sent</string>
     <string name="failed_to_send_request">Failed to send request</string>
     <string name="share_icon">Share icon</string>
     <string name="unshare">Unshare</string>
@@ -223,4 +223,7 @@
     <string name="no_internet_connection_message">The app\'s functionality is limited due to no Internet access.</string>
     <string name="login_icon">Login Icon</string>
     <string name="sign_up_icon">Sign up icon</string>
+    <string name="error_username_taken">Display name in use</string>
+    <string name="username_required_message">To proceed with using TravelBuddy, please complete the initial display name setup.</string>
+    <string name="set_username">Set your username</string>
 </resources>

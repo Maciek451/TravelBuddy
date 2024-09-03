@@ -24,6 +24,7 @@ sealed class Screens(
     object About : Screens("about")
     object Notification: Screens("notification")
     object SignIn: Screens("sign_in")
+    object SetUsername: Screens("set_username")
     object SignUp: Screens("sign_up")
     object AddTrip: Screens("add_trip")
     object AddPhrase: Screens("add_phrase")

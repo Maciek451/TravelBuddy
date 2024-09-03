@@ -130,7 +130,12 @@ fun ProfileScreen(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
             elevation = CardDefaults.cardElevation(4.dp),
-            onClick = { showUsernameDialog.value = true }
+            enabled = false,
+            onClick = {
+                //This feature has been disabled due to its requirement to update the friends list in Firebase,
+                //in addition to its primary operations. Despite this, the core functionality remains fully operational.
+                //showUsernameDialog.value = true
+            }
         ) {
             Row(
                 modifier = Modifier
