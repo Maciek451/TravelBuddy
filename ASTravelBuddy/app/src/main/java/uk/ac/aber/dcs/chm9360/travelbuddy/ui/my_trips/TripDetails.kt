@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Map
@@ -63,6 +66,7 @@ fun TripDetailsScreen(
     val authState = firebaseViewModel.authState.collectAsState().value
     var currentUser by remember { mutableStateOf<User?>(null) }
     var isUserAuthor by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(authState?.uid) {
         authState?.uid?.let { userId ->
@@ -134,130 +138,170 @@ fun TripDetailsScreen(
                     )
                 }
 
-                Card(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                        .padding(vertical = 16.dp),
-                    elevation = CardDefaults.cardElevation(4.dp),
+                        .weight(1f)
+                        .verticalScroll(scrollState)
                 ) {
-                    Column(
+                    Card(
                         modifier = Modifier
-                            .padding(16.dp)
+                            .fillMaxWidth()
                             .align(Alignment.CenterHorizontally)
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally),
-                            text = stringResource(id = R.string.destination),
-                            style = MaterialTheme.typography.headlineSmall,
-                        )
-                        Divider(modifier = Modifier.padding(vertical = 4.dp))
-                        Text(
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally),
-                            text = trip.destination,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                            .padding(end = 8.dp)
-                            .clickable {
-                                Utils.trip = trip
-                                navController.navigate(Screens.TripMap.route)
-                            },
-                        elevation = CardDefaults.cardElevation(4.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Map,
-                                contentDescription = stringResource(id = R.string.map_icon),
-                                modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(id = R.string.show_on_map),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                            .padding(start = 8.dp)
-                            .clickable {
-                                val weatherLink = getWeatherLink(trip.destination)
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(weatherLink))
-                                navController.context.startActivity(intent)
-                            },
+                            .padding(vertical = 16.dp),
                         elevation = CardDefaults.cardElevation(4.dp),
                     ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .align(Alignment.CenterHorizontally)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Cloud,
-                                contentDescription = stringResource(id = R.string.weather_icon),
-                                modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = stringResource(id = R.string.check_weather),
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally),
+                                text = stringResource(id = R.string.destination),
+                                style = MaterialTheme.typography.headlineSmall,
+                            )
+                            Divider(modifier = Modifier.padding(vertical = 4.dp))
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally),
+                                text = trip.destination,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .weight(1f)
+                                .align(Alignment.CenterVertically)
+                                .padding(end = 8.dp)
+                                .clickable {
+                                    Utils.trip = trip
+                                    navController.navigate(Screens.TripMap.route)
+                                },
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Map,
+                                    contentDescription = stringResource(id = R.string.map_icon),
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(id = R.string.show_on_map),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
 
-                if ((currentUser?.username == trip.author)) {
+                        Card(
+                            modifier = Modifier
+                                .weight(1f)
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 8.dp)
+                                .clickable {
+                                    val weatherLink = getWeatherLink(trip.destination)
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(weatherLink))
+                                    navController.context.startActivity(intent)
+                                },
+                            elevation = CardDefaults.cardElevation(4.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Cloud,
+                                    contentDescription = stringResource(id = R.string.weather_icon),
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(id = R.string.check_weather),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if ((currentUser?.username == trip.author)) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                                .clickable {
+                                    Utils.trip = trip
+                                    navController.navigate(Screens.Checklist.route)
+                                },
+                            elevation = CardDefaults.cardElevation(4.dp),
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = stringResource(id = R.string.checklist_colon),
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                                if (uncheckedItemsPreview.isNotEmpty()) {
+                                    uncheckedItemsPreview.forEachIndexed { index, item ->
+                                        Text(
+                                            text = "${index + 1}. ${item.task}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.padding(vertical = 2.dp)
+                                        )
+                                    }
+                                } else {
+                                    Text(
+                                        text = stringResource(id = R.string.list_empty),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.Gray
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp)
                             .clickable {
                                 Utils.trip = trip
-                                navController.navigate(Screens.Checklist.route)
+                                navController.navigate(Screens.TripPlan.route)
                             },
                         elevation = CardDefaults.cardElevation(4.dp),
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = stringResource(id = R.string.checklist_colon),
+                                text = stringResource(id = R.string.trip_plan_colon),
                                 style = MaterialTheme.typography.headlineSmall,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
-                            if (uncheckedItemsPreview.isNotEmpty()) {
-                                uncheckedItemsPreview.forEachIndexed { index, item ->
+                            if (tripPlansPreview.isNotEmpty()) {
+                                tripPlansPreview.forEachIndexed { index, plan ->
                                     Text(
-                                        text = "${index + 1}. ${item.task}",
+                                        text = "${index + 1}. ${plan.place}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(vertical = 2.dp)
                                     )
                                 }
                             } else {
                                 Text(
-                                    text = stringResource(id = R.string.list_empty),
+                                    text = stringResource(id = R.string.no_plans),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Color.Gray
                                 )
@@ -266,41 +310,6 @@ fun TripDetailsScreen(
                     }
                 }
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                        .clickable {
-                            Utils.trip = trip
-                            navController.navigate(Screens.TripPlan.route)
-                        },
-                    elevation = CardDefaults.cardElevation(4.dp),
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = stringResource(id = R.string.trip_plan_colon),
-                            style = MaterialTheme.typography.headlineSmall,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        if (tripPlansPreview.isNotEmpty()) {
-                            tripPlansPreview.forEachIndexed { index, plan ->
-                                Text(
-                                    text = "${index + 1}. ${plan.place}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(vertical = 2.dp)
-                                )
-                            }
-                        } else {
-                            Text(
-                                text = stringResource(id = R.string.no_plans),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.Gray
-                            )
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.weight(1f))
-
                 if ((currentUser?.username == trip.author)) {
                     Text(
                         text = if (trip.shared) stringResource(R.string.status_public) else stringResource(R.string.status_private),
@@ -308,14 +317,14 @@ fun TripDetailsScreen(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(horizontal = 16.dp)
-                            .padding(bottom = 16.dp)
+                            .padding(top = 8.dp, bottom = 4.dp)
                     )
 
                     Button(
                         onClick = { showConfirmStateDialog = true },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(4.dp),
                         enabled = trip.shared,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,

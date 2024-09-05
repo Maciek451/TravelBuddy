@@ -361,85 +361,90 @@ class FirebaseViewModel : ViewModel() {
     )
 
     fun addFriend(user: User, friend: User, onResult: (Boolean) -> Unit = {}) {
-        val auth = FirebaseAuth.getInstance()
-        val currentUser = auth.currentUser
-        val db = FirebaseFirestore.getInstance()
+        auth.currentUser?.let { currentUser ->
+            viewModelScope.launch {
+                try {
+                    val friendRelation = FriendRelation(user, friend)
+                    val friendsListRef = db.collection("friends").document("friends_list")
 
-        if (currentUser != null) {
+                    friendsListRef.update("list_of_friends", FieldValue.arrayUnion(friendRelation)).await()
+                    onResult(true)
+                } catch (e: Exception) {
+                    try {
+                        val friendRelation = FriendRelation(user, friend)
+                        val friendsListRef = db.collection("friends").document("friends_list")
 
-            val friendRelation = FriendRelation(user, friend)
-            val friendsListRef = db.collection("friends").document("friends_list")
-
-            friendsListRef.update("list_of_friends", FieldValue.arrayUnion(friendRelation))
-                .addOnSuccessListener { onResult(true) }
-                .addOnFailureListener {
-                    friendsListRef.set(
-                        hashMapOf(
-                            "list_of_friends" to arrayListOf(friendRelation)
-                        )
-                    )
-                        .addOnSuccessListener { onResult(true) }
-                        .addOnFailureListener { onResult(false) }
+                        friendsListRef.set(
+                            hashMapOf(
+                                "list_of_friends" to arrayListOf(friendRelation)
+                            )
+                        ).await()
+                        onResult(true)
+                    } catch (e: Exception) {
+                        Log.e("FirebaseViewModel", "Error adding friend", e)
+                        onResult(false)
+                    }
                 }
-        } else {
-            onResult(false)
-        }
+            }
+        } ?: onResult(false)
     }
 
     fun getFriendsOfUser(userId: String) {
-        val db = FirebaseFirestore.getInstance()
+        auth.currentUser?.let { currentUser ->
+            viewModelScope.launch {
+                try {
+                    val db = FirebaseFirestore.getInstance()
+                    val friendsListRef = db.collection("friends").document("friends_list")
 
-        val friendsListRef = db.collection("friends").document("friends_list")
+                    val documentSnapshot = friendsListRef.get().await()
+                    if (documentSnapshot.exists()) {
+                        val friendRelations = documentSnapshot.get("list_of_friends") as? List<Map<String, Any>>
 
-        friendsListRef.get()
-            .addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot.exists()) {
-                    val friendRelations = documentSnapshot.get("list_of_friends") as? List<Map<String, Any>>
+                        val friendsList = friendRelations?.mapNotNull { map ->
+                            val userMap = map["user"] as? Map<String, Any>
+                            val friendMap = map["friend"] as? Map<String, Any>
 
-                    val friendsList = friendRelations?.mapNotNull { map ->
-                        val userMap = map["user"] as? Map<String, Any>
-                        val friendMap = map["friend"] as? Map<String, Any>
+                            val user = userMap?.let {
+                                User(
+                                    userId = it["userId"] as? String ?: "",
+                                    username = it["username"] as? String ?: "",
+                                    email = it["email"] as? String ?: ""
+                                )
+                            }
 
-                        val user = userMap?.let {
-                            User(
-                                userId = it["userId"] as? String ?: "",
-                                username = it["username"] as? String ?: "",
-                                email = it["email"] as? String ?: ""
-                            )
-                        }
+                            val friend = friendMap?.let {
+                                User(
+                                    userId = it["userId"] as? String ?: "",
+                                    username = it["username"] as? String ?: "",
+                                    email = it["email"] as? String ?: ""
+                                )
+                            }
 
-                        val friend = friendMap?.let {
-                            User(
-                                userId = it["userId"] as? String ?: "",
-                                username = it["username"] as? String ?: "",
-                                email = it["email"] as? String ?: ""
-                            )
-                        }
+                            if (user != null && friend != null && user.userId == userId) {
+                                FriendRelation(user, friend)
+                            } else {
+                                null
+                            }
+                        }?.flatMap { relation ->
+                            when {
+                                relation.user.userId == userId -> listOf(relation.friend)
+                                relation.friend.userId == userId -> listOf(relation.user)
+                                else -> emptyList()
+                            }
+                        } ?: emptyList()
 
-                        if (user != null && friend != null && user.userId == userId) {
-                            FriendRelation(user, friend)
-                        } else {
-                            null
-                        }
-                    }?.flatMap { relation ->
-                        when {
-                            relation.user.userId == userId -> listOf(relation.friend)
-                            relation.friend.userId == userId -> listOf(relation.user)
-                            else -> emptyList()
-                        }
-                    } ?: emptyList()
-
-                    Log.d("FirebaseViewModel", "Parsed friends list: $friendsList")
-                    _friends.value = friendsList
-                } else {
-                    Log.d("FirebaseViewModel", "No friends list found")
+                        Log.d("FirebaseViewModel", "Parsed friends list: $friendsList")
+                        _friends.value = friendsList
+                    } else {
+                        Log.d("FirebaseViewModel", "No friends list found")
+                        _friends.value = emptyList()
+                    }
+                } catch (e: Exception) {
+                    Log.e("FirebaseViewModel", "Error fetching friends", e)
                     _friends.value = emptyList()
                 }
             }
-            .addOnFailureListener {
-                Log.e("FirebaseViewModel", "Error fetching friends", it)
-                _friends.value = emptyList()
-            }
+        }
     }
 
     fun sendFriendRequest(receiverId: String, onResult: (Boolean, String?) -> Unit) {
@@ -690,7 +695,7 @@ class FirebaseViewModel : ViewModel() {
             viewModelScope.launch {
                 try {
                     val phraseRef = db.collection("users").document(user.uid)
-                        .collection("phrases").document(updatedPhrase.id) // Make sure `updatedPhrase` has an `id` property
+                        .collection("phrases").document(updatedPhrase.id)
 
                     val updates = mapOf(
                         "language" to updatedPhrase.language,
@@ -718,7 +723,7 @@ class FirebaseViewModel : ViewModel() {
         auth.currentUser?.let { user ->
             viewModelScope.launch {
                 db.collection("users").document(user.uid)
-                    .collection("phrases").document(phrase.id) // Make sure `phrase` has an `id` property
+                    .collection("phrases").document(phrase.id)
                     .delete()
                     .addOnSuccessListener { onComplete(true) }
                     .addOnFailureListener { onComplete(false) }

@@ -97,7 +97,7 @@ fun TripPlanScreen(
             navController = navController,
             appBarTitle = appBarTitle,
             showSaveButton = isUserAuthor,
-            showMoreIcon = isUserAuthor,
+            showMoreIcon = false,
             isSaveButtonEnabled = false
         )
 

@@ -98,16 +98,6 @@ fun SetUsernameScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-            ,
-            isError = !isUsernameAvailable && username.isNotEmpty()
         )
-
-        if (!isUsernameAvailable && username.isNotEmpty()) {
-            Text(
-                text = stringResource(id = R.string.error_username_taken),
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
     }
 }

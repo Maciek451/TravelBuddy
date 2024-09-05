@@ -142,7 +142,7 @@
     <string name="update_email">Update your email</string>
     <string name="current_email_address">Current email address</string>
     <string name="new_email_address">New email address</string>
-    <string name="confirm_remove_trip">Click confirm to remove selected friend</string>
+    <string name="confirm_remove_trip">Click confirm to remove selected trip</string>
     <string name="city">City</string>
     <string name="country">Country</string>
     <string name="failed_to_load_image">Failed to load image</string>
@@ -179,7 +179,7 @@
     <string name="no_results_found">No places found. Try a different search.</string>
     <string name="view_on_map">View on map</string>
     <string name="map_icon">Map icon</string>
-    <string name="show_on_map">Visualize on map</string>
+    <string name="show_on_map">Visualise on map</string>
     <string name="weather_icon">Weather icon</string>
     <string name="check_weather">Check weather online</string>
     <string name="place_label">Label</string>
@@ -225,5 +225,5 @@
     <string name="sign_up_icon">Sign up icon</string>
     <string name="error_username_taken">Display name in use</string>
     <string name="username_required_message">To proceed with using TravelBuddy, please complete the initial display name setup.</string>
-    <string name="set_username">Set your username</string>
+    <string name="set_username">Set your display name</string>
 </resources>
