@@ -28,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,15 +63,15 @@ fun AddBottomSheet(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 16.dp)
                 ) {
-                    AddButton(R.string.add_trip_bottom_sheet, Icons.Default.Luggage) {
+                    AddButton(R.string.add_trip_bottom_sheet, Icons.Default.Luggage, testTag = "AddTrip") {
                         navController.navigate(Screens.AddTrip.route)
                         onDismiss()
                     }
-                    AddButton(R.string.add_phrase_bottom_sheet, Icons.Default.FormatQuote) {
+                    AddButton(R.string.add_phrase_bottom_sheet, Icons.Default.FormatQuote, testTag = "AddPhrase") {
                         navController.navigate(Screens.AddPhrase.route)
                         onDismiss()
                     }
-                    AddButton(R.string.add_friend_bottom_sheet, Icons.Default.PersonAdd) {
+                    AddButton(R.string.add_friend_bottom_sheet, Icons.Default.PersonAdd, testTag = "AddFriend") {
                         navController.navigate(Screens.AddFriend.route)
                         onDismiss()
                     }
@@ -89,6 +90,7 @@ fun AddBottomSheet(
 private fun AddButton(
     text: Int,
     icon: ImageVector,
+    testTag: String = "",
     onClick: () -> Unit
 ) {
     Column(
@@ -98,7 +100,7 @@ private fun AddButton(
         Button(
             onClick = onClick,
             shape = CircleShape,
-            modifier = Modifier.size(80.dp),
+            modifier = Modifier.size(80.dp).testTag(testTag),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Icon(icon, contentDescription = stringResource(id = R.string.add_icon), modifier = Modifier.size(50.dp))

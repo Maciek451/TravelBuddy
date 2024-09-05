@@ -18,6 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -47,10 +49,10 @@ fun MyNavigationBar(
             outlineIcon = Icons.Outlined.TravelExplore,
             label = stringResource(id = R.string.explore)
         ),
-        Screens.Friends to IconGroup(
+        Screens.Social to IconGroup(
             filledIcon = Icons.Filled.Group,
             outlineIcon = Icons.Outlined.Group,
-            label = stringResource(id = R.string.friends)
+            label = stringResource(id = R.string.social)
         )
     )
 
@@ -90,7 +92,7 @@ fun MyNavigationBar(
                             restoreState = true
                         }
                     }
-                }
+                }, modifier = Modifier.testTag(labelText)
             )
         }
     }

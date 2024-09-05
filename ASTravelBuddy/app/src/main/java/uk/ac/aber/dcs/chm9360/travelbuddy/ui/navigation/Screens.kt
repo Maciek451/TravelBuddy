@@ -18,7 +18,7 @@ sealed class Screens(
     object MapView : Screens("map_view")
     object PlaceDetails : Screens("place_details")
     object AddTripPlanFromExplore : Screens("add_trip_plan_from_explore")
-    object Friends : Screens("friends")
+    object Social : Screens("social")
     object Account : Screens("account")
     object TermsOfService : Screens("terms_of_service")
     object About : Screens("about")
@@ -38,5 +38,5 @@ val screens = listOf(
     Screens.AddSheet,
     Screens.MyTrips,
     Screens.Explore,
-    Screens.Friends
+    Screens.Social
 )

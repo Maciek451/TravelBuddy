@@ -95,7 +95,7 @@ fun AddFriendScreen(
                         when {
                             success -> {
                                 Toast.makeText(context, R.string.friend_request_sent, Toast.LENGTH_SHORT).show()
-                                navController.navigate(Screens.Friends.route) { popUpTo(0) }
+                                navController.navigate(Screens.Social.route) { popUpTo(0) }
                             }
                             reason == "already_friends" -> {
                                 Toast.makeText(context, R.string.already_friends, Toast.LENGTH_SHORT).show()

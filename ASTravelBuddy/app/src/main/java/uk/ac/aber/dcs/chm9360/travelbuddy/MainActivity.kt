@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,15 +16,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -46,7 +43,7 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.MapViewScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.explore.PlaceDetailsScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.AddFriendScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.FriendsListScreen
-import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.FriendsScreen
+import uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends.SocialScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.AddTripPlanFromExploreScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.AddTripPlanScreen
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.ChecklistScreen
@@ -101,7 +98,11 @@ class MainActivity : ComponentActivity() {
                                 color = MaterialTheme.colorScheme.background
                             ) {
                                 val navController = rememberNavController()
-                                BuildNavigationGraph(navController, startDestination)
+                                BuildNavigationGraph(
+                                    navController,
+                                    startDestination,
+                                    firebaseViewModel
+                                )
 
                                 if (showNetworkDialog) {
                                     AlertDialog(
@@ -148,51 +149,53 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @Composable
-    private fun BuildNavigationGraph(
-        navController: NavHostController,
-        startDestination: String
-    ) {
-        NavHost(
-            navController = navController,
-            startDestination = startDestination
-        ) {
-            composable(Screens.MyTrips.route) { MyTripsScreen(navController) }
-            composable(Screens.TripDetails.route) { TripDetailsScreen(navController) }
-            composable(Screens.EditTrip.route) { EditTripScreen(navController) }
-            composable(Screens.Checklist.route) { ChecklistScreen(navController) }
-            composable(Screens.TripPlan.route) { TripPlanScreen(navController) }
-            composable(Screens.AddTripPlan.route) { AddTripPlanScreen(navController) }
-            composable(Screens.EditTripPlan.route) { EditTripPlanScreen(navController) }
-            composable(Screens.TripPlanDetails.route) { TripPlanDetailsScreen(navController) }
-            composable(Screens.TripMap.route) { TripMapScreen(navController) }
-            composable(Screens.Explore.route) { ExploreScreen(navController) }
-            composable(Screens.Map.route) { MapScreen(navController) }
-            composable(Screens.MapView.route) { MapViewScreen(navController) }
-            composable(Screens.PlaceDetails.route) { PlaceDetailsScreen(navController) }
-            composable(Screens.AddTripPlanFromExplore.route) { AddTripPlanFromExploreScreen(navController) }
-            composable(Screens.Friends.route) { FriendsScreen(navController) }
-            composable(Screens.Account.route) { AccountScreen(navController) }
-            composable(Screens.TermsOfService.route) { TermsOfServiceScreen(navController) }
-            composable(Screens.About.route) { AboutScreen(navController) }
-            composable(Screens.Notification.route) { NotificationScreen(navController) }
-            composable(Screens.SignIn.route) { SignInScreen(navController, firebaseViewModel) }
-            composable(Screens.SetUsername.route) { SetUsernameScreen(navController, firebaseViewModel) }
-            composable(Screens.SignUp.route) { SignUpScreen(navController, firebaseViewModel) }
-            composable(Screens.AddTrip.route) { AddTripScreen(navController) }
-            composable(Screens.AddPhrase.route) { AddPhraseScreen(navController) }
-            composable(Screens.EditPhrase.route) { EditPhraseScreen(navController) }
-            composable(Screens.AddFriend.route) { AddFriendScreen(navController) }
-            composable(Screens.FriendsList.route) { FriendsListScreen(navController) }
-            composable(Screens.Profile.route) { ProfileScreen(navController) }
-        }
-    }
-
     fun isNetworkAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+fun BuildNavigationGraph(
+    navController: NavHostController,
+    startDestination: String,
+    firebaseViewModel: FirebaseViewModel = viewModel()
+) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        composable(Screens.MyTrips.route) { MyTripsScreen(navController) }
+        composable(Screens.TripDetails.route) { TripDetailsScreen(navController) }
+        composable(Screens.EditTrip.route) { EditTripScreen(navController) }
+        composable(Screens.Checklist.route) { ChecklistScreen(navController) }
+        composable(Screens.TripPlan.route) { TripPlanScreen(navController) }
+        composable(Screens.AddTripPlan.route) { AddTripPlanScreen(navController) }
+        composable(Screens.EditTripPlan.route) { EditTripPlanScreen(navController) }
+        composable(Screens.TripPlanDetails.route) { TripPlanDetailsScreen(navController) }
+        composable(Screens.TripMap.route) { TripMapScreen(navController) }
+        composable(Screens.Explore.route) { ExploreScreen(navController) }
+        composable(Screens.Map.route) { MapScreen(navController) }
+        composable(Screens.MapView.route) { MapViewScreen(navController) }
+        composable(Screens.PlaceDetails.route) { PlaceDetailsScreen(navController) }
+        composable(Screens.AddTripPlanFromExplore.route) { AddTripPlanFromExploreScreen(navController) }
+        composable(Screens.Social.route) { SocialScreen(navController) }
+        composable(Screens.Account.route) { AccountScreen(navController) }
+        composable(Screens.TermsOfService.route) { TermsOfServiceScreen(navController) }
+        composable(Screens.About.route) { AboutScreen(navController) }
+        composable(Screens.Notification.route) { NotificationScreen(navController) }
+        composable(Screens.SignIn.route) { SignInScreen(navController, firebaseViewModel) }
+        composable(Screens.SetUsername.route) { SetUsernameScreen(navController, firebaseViewModel) }
+        composable(Screens.SignUp.route) { SignUpScreen(navController, firebaseViewModel) }
+        composable(Screens.AddTrip.route) { AddTripScreen(navController) }
+        composable(Screens.AddPhrase.route) { AddPhraseScreen(navController) }
+        composable(Screens.EditPhrase.route) { EditPhraseScreen(navController) }
+        composable(Screens.AddFriend.route) { AddFriendScreen(navController) }
+        composable(Screens.FriendsList.route) { FriendsListScreen(navController) }
+        composable(Screens.Profile.route) { ProfileScreen(navController) }
     }
 }

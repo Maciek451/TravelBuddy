@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NoLuggage
 import androidx.compose.material.icons.filled.SpeakerNotesOff
@@ -48,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -63,7 +63,6 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.model.User
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.FirebaseViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.RetrofitViewModel
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.components.TopLevelScaffold
-import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.ConfirmTripRemovalDialog
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.my_trips.TripCard
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.navigation.Screens
 import uk.ac.aber.dcs.chm9360.travelbuddy.ui.phrase.ConfirmPhraseRemovalDialog
@@ -71,12 +70,12 @@ import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils
 import uk.ac.aber.dcs.chm9360.travelbuddy.utils.Utils.phrase
 
 @Composable
-fun FriendsScreen(
+fun SocialScreen(
     navController: NavHostController,
     firebaseViewModel: FirebaseViewModel = viewModel(),
     retrofitViewModel: RetrofitViewModel = viewModel()
 ) {
-    val appBarTitle = stringResource(id = R.string.friends)
+    val appBarTitle = stringResource(id = R.string.social)
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val phrases by firebaseViewModel.phrases.collectAsState()
     val trips by firebaseViewModel.trips.collectAsState()
@@ -121,7 +120,8 @@ fun FriendsScreen(
             Column(
                 modifier = Modifier
                     .padding(start = 8.dp, end = 8.dp)
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .testTag("Social"),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TabRow(
