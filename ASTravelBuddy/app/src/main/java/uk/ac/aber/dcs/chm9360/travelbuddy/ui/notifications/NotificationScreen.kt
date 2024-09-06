@@ -58,10 +58,10 @@ fun NotificationScreen(
                     FriendRequestCard(
                         friendRequest = request,
                         onAccept = {
-                            firebaseViewModel.acceptFriendRequest(request) {  }
-                                   },
+                            firebaseViewModel.acceptFriendRequest(request) { }
+                        },
                         onDecline = {
-                            firebaseViewModel.declineFriendRequest(request) {  }
+                            firebaseViewModel.declineFriendRequest(request) { }
                         }
                     )
                 }

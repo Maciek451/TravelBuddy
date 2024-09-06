@@ -37,7 +37,8 @@ class MainTopAppBarTest {
 
     @Test
     fun notificationIcon_isDisplayed() {
-        composeTestRule.onNodeWithContentDescription(composeTestRule.activity.getString(R.string.notification_button)).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(composeTestRule.activity.getString(R.string.notification_button))
+            .assertIsDisplayed()
     }
 
     @Test

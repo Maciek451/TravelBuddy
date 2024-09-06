@@ -154,7 +154,9 @@ fun MapScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
             ) {
-                FloatingActionButton(onClick = { searchBarVisible.value = !searchBarVisible.value }) {
+                FloatingActionButton(onClick = {
+                    searchBarVisible.value = !searchBarVisible.value
+                }) {
                     Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
                 }
                 FloatingActionButton(onClick = { moveToCurrentLocation() }) {

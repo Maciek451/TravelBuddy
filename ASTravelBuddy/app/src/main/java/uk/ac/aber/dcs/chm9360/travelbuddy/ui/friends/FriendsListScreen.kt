@@ -61,7 +61,10 @@ fun FriendsListScreen(
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getFriendsOfUser(firebaseViewModel.authState.value?.uid ?: "")
-        Log.d("FriendsListScreen", "Friends fetched: ${friends.map { "${it.username}, ${it.email}" }}")
+        Log.d(
+            "FriendsListScreen",
+            "Friends fetched: ${friends.map { "${it.username}, ${it.email}" }}"
+        )
     }
 
     Column(

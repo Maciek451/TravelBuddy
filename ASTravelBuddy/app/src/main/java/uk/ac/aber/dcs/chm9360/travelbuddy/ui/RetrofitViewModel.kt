@@ -78,7 +78,10 @@ class RetrofitViewModel : ViewModel() {
                     _places.value = responseData ?: emptyList()
                 } else {
                     val errorBody = response.errorBody()?.string()
-                    Log.e("RetrofitViewModel", "Geoapify response not successful: ${response.code()}: $errorBody")
+                    Log.e(
+                        "RetrofitViewModel",
+                        "Geoapify response not successful: ${response.code()}: $errorBody"
+                    )
                 }
             } catch (e: Exception) {
                 Log.e("RetrofitViewModel", "Geoapify call failed: ${e.message}")
@@ -98,7 +101,10 @@ class RetrofitViewModel : ViewModel() {
                 response.body()?.features?.firstOrNull()?.bbox
             } else {
                 val errorBody = response.errorBody()?.string()
-                Log.e("RetrofitViewModel", "Geoapify response not successful: ${response.code()}: $errorBody")
+                Log.e(
+                    "RetrofitViewModel",
+                    "Geoapify response not successful: ${response.code()}: $errorBody"
+                )
                 null
             }
         } catch (e: Exception) {
@@ -117,11 +123,15 @@ class RetrofitViewModel : ViewModel() {
                     limit = 5
                 )
                 if (response.isSuccessful) {
-                    val suggestions = response.body()?.features?.map { it.properties.formatted } ?: emptyList()
+                    val suggestions =
+                        response.body()?.features?.map { it.properties.formatted } ?: emptyList()
                     _autocompleteSuggestions.value = suggestions
                 } else {
                     val errorBody = response.errorBody()?.string()
-                    Log.e("RetrofitViewModel", "Geoapify response not successful: ${response.code()}: $errorBody")
+                    Log.e(
+                        "RetrofitViewModel",
+                        "Geoapify response not successful: ${response.code()}: $errorBody"
+                    )
                     _autocompleteSuggestions.value = emptyList()
                 }
             } catch (e: Exception) {

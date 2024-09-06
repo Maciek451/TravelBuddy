@@ -240,7 +240,10 @@ fun ChecklistItemView(
         )
         if (isTextFieldFocused) {
             IconButton(onClick = { onItemDelete(item) }) {
-                Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(id = R.string.close_icon))
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(id = R.string.close_icon)
+                )
             }
         }
     }

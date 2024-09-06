@@ -43,7 +43,9 @@ fun AddTripPlanFromExploreScreen(
     val placeDetails = Utils.placeDetails
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var place by rememberSaveable { mutableStateOf(placeDetails?.properties?.let { it.formatted } ?: "") }
+    var place by rememberSaveable {
+        mutableStateOf(placeDetails?.properties?.let { it.formatted } ?: "")
+    }
     var dateOfVisit by rememberSaveable { mutableStateOf(LocalDate.now()) }
 
     val isSaveButtonEnabled by rememberSaveable(place) {
@@ -102,7 +104,10 @@ fun AddTripPlanFromExploreScreen(
                             keyboardController?.hide()
                         }
                     ) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.delete_icon))
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.delete_icon)
+                        )
                     }
                 }
             },

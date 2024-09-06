@@ -367,7 +367,8 @@ class FirebaseViewModel : ViewModel() {
                     val friendRelation = FriendRelation(user, friend)
                     val friendsListRef = db.collection("friends").document("friends_list")
 
-                    friendsListRef.update("list_of_friends", FieldValue.arrayUnion(friendRelation)).await()
+                    friendsListRef.update("list_of_friends", FieldValue.arrayUnion(friendRelation))
+                        .await()
                     onResult(true)
                 } catch (e: Exception) {
                     try {
@@ -398,7 +399,8 @@ class FirebaseViewModel : ViewModel() {
 
                     val documentSnapshot = friendsListRef.get().await()
                     if (documentSnapshot.exists()) {
-                        val friendRelations = documentSnapshot.get("list_of_friends") as? List<Map<String, Any>>
+                        val friendRelations =
+                            documentSnapshot.get("list_of_friends") as? List<Map<String, Any>>
 
                         val friendsList = friendRelations?.mapNotNull { map ->
                             val userMap = map["user"] as? Map<String, Any>
@@ -451,8 +453,10 @@ class FirebaseViewModel : ViewModel() {
         auth.currentUser?.let { user ->
             viewModelScope.launch {
                 try {
-                    val friendsListRef = db.collection("friends").document("friends_list").get().await()
-                    val friendRelations = friendsListRef.get("list_of_friends") as? List<Map<String, Any>>
+                    val friendsListRef =
+                        db.collection("friends").document("friends_list").get().await()
+                    val friendRelations =
+                        friendsListRef.get("list_of_friends") as? List<Map<String, Any>>
 
                     val alreadyFriends = friendRelations?.any { map ->
                         val userMap = map["user"] as? Map<String, Any>
@@ -514,7 +518,10 @@ class FirebaseViewModel : ViewModel() {
                         friend = friend
                     )
 
-                    friendsListRef.update("list_of_friends", FieldValue.arrayRemove(friendRelationToRemove))
+                    friendsListRef.update(
+                        "list_of_friends",
+                        FieldValue.arrayRemove(friendRelationToRemove)
+                    )
                         .addOnSuccessListener {
                             val reverseFriendRelation = FriendRelation(
                                 user = friend,
@@ -525,7 +532,10 @@ class FirebaseViewModel : ViewModel() {
                                 )
                             )
 
-                            friendsListRef.update("list_of_friends", FieldValue.arrayRemove(reverseFriendRelation))
+                            friendsListRef.update(
+                                "list_of_friends",
+                                FieldValue.arrayRemove(reverseFriendRelation)
+                            )
                                 .addOnSuccessListener {
                                     getFriendsOfUser(currentUser.uid)
                                     onComplete(true)
@@ -680,7 +690,8 @@ class FirebaseViewModel : ViewModel() {
                         .getString("username") ?: "Unknown User"
                     val phraseRef = db.collection("users").document(user.uid)
                         .collection("phrases").document()
-                    val phraseWithIdAndUsername = phrase.copy(id = phraseRef.id, username = username)
+                    val phraseWithIdAndUsername =
+                        phrase.copy(id = phraseRef.id, username = username)
                     phraseRef.set(phraseWithIdAndUsername).await()
                     fetchPhrases()
                 } catch (e: Exception) {

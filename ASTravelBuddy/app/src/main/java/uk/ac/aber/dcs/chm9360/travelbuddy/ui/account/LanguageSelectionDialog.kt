@@ -89,7 +89,10 @@ fun LanguageSelectionDialog(
                         coroutineScope.launch {
                             saveLanguagePreference(context, selectedLanguageState.intValue)
                             onLanguageSelected(selectedLanguageState.intValue)
-                            LocaleManager.setLocale(context, if (selectedLanguageState.intValue == 0) "en" else "pl")
+                            LocaleManager.setLocale(
+                                context,
+                                if (selectedLanguageState.intValue == 0) "en" else "pl"
+                            )
                             restartActivity(context)
                             onDismiss()
                         }

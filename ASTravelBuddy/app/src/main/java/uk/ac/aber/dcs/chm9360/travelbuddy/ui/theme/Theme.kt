@@ -111,7 +111,7 @@ private val mediumContrastLightColorScheme = lightColorScheme(
     inverseSurface = inverseSurfaceLightMediumContrast,
     inverseOnSurface = inverseOnSurfaceLightMediumContrast,
     inversePrimary = inversePrimaryLightMediumContrast,
-    )
+)
 
 private val highContrastLightColorScheme = lightColorScheme(
     primary = primaryLightHighContrast,
@@ -142,7 +142,7 @@ private val highContrastLightColorScheme = lightColorScheme(
     inverseSurface = inverseSurfaceLightHighContrast,
     inverseOnSurface = inverseOnSurfaceLightHighContrast,
     inversePrimary = inversePrimaryLightHighContrast,
-    )
+)
 
 private val mediumContrastDarkColorScheme = darkColorScheme(
     primary = primaryDarkMediumContrast,
@@ -173,7 +173,7 @@ private val mediumContrastDarkColorScheme = darkColorScheme(
     inverseSurface = inverseSurfaceDarkMediumContrast,
     inverseOnSurface = inverseOnSurfaceDarkMediumContrast,
     inversePrimary = inversePrimaryDarkMediumContrast,
-    )
+)
 
 private val highContrastDarkColorScheme = darkColorScheme(
     primary = primaryDarkHighContrast,
@@ -204,7 +204,7 @@ private val highContrastDarkColorScheme = darkColorScheme(
     inverseSurface = inverseSurfaceDarkHighContrast,
     inverseOnSurface = inverseOnSurfaceDarkHighContrast,
     inversePrimary = inversePrimaryDarkHighContrast,
-    )
+)
 
 @Immutable
 data class ColorFamily(
@@ -235,6 +235,7 @@ fun TravelBuddyTheme(
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         darkTheme -> darkScheme
         else -> lightScheme
     }

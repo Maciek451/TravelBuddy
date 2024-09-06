@@ -6,8 +6,3 @@ data class FriendRequest(
     val senderEmail: String = "",
     val senderUsername: String = ""
 )
-
-data class Friend(
-    val userId: String = "",
-    val friendId: String = ""
-)

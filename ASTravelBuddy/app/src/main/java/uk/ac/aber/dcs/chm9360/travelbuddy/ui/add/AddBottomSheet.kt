@@ -63,15 +63,27 @@ fun AddBottomSheet(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 16.dp)
                 ) {
-                    AddButton(R.string.add_trip_bottom_sheet, Icons.Default.Luggage, testTag = "AddTrip") {
+                    AddButton(
+                        R.string.add_trip_bottom_sheet,
+                        Icons.Default.Luggage,
+                        testTag = "AddTrip"
+                    ) {
                         navController.navigate(Screens.AddTrip.route)
                         onDismiss()
                     }
-                    AddButton(R.string.add_phrase_bottom_sheet, Icons.Default.FormatQuote, testTag = "AddPhrase") {
+                    AddButton(
+                        R.string.add_phrase_bottom_sheet,
+                        Icons.Default.FormatQuote,
+                        testTag = "AddPhrase"
+                    ) {
                         navController.navigate(Screens.AddPhrase.route)
                         onDismiss()
                     }
-                    AddButton(R.string.add_friend_bottom_sheet, Icons.Default.PersonAdd, testTag = "AddFriend") {
+                    AddButton(
+                        R.string.add_friend_bottom_sheet,
+                        Icons.Default.PersonAdd,
+                        testTag = "AddFriend"
+                    ) {
                         navController.navigate(Screens.AddFriend.route)
                         onDismiss()
                     }
@@ -100,10 +112,16 @@ private fun AddButton(
         Button(
             onClick = onClick,
             shape = CircleShape,
-            modifier = Modifier.size(80.dp).testTag(testTag),
+            modifier = Modifier
+                .size(80.dp)
+                .testTag(testTag),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-            Icon(icon, contentDescription = stringResource(id = R.string.add_icon), modifier = Modifier.size(50.dp))
+            Icon(
+                icon,
+                contentDescription = stringResource(id = R.string.add_icon),
+                modifier = Modifier.size(50.dp)
+            )
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(

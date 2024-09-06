@@ -42,23 +42,20 @@ class SignInScreenTest {
     }
 
     @Test
-    fun signInButton_shouldBeEnabled_whenValidDataEntered() {
+    fun signInButton_shouldBeDisabled_whenOneFieldEntered() {
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.email_address))
+            .performTextInput("test@example.com")
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sign_in_button))
+            .assertIsNotEnabled()
+    }
+
+    @Test
+    fun signInButton_shouldBeEnabled_whenTwoFieldsEntered() {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.email_address))
             .performTextInput("test@example.com")
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.password))
             .performTextInput("password123")
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sign_in_button))
             .assertIsEnabled()
-    }
-
-    @Test
-    fun clickingSignInButton_staysOnSignInScreen_onInvalidCredentials() {
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.email_address))
-            .performTextInput("invalid@example.com")
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.password))
-            .performTextInput("wrongpassword")
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sign_in_button))
-            .performClick()
-        assert(navController.currentDestination?.route.equals(Screens.SignIn.route))
     }
 }

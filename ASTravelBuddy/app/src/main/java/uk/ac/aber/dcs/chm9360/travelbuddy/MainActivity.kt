@@ -182,14 +182,23 @@ fun BuildNavigationGraph(
         composable(Screens.Map.route) { MapScreen(navController) }
         composable(Screens.MapView.route) { MapViewScreen(navController) }
         composable(Screens.PlaceDetails.route) { PlaceDetailsScreen(navController) }
-        composable(Screens.AddTripPlanFromExplore.route) { AddTripPlanFromExploreScreen(navController) }
+        composable(Screens.AddTripPlanFromExplore.route) {
+            AddTripPlanFromExploreScreen(
+                navController
+            )
+        }
         composable(Screens.Social.route) { SocialScreen(navController) }
         composable(Screens.Account.route) { AccountScreen(navController) }
         composable(Screens.TermsOfService.route) { TermsOfServiceScreen(navController) }
         composable(Screens.About.route) { AboutScreen(navController) }
         composable(Screens.Notification.route) { NotificationScreen(navController) }
         composable(Screens.SignIn.route) { SignInScreen(navController, firebaseViewModel) }
-        composable(Screens.SetUsername.route) { SetUsernameScreen(navController, firebaseViewModel) }
+        composable(Screens.SetUsername.route) {
+            SetUsernameScreen(
+                navController,
+                firebaseViewModel
+            )
+        }
         composable(Screens.SignUp.route) { SignUpScreen(navController, firebaseViewModel) }
         composable(Screens.AddTrip.route) { AddTripScreen(navController) }
         composable(Screens.AddPhrase.route) { AddPhraseScreen(navController) }

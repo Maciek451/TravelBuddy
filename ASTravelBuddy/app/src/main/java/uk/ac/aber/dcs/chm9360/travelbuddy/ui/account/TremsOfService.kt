@@ -25,7 +25,7 @@ fun TermsOfServiceScreen(
             navController = navController,
             appBarTitle = appBarTitle,
             showMoreIcon = false,
-            )
+        )
 
         Column(
             modifier = Modifier.fillMaxSize(),

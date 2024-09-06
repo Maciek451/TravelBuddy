@@ -83,7 +83,9 @@ fun AddTripScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().testTag("AddTripScreen")
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("AddTripScreen")
     ) {
         AppBarWithArrowBack(
             navController = navController,
@@ -143,7 +145,10 @@ fun AddTripScreen(
                             keyboardController?.hide()
                         }
                     ) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.delete_icon))
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.delete_icon)
+                        )
                     }
                 }
             },
@@ -179,7 +184,10 @@ fun AddTripScreen(
                             keyboardController?.hide()
                         }
                     ) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.delete_icon))
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.delete_icon)
+                        )
                     }
                 }
             },

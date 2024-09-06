@@ -94,17 +94,36 @@ fun AddFriendScreen(
                     firebaseViewModel.sendFriendRequest(user.userId) { success, reason ->
                         when {
                             success -> {
-                                Toast.makeText(context, R.string.friend_request_sent, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    R.string.friend_request_sent,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 navController.navigate(Screens.Social.route) { popUpTo(0) }
                             }
+
                             reason == "already_friends" -> {
-                                Toast.makeText(context, R.string.already_friends, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    R.string.already_friends,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
+
                             reason == "already_sent" -> {
-                                Toast.makeText(context, R.string.already_sent_request, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    R.string.already_sent_request,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
+
                             else -> {
-                                Toast.makeText(context, R.string.failed_to_send_request, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    R.string.failed_to_send_request,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                     }

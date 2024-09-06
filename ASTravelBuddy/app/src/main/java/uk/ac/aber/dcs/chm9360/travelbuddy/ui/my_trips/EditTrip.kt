@@ -158,7 +158,10 @@ fun EditTripScreen(
                             keyboardController?.hide()
                         }
                     ) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.delete_icon))
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.delete_icon)
+                        )
                     }
                 }
             },
@@ -194,7 +197,10 @@ fun EditTripScreen(
                             keyboardController?.hide()
                         }
                     ) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.delete_icon))
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.delete_icon)
+                        )
                     }
                 }
             },

@@ -10,17 +10,17 @@ e) Creation and management of personalized travel itineraries (choosing destinat
 
 a) Planning their trips by searching and adding desired places based on various criteria like budget, weather conditions, or user preferences and interests.
 b) Adding different types of media, reviews, and notes to create trips and visited places.
-c) Proposing recommended destinations, attractions, accommodations, and activities near the user's destination.
+c) Visualizing trips on an interactive map.
 d) Sharing travel journals with friends who can interact with them by leaving reviews and comments.
+e) Collaborative feature that allows app users to add commonly used useful phrases for different countries. Plus having a feature to like and comment by other users.
 
 3. COULD-HAVE
 
 a) Reminding users about previously added checklists/to-do lists a few days before a trip.
 b) Possibility to change a language of the app (English and Polish).
-c) Visualizing trips on an interactive map.
+c) Proposing recommended destinations, attractions, accommodations, and activities near the user's destination.
 d) Adding expanses to a trip to split it between previously added friends.
-c) Collaborative feature that allows app users to add commonly used useful phrases for different countries. Plus having a feature to like and comment by other users.
-e) Dedicated section with contact details for emergency personnel, hospital information, and local embassy and travel advisories
+e) Dedicated section with contact details for emergency personnel, hospital information, and local embassy and travel advisories.
 
 4. WON'T-HAVE
 

@@ -1,5 +1,6 @@
 package uk.ac.aber.dcs.chm9360.travelbuddy.ui.friends
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -99,12 +100,14 @@ fun SocialScreen(
 
     LaunchedEffect(phrases) {
         firebaseViewModel.fetchPhrases()
+        firebaseViewModel.fetchTrips()
     }
 
     LaunchedEffect(trips) {
         trips.forEach { trip ->
             retrofitViewModel.fetchImage(trip.destination)
         }
+        Log.d("FETCHED TRIPS", "Fetched trip $trips")
     }
 
     TopLevelScaffold(
@@ -156,7 +159,8 @@ fun SocialScreen(
                                         TripCard(
                                             trip = trip,
                                             imageUrl = imageUrls[trip.destination],
-                                            isLoading = imageLoadingStates[trip.destination] ?: false,
+                                            isLoading = imageLoadingStates[trip.destination]
+                                                ?: false,
                                             onItemClick = {
                                                 Utils.trip = trip
                                                 navController.navigate(Screens.TripDetails.route)

@@ -61,7 +61,12 @@ fun EditTripPlanScreen(
 
     var place by rememberSaveable { mutableStateOf(tripPlanItem.place) }
     var dateOfVisit by rememberSaveable {
-        mutableStateOf(LocalDate.parse(tripPlanItem.dateOfVisit, DateTimeFormatter.ofPattern("dd-MM-yyyy")))
+        mutableStateOf(
+            LocalDate.parse(
+                tripPlanItem.dateOfVisit,
+                DateTimeFormatter.ofPattern("dd-MM-yyyy")
+            )
+        )
     }
     val loading by retrofitViewModel.loading.collectAsState()
     var isDropdownVisible by rememberSaveable { mutableStateOf(false) }
@@ -91,7 +96,8 @@ fun EditTripPlanScreen(
                             Utils.trip = it.copy(tripPlans = it.tripPlans.map { plan ->
                                 if (plan.id == tripPlanItem.id) updatedTripPlan else plan
                             })
-                            Toast.makeText(context, R.string.trip_plan_updated, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, R.string.trip_plan_updated, Toast.LENGTH_SHORT)
+                                .show()
                             navController.popBackStack()
                         }
                     }
@@ -133,7 +139,10 @@ fun EditTripPlanScreen(
                             keyboardController?.hide()
                         }
                     ) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.delete_icon))
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.delete_icon)
+                        )
                     }
                 }
             },

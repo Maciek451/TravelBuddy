@@ -36,15 +36,20 @@ class MyNavigationBarTest {
 
     @Test
     fun navigationBarItems_areDisplayed() {
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.add)).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.my_trips)).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.explore)).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.social)).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.add))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.my_trips))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.explore))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.social))
+            .assertIsDisplayed()
     }
 
     @Test
     fun clickingAddSheetButton_showsBottomSheet() {
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.add)).performClick()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.add))
+            .performClick()
         composeTestRule.onNodeWithTag("AddTrip").assertIsDisplayed()
         composeTestRule.onNodeWithTag("AddPhrase").assertIsDisplayed()
         composeTestRule.onNodeWithTag("AddFriend").assertIsDisplayed()

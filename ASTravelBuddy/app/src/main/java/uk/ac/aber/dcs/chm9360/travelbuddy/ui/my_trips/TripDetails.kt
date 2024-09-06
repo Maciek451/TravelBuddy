@@ -312,7 +312,9 @@ fun TripDetailsScreen(
 
                 if ((currentUser?.username == trip.author)) {
                     Text(
-                        text = if (trip.shared) stringResource(R.string.status_public) else stringResource(R.string.status_private),
+                        text = if (trip.shared) stringResource(R.string.status_public) else stringResource(
+                            R.string.status_private
+                        ),
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)

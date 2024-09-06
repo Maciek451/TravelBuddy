@@ -61,9 +61,11 @@ fun TripMapScreen(
             }
         }
     ) { innerPadding ->
-        MapComposable(context = context,
+        MapComposable(
+            context = context,
             centerMarker = destinationMarker!!,
             placesMarkers = tripMarkers,
-            innerPadding = innerPadding)
+            innerPadding = innerPadding
+        )
     }
 }

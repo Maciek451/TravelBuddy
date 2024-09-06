@@ -49,7 +49,8 @@ fun AccountScreen(
 ) {
     val appBarTitle = stringResource(id = R.string.account)
     val navigateToFriendsList: () -> Unit = { navController.navigate(Screens.FriendsList.route) }
-    val navigateToTermsOfService: () -> Unit = { navController.navigate(Screens.TermsOfService.route) }
+    val navigateToTermsOfService: () -> Unit =
+        { navController.navigate(Screens.TermsOfService.route) }
     val navigateToAbout: () -> Unit = { navController.navigate(Screens.About.route) }
 
     val authState by firebaseViewModel.authState.collectAsState()
@@ -82,7 +83,12 @@ fun AccountScreen(
     )
 
     Column {
-        AppBarWithArrowBack(navController, appBarTitle = appBarTitle, showSignOut = true, showMoreIcon = false)
+        AppBarWithArrowBack(
+            navController,
+            appBarTitle = appBarTitle,
+            showSignOut = true,
+            showMoreIcon = false
+        )
         UserCard(username ?: "", email, monogram)
         Button(
             onClick = {
